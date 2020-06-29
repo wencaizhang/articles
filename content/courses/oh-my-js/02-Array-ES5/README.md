@@ -1,3 +1,19 @@
+---
+title: ES5 新增数组方法总览
+linktitle: ES5 新增数组方法总览
+toc: true
+type: docs
+date: "2019-05-05T00:00:00+01:00"
+draft: false
+menu:
+  oh-my-js:
+    parent: Array ES5
+    weight: 1
+
+# Prev/next pager order (if `docs_section_pager` enabled in `params.toml`)
+weight: 1
+---
+
 # ES5 新增数组方法总览
 
 ES5 新增了一些数组方法，灵活运用这些方法可以让我们少些很多代码，而且可以在**一定程度上替代** underscore/lodash 等工具库。
