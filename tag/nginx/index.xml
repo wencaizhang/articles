@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>nginx | 阿文的网络空间</title><link>/tag/nginx/</link><atom:link href="/tag/nginx/index.xml" rel="self" type="application/rss+xml"/><description>nginx</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Sat, 16 Nov 2019 11:16:00 +0800</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>nginx</title><link>/tag/nginx/</link></image><item><title>Basic Usage of Nginx</title><link>/post/2019/2019-11-16-basic-usage-of-nginx/</link><pubDate>Sat, 16 Nov 2019 11:16:00 +0800</pubDate><guid>/post/2019/2019-11-16-basic-usage-of-nginx/</guid><description>&lt;h2 id="安装">安装&lt;/h2>
+&lt;pre>&lt;code class="language-bash"># ubuntu
+sudo apt install nginx -y
+&lt;/code>&lt;/pre>
+&lt;h2 id="命令">命令&lt;/h2>
+&lt;h3 id="nginx命令">nginx 命令&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th align="left">描述&lt;/th>
+&lt;th align="left">命令&lt;/th>
+&lt;th align="left">命令二&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td align="left">启动&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">停止&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx -s stop&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -s stop&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">重启&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx -s restart&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -s restart&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">重载配置文件&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx -s reload&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -s reload&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="nginx目录">nginx 目录&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th align="left">描述&lt;/th>
+&lt;th align="left">命令&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td align="left">nginx 安装目录&lt;/td>
+&lt;td align="left">&lt;code>/usr/sbin/nginx&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">默认网站根目录&lt;/td>
+&lt;td align="left">&lt;code>/usr/share/nginx/html&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">配置文件&lt;/td>
+&lt;td align="left">&lt;code>/etc/nginx/nginx.conf &lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="查找nginx安装目录的命令">查找 nginx 安装目录的命令&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th align="left">描述&lt;/th>
+&lt;th align="left">命令&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td align="left">查找 nginx 安装目录&lt;/td>
+&lt;td align="left">&lt;code>which nginx&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">查找 nginx 配置文件&lt;/td>
+&lt;td align="left">&lt;code>sudo find / -name nginx.conf&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">检测配置文件语法是否正确：&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -t&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="常见使用场景">常见使用场景&lt;/h2>
+&lt;h3 id="一-静态网站">(一) 静态网站&lt;/h3>
+&lt;p>指定域名和对应的网站根目录位置，&lt;code>server_name&lt;/code> 可以是域名、二级域名，也可以是 ip 地址。&lt;/p>
+&lt;pre>&lt;code>server {
+listen 80;
+server_name demo.example.com;
+location / {
+root /www/demo/;
+index index.html index.htm;
+}
+}
+&lt;/code>&lt;/pre>
+&lt;h3 id="二-反向代理">(二) 反向代理&lt;/h3>
+&lt;p>场景：&lt;/p>
+&lt;ul>
+&lt;li>解决跨域问题，利用 nginx 来访问其他域名下的接口&lt;/li>
+&lt;li>当 docker 服务的端口映射到宿主机上某个端口（如 8080）时，可以设置二级域名代理 8080 端口。&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code>server {
+server_name docker.example.com;
+listen 80;
+location / {
+proxy_pass http://localhost:8000;
+proxy_set_header Host $host;
+proxy_set_header X-Forward-For $remote_addr;
+}
+}
+&lt;/code>&lt;/pre>
+&lt;h3 id="三-负载均衡">(三) 负载均衡&lt;/h3>
+&lt;pre>&lt;code>upstream backend {
+server backend1.example.com weight=5;
+server backend2.example.com:8080;
+server unix:/tmp/backend3;
+}
+server {
+location / {
+proxy_pass http://backend;
+}
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="一些学习资源">一些学习资源&lt;/h2>
+&lt;p>
+&lt;a href="http://www.nginx.cn/doc/" target="_blank" rel="noopener">Nginx中文文档&lt;/a>&lt;/p></description></item></channel></rss>

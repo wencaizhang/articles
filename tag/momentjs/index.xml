@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>momentjs | 阿文的网络空间</title><link>/tag/momentjs/</link><atom:link href="/tag/momentjs/index.xml" rel="self" type="application/rss+xml"/><description>momentjs</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Tue, 19 Nov 2019 17:04:31 +0800</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>momentjs</title><link>/tag/momentjs/</link></image><item><title>Get the Beginning and Ending in a Unit of Time via Momentjs</title><link>/post/2019/2019-11-19-get-the-beginning-and-ending-in-a-unit-of-time-via-momentjs/</link><pubDate>Tue, 19 Nov 2019 17:04:31 +0800</pubDate><guid>/post/2019/2019-11-19-get-the-beginning-and-ending-in-a-unit-of-time-via-momentjs/</guid><description>&lt;blockquote>
+&lt;p>根据 &lt;code>moment.js&lt;/code> 得到一个单位时间或者时间段（如本周，上周，本月，上月，当前季度，上个季度）的开始结束时间&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;a href="https://momentjs.com/" target="_blank" rel="noopener">momentjs 文档&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>主要利用以下几项 API：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>format()&lt;/code>: 得到格式化的时间&lt;/li>
+&lt;li>&lt;code>startOf()&lt;/code>: 得到一个单位时间的开始时间点，
+&lt;a href="https://momentjs.com/docs/#/manipulating/start-of/" target="_blank" rel="noopener">文档&lt;/a>&lt;/li>
+&lt;li>&lt;code>endOf()&lt;/code>: 得到一个单位时间的结束时间点&lt;/li>
+&lt;li>&lt;code>add()&lt;/code>: 在指定时间点的基础上，加上一个时间段&lt;/li>
+&lt;li>&lt;code>subtract()&lt;/code>: 在指定时间点的基础上，减去一个时间段&lt;/li>
+&lt;li>&lt;code>week()&lt;/code>: 获取或设置一个时间对象的周数（第几周）&lt;/li>
+&lt;li>&lt;code>month()&lt;/code>: 获取或设置一个时间对象的月份&lt;/li>
+&lt;li>&lt;code>quarter()&lt;/code>: 获取或设置一个时间对象的季度&lt;/li>
+&lt;/ul>
+&lt;h2 id="天">天&lt;/h2>
+&lt;pre>&lt;code class="language-js">// 获取当天开始结束时间
+function getCurrDays () {
+let date = moment()
+let start = date.startOf('days').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('days').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 获取昨天的开始结束时间
+function getYesterday () {
+let date = moment().subtract('days',1);
+let start = date.startOf('days').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('days').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 获取明天的开始结束时间
+function getTomorrow () {
+let date = moment().add('days',1);
+let start = date.startOf('days').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('days').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="周">周&lt;/h2>
+&lt;p>获取某一周（本周，上周，下周）的开始结束时间，一周从周日开始到周六结束。&lt;/p>
+&lt;pre>&lt;code class="language-js">// 本周
+function getCurrWeekDays () {
+let date = moment()
+let start = date.startOf('week').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('week').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 上一周
+function getLastWeekDays () {
+let date = moment().week(moment().week() - 1)
+let start = date.startOf('week').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('week').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 下一周
+function getNextWeekDays () {
+let date = moment().week(moment().week() + 1)
+let start = date.startOf('week').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('week').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="月">月&lt;/h2>
+&lt;pre>&lt;code class="language-js">// 本月
+function getCurrMonthDays () {
+let date = moment()
+let start = date.startOf('month').format('YYYY-MM-DD')
+let end = date.endOf('month').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 上个月
+function getLastMonthDays () {
+let date = moment().month(moment().month() - 1)
+let start = date.startOf('month').format('YYYY-MM-DD')
+let end = date.endOf('month').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 下个月
+function getNextMonthDays () {
+let date = moment().month(moment().month() + 1)
+let start = date.startOf('month').format('YYYY-MM-DD')
+let end = date.endOf('month').format('YYYY-MM-DD')
+return [ start, end ];
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="季度">季度&lt;/h2>
+&lt;pre>&lt;code class="language-js">// 当前季度
+function getCurrQuarter () {
+let date = moment()
+let start = date.startOf('quarter').format('YYYY-MM-DD')
+let end = date.endOf('quarter').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 上个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() - 1)
+let start = date.startOf('quarter').format('YYYY-MM-DD')
+let end = date.endOf('quarter').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 下个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() + 1)
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="dry--">DRY -&lt;/h2>
+&lt;blockquote>
+&lt;p>Don&amp;rsquo;t repeat yourself.&lt;/p>
+&lt;/blockquote>
+&lt;p>上面代码中可以看到有一个固定结构重复了好多次：&lt;/p>
+&lt;pre>&lt;code class="language-js">function getX () {
+let date = x
+let start = date.startOf('时间单位类型').format('格式化')
+let end = date.endOf('时间单位类型').format('格式化')
+return [ start, end ];
+}
+&lt;/code>&lt;/pre>
+&lt;p>所以我们可以专门封装一个函数，接收三个参数（时间，时间单位，格式化），返回开始和结束时间。&lt;/p>
+&lt;pre>&lt;code class="language-js">function getDuringTime (date, type, format) {
+let start = date.startOf(type).format(format)
+let end = date.endOf(type).format(format)
+return [ start, end ];
+}
+&lt;/code>&lt;/pre>
+&lt;p>有了此工具函数，将上面代码汇总如下：&lt;/p>
+&lt;pre>&lt;code class="language-js">/**
+* @param {date} date [momentjs 时间对象]
+* @param {String} type [单位时间类型]
+* @param {String} format [时间格式]
+* type 可以接收的值： year, month, quarter, week, isoWeek, day, date, hour, minute, second
+*/
+function getDuringTime (date=moment(), type='days', format='YYYY-MM-DD HH:mm:ss') {
+let start = date.startOf(type).format(format)
+let end = date.endOf(type).format(format)
+return [ start, end ];
+}
+// 获取当天开始结束时间
+function getCurrDays () {
+let date = moment()
+return getDuringTime(date, 'days', 'YYYY-MM-DD')
+}
+// 获取昨天的开始结束时间
+function getYesterday () {
+let date = moment().subtract('days',1)
+return getDuringTime(date, 'days', 'YYYY-MM-DD')
+}
+// 获取明天的开始结束时间
+function getTomorrow () {
+let date = moment().add('days',1)
+return getDuringTime(date, 'days', 'YYYY-MM-DD')
+}
+// 获取某一周（本周，上周，下周）的开始结束时间，一周从周日开始到周六结束。
+// 本周
+function getCurrWeekDays () {
+let date = moment()
+return getDuringTime(date, 'week', 'YYYY-MM-DD')
+}
+// 上一周
+function getLastWeekDays () {
+let date = moment().week(moment().week() - 1)
+return getDuringTime(date, 'week', 'YYYY-MM-DD')
+}
+// 下一周
+function getNextWeekDays () {
+let date = moment().week(moment().week() + 1)
+return getDuringTime(date, 'week', 'YYYY-MM-DD')
+}
+// 本月
+function getCurrMonthDays () {
+let date = moment()
+return getDuringTime(date, 'month', 'YYYY-MM-DD')
+}
+// 上个月
+function getLastMonthDays () {
+let date = moment().month(moment().month() - 1)
+return getDuringTime(date, 'month', 'YYYY-MM-DD')
+}
+// 下个月
+function getNextMonthDays () {
+let date = moment().month(moment().month() + 1)
+return getDuringTime(date, 'month', 'YYYY-MM-DD')
+}
+// 当前季度
+function getCurrQuarter () {
+let date = moment()
+return getDuringTime(date, 'quarter', 'YYYY-MM-DD')
+}
+// 上个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() - 1)
+return getDuringTime(date, 'quarter', 'YYYY-MM-DD')
+}
+// 下个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() + 1)
+return getDuringTime(date, 'quarter', 'YYYY-MM-DD')
+}
+&lt;/code>&lt;/pre>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item></channel></rss>

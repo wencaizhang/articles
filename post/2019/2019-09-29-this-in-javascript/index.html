@@ -1,0 +1,188 @@
+<!doctype html><html lang=zh-hans><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=generator content="Source Themes Academic 4.8.0"><meta name=author content="前端果酱"><meta name=description content="JavaScript 中的 this 总是指向一个对象，而具体指向哪个对象是在函数运行时的环境动态绑定的，而非函数被声明时的环境。
+但是 ES6 标准新增的箭头函数中的 this 却是由被声明的环境即上下文来确定的。
+this 的指向大致分为下面 5 种：
+ 作为对象的方法调用 作为普通函数调用 作为构造器调用 通过 call 和 apply 调用 箭头函数  情况一：作为普通函数调用 当函数作为普通函数或者匿名函数调用时，this 总是指向全局对象，在浏览器中这个全局对象是 window，在 nodejs 中全局对象是 global，这里讨论的是浏览器端，所有代码都可以在 chrome 开发者工具的 console 面板中执行。"><link rel=alternate hreflang=zh-hans href=/post/2019/2019-09-29-this-in-javascript/><meta name=theme-color content="#2962ff"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin=anonymous><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin=anonymous><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin=anonymous><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/github.min.css crossorigin=anonymous title=hl-light><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/dracula.min.css crossorigin=anonymous title=hl-dark disabled><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin=anonymous><script src=https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin=anonymous async></script><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap"><link rel=stylesheet href=/css/academic.css><link rel=manifest href=/index.webmanifest><link rel=icon type=image/png href=/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png><link rel=apple-touch-icon type=image/png href=/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png><link rel=canonical href=/post/2019/2019-09-29-this-in-javascript/><meta property="twitter:card" content="summary"><meta property="og:site_name" content="阿文的网络空间"><meta property="og:url" content="/post/2019/2019-09-29-this-in-javascript/"><meta property="og:title" content="JavaScript 中 this 总结 | 阿文的网络空间"><meta property="og:description" content="JavaScript 中的 this 总是指向一个对象，而具体指向哪个对象是在函数运行时的环境动态绑定的，而非函数被声明时的环境。
+但是 ES6 标准新增的箭头函数中的 this 却是由被声明的环境即上下文来确定的。
+this 的指向大致分为下面 5 种：
+ 作为对象的方法调用 作为普通函数调用 作为构造器调用 通过 call 和 apply 调用 箭头函数  情况一：作为普通函数调用 当函数作为普通函数或者匿名函数调用时，this 总是指向全局对象，在浏览器中这个全局对象是 window，在 nodejs 中全局对象是 global，这里讨论的是浏览器端，所有代码都可以在 chrome 开发者工具的 console 面板中执行。"><meta property="og:image" content="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png"><meta property="twitter:image" content="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="zh-Hans"><meta property="article:published_time" content="2019-09-29T14:49:00+00:00"><meta property="article:modified_time" content="2019-09-29T14:49:00+00:00"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"/post/2019/2019-09-29-this-in-javascript/"},"headline":"JavaScript 中 this 总结","datePublished":"2019-09-29T14:49:00Z","dateModified":"2019-09-29T14:49:00Z","author":{"@type":"Person","name":"前端果酱"},"publisher":{"@type":"Organization","name":"阿文的网络空间","logo":{"@type":"ImageObject","url":"/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png"}},"description":"JavaScript 中的 this 总是指向一个对象，而具体指向哪个对象是在函数运行时的环境动态绑定的，而非函数被声明时的环境。\n但是 ES6 标准新增的箭头函数中的 this 却是由被声明的环境即上下文来确定的。\nthis 的指向大致分为下面 5 种：\n 作为对象的方法调用 作为普通函数调用 作为构造器调用 通过 call 和 apply 调用 箭头函数  情况一：作为普通函数调用 当函数作为普通函数或者匿名函数调用时，this 总是指向全局对象，在浏览器中这个全局对象是 window，在 nodejs 中全局对象是 global，这里讨论的是浏览器端，所有代码都可以在 chrome 开发者工具的 console 面板中执行。"}</script><title>JavaScript 中 this 总结 | 阿文的网络空间</title></head><body id=top data-spy=scroll data-offset=70 data-target=#TableOfContents><aside class=search-results id=search><div class=container><section class=search-header><div class="row no-gutters justify-content-between mb-3"><div class=col-6><h1>搜索</h1></div><div class="col-6 col-search-close"><a class=js-search href=#><i class="fas fa-times-circle text-muted" aria-hidden=true></i></a></div></div><div id=search-box><input name=q id=search-query placeholder=搜索... autocapitalize=off autocomplete=off autocorrect=off spellcheck=false type=search></div></section><section class=section-search-results><div id=search-hits></div></section></div></aside><nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id=navbar-main><div class=container><div class="d-none d-lg-inline-flex"><a class=navbar-brand href=/>阿文的网络空间</a></div><button type=button class=navbar-toggler data-toggle=collapse data-target=#navbar-content aria-controls=navbar aria-expanded=false aria-label=切换导航>
+<span><i class="fas fa-bars"></i></span></button><div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none"><a class=navbar-brand href=/>阿文的网络空间</a></div><div class="navbar-collapse main-menu-item collapse justify-content-start" id=navbar-content><ul class="navbar-nav d-md-inline-flex"><li class=nav-item><a class=nav-link href=/#posts><span>技术文章</span></a></li><li class=nav-item><a class=nav-link href=/#projects><span>个人项目</span></a></li><li class=nav-item><a class=nav-link href=/doc><span>我的文档</span></a></li></ul></div><ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2"><li class=nav-item><a class="nav-link js-search" href=# aria-label=搜索><i class="fas fa-search" aria-hidden=true></i></a></li><li class="nav-item dropdown theme-dropdown"><a href=# class="nav-link js-theme-selector" data-toggle=dropdown aria-haspopup=true><i class="fas fa-palette" aria-hidden=true></i></a><div class=dropdown-menu><a href=# class="dropdown-item js-set-theme-light"><span>Light</span></a>
+<a href=# class="dropdown-item js-set-theme-dark"><span>Dark</span></a>
+<a href=# class="dropdown-item js-set-theme-auto"><span>Automatic</span></a></div></li></ul></div></nav><article class=article><div class="article-container pt-3"><h1>JavaScript 中 this 总结</h1><div class=article-metadata><span class=article-date>Sep 29, 2019</span>
+<span class=middot-divider></span><span class=article-reading-time>4 分钟阅读时长</span></div></div><div class=article-container><div class=article-style><p>JavaScript 中的 <code>this</code> 总是指向一个对象，而具体指向哪个对象是在函数运行时的环境动态绑定的，而非函数被声明时的环境。</p><p>但是 ES6 标准新增的箭头函数中的 <code>this</code> 却是由被声明的环境即上下文来确定的。</p><p><code>this</code> 的指向大致分为下面 5 种：</p><ul><li>作为对象的方法调用</li><li>作为普通函数调用</li><li>作为构造器调用</li><li>通过 <code>call</code> 和 <code>apply</code> 调用</li><li>箭头函数</li></ul><h2 id=情况一作为普通函数调用>情况一：作为普通函数调用</h2><p>当函数作为普通函数或者匿名函数调用时，<code>this</code> 总是指向全局对象，在浏览器中这个全局对象是 <code>window</code>，在 nodejs 中全局对象是 <code>global</code>，这里讨论的是浏览器端，所有代码都可以在 chrome 开发者工具的 console 面板中执行。</p><p>ES5 规范提出了「严格模式」，在整个脚本文件第一行或者函数内第一行添加一条语句 <code>'use strict';</code> 即可开启严格模式。</p><p>如果启用「严格模式」，那么 <code>this</code> 就不再是指向全局对象，而是 <code>undefined</code> 。</p><p><strong>1) 普通函数：</strong></p><pre><code class=language-js>window.name = 'global name';
+
+function printName1 () {
+  console.log(this === window);  // true
+  console.log(this.name);  // &quot;global object&quot;
+}
+function printName2 () {
+  &quot;use strict&quot;; // 启用严格模式
+  console.log(this);  // undefined
+}
+
+printName1();
+printName2();
+</code></pre><p><strong>2) 匿名函数：</strong></p><p>匿名函数自执行，这种形式封装公用库的时候最常见：</p><pre><code class=language-js>window.name = 'global name';
+(function () {
+  console.log(this === window);  // true
+  console.log(this.name);  // &quot;global object&quot;
+})()
+</code></pre><p>作为参数的匿名函数：</p><pre><code class=language-js>window.name = 'global name';
+
+setTimeout(function () {
+  console.log(this === window);  // true
+  console.log(this.name);  // &quot;global object&quot;
+}, 100);
+
+[1, 2, 3].forEach(function (item) {
+  console.log(item, this.name)
+  // 1 &quot;global name&quot;
+  // 2 &quot;global name&quot;
+  // 3 &quot;global name&quot;
+});
+</code></pre><h2 id=情况二作为对象的方法调用>情况二：作为对象的方法调用</h2><p>当函数作为对象当属性方法调用时，<code>this</code> 总指向这个对象。</p><pre><code class=language-js>var obj = {
+  name: 'obj',
+  printName: function () {
+    console.log(this === obj);  // true
+    console.log(this.name);  // &quot;obj&quot;
+  }
+}
+
+obj.printName();
+</code></pre><p>但是如果一个对象的属性方法又赋值给了其他变量，那么 <code>this</code> 将发生变化，其指向只有在函数执行那一刻才能确定。例如：</p><pre><code class=language-js>var obj = {
+  name: 'obj',
+  printName: function () {
+    console.log(this === obj);  // true
+    console.log(this.name);  // &quot;obj&quot;
+  }
+}
+
+var myPrintName = obj.printName;
+window.name = 'global name';
+
+myPrintName();
+// false
+// &quot;global name&quot;
+</code></pre><p>当 <code>myPrintName</code> 执行时，就要按照普通函数来判断 <code>this</code> 指向了。</p><p>再来一个例子：</p><pre><code class=language-js>var obj = {
+  name: 'obj',
+  printName: function () {
+    console.log(this === obj);  // true
+    console.log(this.name);  // &quot;obj&quot;
+  }
+}
+
+var obj2 = {
+  name: 'obj2',
+}
+obj2.printName = obj.printName;
+
+obj2.printName();
+// false
+// &quot;obj2&quot;
+</code></pre><p>当 <code>obj2.printName</code> 执行时，<code>printName</code> 是作为 <code>obj2</code> 的属性方法来调用的，因此 <code>this</code> 指向 <code>obj2</code> 这个对象。</p><p>所以说，JavaScript 中的 this 指向无法在定义时判断，只有在其执行时才能判断。</p><h2 id=情况三作为构造器调用>情况三：作为构造器调用</h2><p>在 JavaScript 中没有「类」的概念（直到 ES6 才有类的出现），而是把函数作为构造器，通过 new 操作符来生成实例。</p><p>那么在构造函数中 <code>this</code> 就指向新生成的实例。</p><pre><code class=language-js>var MyClass = function () {
+  // 给实例添加 name 属性
+  this.name = 'myclass'
+  this.printName = function () {
+    return this.name
+  }
+}
+var obj = new MyClass()
+obj.printName() // &quot;myclass&quot;
+</code></pre><h2 id=情况四显式指定-this>情况四：显式指定 <code>this</code></h2><p>前面的几种方法都是被动地根据代码执行时的环境来判断 <code>this</code> 具体指向哪里，那么有没有办法主动指定 <code>this</code> 指向呢。</p><p>答案当然是有的，甚至它们的出场率还相当高。</p><p>常见的显式指定 <code>this</code> 的方法主要是 <code>call</code>，<code>apply</code> 和 <code>bind</code> 来，在函数式编程中几乎离不开这三个方法。</p><p>先定义如下变量：</p><pre><code class=language-js>window.name = 'global name'
+function printName () {
+  console.log(this.name)
+}
+
+var obj1 = { name: 'obj1' }
+var obj2 = { name: 'obj2' }
+var obj3 = { name: 'obj3' }
+</code></pre><p>默认情况 this 指向全局对象 window</p><pre><code class=language-js>printName()  // &quot;global name&quot;
+</code></pre><p>使用 <code>call</code> 来改变 <code>this</code> 指向：</p><pre><code class=language-js>printName.call(obj1)  // &quot;obj1&quot;
+</code></pre><p>使用 <code>apply</code> 来改变 <code>this</code> 指向：</p><pre><code class=language-js>printName.apply(obj2)  // &quot;obj2&quot;
+</code></pre><p>使用 <code>bind</code> 来改变 <code>this</code> 指向：</p><pre><code class=language-js>var printName2 = printName.bind(obj3)
+printName2()  // &quot;obj3&quot;
+</code></pre><p>除此之外，还有一些函数也可以修改 this 指向，例如：forEach, map, filter, some, every 等。以 <code>forEach</code> 为例：</p><pre><code class=language-js>var obj = { name: 'zwc' }
+var arr = [ 1, 2 ]
+
+arr.forEach(function (item, index) {
+  console.log(item, this)
+})
+// 1 Window
+// 2 Window
+
+arr.forEach(function (item, index) {
+  console.log(item, this)
+}, obj)
+// 1 {name: &quot;zwc&quot;}
+// 2 {name: &quot;zwc&quot;}
+</code></pre><p><code>forEach</code> 第一个参数接收一个函数作为迭代器，用来处理数组中每一项元素，这个函数通常是一个匿名函数，函数内部的 <code>this</code> 指向全局对象。</p><p><code>forEach</code> 第二个参数可以接收一个对象，这个对象就是参数函数中的 <code>this</code> 指向。</p><p>根据打印结果可以看到，在 <code>forEach</code> 的迭代器函数中的 <code>this</code> 已经指向了 <code>obj</code> 。</p><h2 id=情况五es6箭头函数>情况五：ES6箭头函数</h2><h3 id=箭头函数简介>箭头函数简介</h3><p>ES6 允许使用「箭头」（=>）定义函数。</p><pre><code class=language-js>var f = v =&gt; v;
+
+// 等同于
+var f = function (v) {
+  return v;
+};
+</code></pre><p>除了形式更简洁之外，箭头函数没有自己的 <code>this</code>，而是<strong>从自己作用域链的上一层继承 <code>this</code></strong>。</p><blockquote><p><strong>箭头函数总是从自己作用域链的上一层继承 <code>this</code>。</strong></p><p>神马意思呢？我的理解就是箭头函数内部的 <code>this</code> 指向永远是箭头函数被定义时所在的作用域的 <code>this</code>，并且无法修改。</p></blockquote><h3 id=无法绑定-this>无法绑定 this</h3><p>使用 call 来调用箭头函数时，第一个参数会被忽略，也就是说无法修改 this 指向。apply 和 bind 也是同样现象。</p><pre><code class=language-js>var printName = () =&gt; {
+  console.log(this === window); // true
+}
+
+var obj = { name: 'obj' }
+
+printName.call(obj);
+</code></pre><h3 id=例子一>例子一</h3><p>来看一个例子，在不使用箭头函数的情况下，我们知道构造器函数内部 this 指向对象实例，而匿名函数的 this 是指向全局对象的，因此想要通过定时器打印对象实例的 <code>age</code> 属性，只能用一个变量 <code>self</code> 保存 <code>this</code> 的引用（即闭包）</p><pre><code class=language-js>function Person(){
+  // 构造器函数内部 this 指向对象实例
+  this.age = 0;
+  var self = this;
+  setInterval(function () {
+    // 匿名函数中 this 指向全局对象
+    console.log(self.age++)
+  }, 1000);
+}
+
+var p = new Person();
+</code></pre><p>使用箭头函数之后，因为箭头函数的 <code>this</code> 继承自其被定义时所在环境的 <code>this</code>，在本例中这个 this 就是实例对象：</p><pre><code class=language-js>function Person(){
+  // 构造器函数内部 this 指向对象实例
+  this.age = 0;
+  setInterval(() =&gt; {
+    // 这里的 this 也指向构造函数的 this
+    console.log(this.age++)
+  }, 1000);
+}
+
+var p = new Person();
+</code></pre><h3 id=例子二>例子二</h3><p>再说一个更实用的例子：在 Vue.js 中使用箭头函数</p><pre><code class=language-js>import axios from 'axios';
+export default {
+  methods: {
+    fetch () {
+      axios.get('/userinfo')
+      .then(resp =&gt; {
+        this.sayHi();  // this 指向 vue 实例
+      })
+      .catch(err =&gt; {
+        this.sayHi();  // this 指向 vue 实例
+      })
+    },
+    sayHi () {
+      setTimeout(() =&gt; {
+        // this 指向 vue 实例
+      }, 1000);
+    }
+  }
+}
+</code></pre><p>使用箭头函数之后，再也无需缓存 vue 实例，像是 <code>var vm = this;</code> 这种代码统统可以消灭掉，嗯，清爽！</p><h2 id=相关链接>相关链接</h2><ul><li><p><a href=https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Strict_mode target=_blank rel=noopener>严格模式 - MDN</a></p></li><li><p><a href=https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/arrow_functions target=_blank rel=noopener>箭头函数 - MDN</a></p></li><li><p><a href=http://es6.ruanyifeng.com/#docs/function#%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0 target=_blank rel=noopener>箭头函数 - ES6 入门</a></p></li></ul><h2 id=总结>总结</h2><p>在箭头函数出现之前，每一个新函数根据<strong>它是被如何调用的</strong>来定义这个函数的 <code>this</code> 值：</p><ul><li>如果是该函数是一个普通函数或者匿名函数<ul><li>在严格模式下的函数调用下，<code>this</code> 指向 <code>undefined</code>，</li><li>在非严格模式的函数调用中，<code>this</code> 指向全局对象，浏览器中全局对象是 <code>window</code> ，在 nodejs 中全局对象是 <code>global</code></li></ul></li><li>如果是该函数是一个构造函数，<code>this</code> 指针指向一个新的对象（实例）</li><li>如果是该函数是一个对象的方法，则它的<code>this</code> 指针指向这个对象</li><li>或者使用 <code>call</code> <code>apply</code> 等方法显式指定 <code>this</code> 的指向</li></ul><p>在箭头函数中，则是根据箭头函数上下文决定其 this 指向，且无法修改 <code>this</code> 指向。</p><hr><p>本文完，感谢阅读。😜</p></div><div class=article-tags><a class="badge badge-light" href=/tag/js/>js</a>
+<a class="badge badge-light" href=/tag/this%E6%8C%87%E5%90%91/>this指向</a></div><div class=share-box aria-hidden=true><ul class=share><li><a href="https://twitter.com/intent/tweet?url=/post/2019/2019-09-29-this-in-javascript/&text=JavaScript%20%e4%b8%ad%20this%20%e6%80%bb%e7%bb%93" target=_blank rel=noopener class=share-btn-twitter><i class="fab fa-twitter"></i></a></li><li><a href="https://www.facebook.com/sharer.php?u=/post/2019/2019-09-29-this-in-javascript/&t=JavaScript%20%e4%b8%ad%20this%20%e6%80%bb%e7%bb%93" target=_blank rel=noopener class=share-btn-facebook><i class="fab fa-facebook"></i></a></li><li><a href="mailto:?subject=JavaScript%20%e4%b8%ad%20this%20%e6%80%bb%e7%bb%93&body=/post/2019/2019-09-29-this-in-javascript/" target=_blank rel=noopener class=share-btn-email><i class="fas fa-envelope"></i></a></li><li><a href="https://www.linkedin.com/shareArticle?url=/post/2019/2019-09-29-this-in-javascript/&title=JavaScript%20%e4%b8%ad%20this%20%e6%80%bb%e7%bb%93" target=_blank rel=noopener class=share-btn-linkedin><i class="fab fa-linkedin-in"></i></a></li><li><a href="whatsapp://send?text=JavaScript%20%e4%b8%ad%20this%20%e6%80%bb%e7%bb%93%20/post/2019/2019-09-29-this-in-javascript/" target=_blank rel=noopener class=share-btn-whatsapp><i class="fab fa-whatsapp"></i></a></li><li><a href="https://service.weibo.com/share/share.php?url=/post/2019/2019-09-29-this-in-javascript/&title=JavaScript%20%e4%b8%ad%20this%20%e6%80%bb%e7%bb%93" target=_blank rel=noopener class=share-btn-weibo><i class="fab fa-weibo"></i></a></li></ul></div><div class="media author-card content-widget-hr"><img class="avatar mr-3 avatar-circle" src=/author/%E5%89%8D%E7%AB%AF%E6%9E%9C%E9%85%B1/avatar_hu52a603635ecebd45650b162dadabb4e5_12861_270x270_fill_q90_lanczos_center.jpg alt=前端果酱><div class=media-body><h5 class=card-title><a href=/>前端果酱</a></h5><h6 class=card-subtitle>前端开发工程师</h6><p class=card-text>擅长 HTML、CSS、JavaScript、Vue.js.</p><ul class=network-icon aria-hidden=true><li><a href=https://github.com/wencaizhang target=_blank rel=noopener><i class="fab fa-github"></i></a></li></ul></div></div></div></article><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/languages/r.min.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.js integrity="sha256-EErZamuLefUnbMBQbsEqu1USa+btR2oIlCpBJbyD4/g=" crossorigin=anonymous></script><script>const code_highlighting=true;</script><script>const isSiteThemeDark=false;</script><script>const search_config={"indexURI":"/index.json","minLength":1,"threshold":0.3};const i18n={"no_results":"没有找到结果","placeholder":"搜索...","results":"搜索结果"};const content_type={'post':"文章",'project':"项目",'publication':"出版物",'talk':"演讲",'slides':"演示文稿"};</script><script id=search-hit-fuse-template type=text/x-template>
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script><script src=https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin=anonymous></script><script src=/js/academic.min.66c553246b0f279a03be6e5597f72b52.js></script><div class=container><footer class=site-footer><p class=powered-by></p><p class=powered-by>Powered by the
+<a href=https://sourcethemes.com/academic/ target=_blank rel=noopener>Academic theme</a> for
+<a href=https://gohugo.io target=_blank rel=noopener>Hugo</a>.
+<span class=float-right aria-hidden=true><a href=# class=back-to-top><span class=button_icon><i class="fas fa-chevron-up fa-2x"></i></span></a></span></p><p>本站由
+<a style=display:inline-block;vertical-align:bottom href="https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral" target=_blank><img style=height:30px src=/img/upyun_logos/又拍云_logo2.png alt></a>
+提供CDN加速/云存储服务</p></footer></div><div id=modal class="modal fade" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><h5 class=modal-title>引用</h5><button type=button class=close data-dismiss=modal aria-label=Close>
+<span aria-hidden=true>&#215;</span></button></div><div class=modal-body><pre><code class="tex hljs"></code></pre></div><div class=modal-footer><a class="btn btn-outline-primary my-1 js-copy-cite" href=# target=_blank><i class="fas fa-copy"></i>复制</a>
+<a class="btn btn-outline-primary my-1 js-download-cite" href=# target=_blank><i class="fas fa-download"></i>下载</a><div id=modal-error></div></div></div></div></div></body></html>

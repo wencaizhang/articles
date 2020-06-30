@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ubuntu | 阿文的网络空间</title><link>/tag/ubuntu/</link><atom:link href="/tag/ubuntu/index.xml" rel="self" type="application/rss+xml"/><description>ubuntu</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Sun, 17 Nov 2019 09:49:31 +0800</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>ubuntu</title><link>/tag/ubuntu/</link></image><item><title>Basic Setup for Ubuntu</title><link>/post/2019/2019-11-17-basic-setup-for-ubuntu/</link><pubDate>Sun, 17 Nov 2019 09:49:31 +0800</pubDate><guid>/post/2019/2019-11-17-basic-setup-for-ubuntu/</guid><description>&lt;blockquote>
+&lt;p>Ubuntu 基础设置，包含一些常用软件安装，配置文件修改等等。&lt;/p>
+&lt;/blockquote>
+&lt;p>这篇文章的意义在于，当你拿到一个新的 Ubuntu 系统之后，直接按照本文的步骤进行设置，就可以得到一个顺手的开发/部署环境。不再需要逐项搜索每个软件的安装步骤了。&lt;/p>
+&lt;ul>
+&lt;li>设置国内软件镜像源&lt;/li>
+&lt;li>node&lt;/li>
+&lt;li>git&lt;/li>
+&lt;li>docker&lt;/li>
+&lt;li>nginx&lt;/li>
+&lt;li>oh-my-zsh&lt;/li>
+&lt;li>alias&lt;/li>
+&lt;li>vim&lt;/li>
+&lt;/ul>
+&lt;h2 id="设置系统软件镜像源">设置系统软件镜像源&lt;/h2>
+&lt;p>配置系统源第一件事是修改镜像源，这样方便后续其他软件的安装。在国内可以选择阿里云的源。&lt;/p>
+&lt;pre>&lt;code class="language-bash"># 编辑源文件
+sudo vim /etc/apt/sources.list
+# 在VIM编辑器内替换默认源为阿里云
+:0,$ s/archive.ubuntu.com/mirrors.aliyun.com/
+# 保存源文件并退出
+:wq
+&lt;/code>&lt;/pre>
+&lt;h2 id="包管理工具安装">包管理工具安装&lt;/h2>
+&lt;p>&lt;strong>先更新&lt;/strong>&lt;/p>
+&lt;pre>&lt;code class="language-bash">sudo apt update &amp;amp;&amp;amp; apt upgrade -y
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>
+&lt;a href="https://www.sysgeek.cn/apt-vs-apt-get/" target="_blank" rel="noopener">Linux中apt与apt-get命令的区别与解释&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://www.cnblogs.com/fenglongyu/p/8654991.html" target="_blank" rel="noopener">linux命令系列 sudo apt-get update和upgrade的区别&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>安装常用软件&lt;/strong>&lt;/p>
+&lt;p>通常会有一些是默认安装的，比如 git vim wget curl vim，如果没有，用下面方式安装即可。&lt;/p>
+&lt;pre>&lt;code class="language-bash">sudo apt install zsh nginx tree -y
+&lt;/code>&lt;/pre>
+&lt;h2 id="oh-my-zsh">oh-my-zsh&lt;/h2>
+&lt;p>关于 zsh 和 oh-my-zsh 可以参考：
+&lt;a href="https://zhuanlan.zhihu.com/p/19556676" target="_blank" rel="noopener">终极 Shell——ZSH&lt;/a>&lt;/p>
+&lt;h3 id="安装">安装&lt;/h3>
+&lt;p>脚本安装：&lt;/p>
+&lt;pre>&lt;code class="language-bash">wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
+&lt;/code>&lt;/pre>
+&lt;p>或者手动安装:&lt;/p>
+&lt;pre>&lt;code class="language-bash">git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
+&lt;/code>&lt;/pre>
+&lt;p>安装完成之后退出当前会话重新打开一个终端窗口即可。&lt;/p>
+&lt;h3 id="插件">插件&lt;/h3>
+&lt;p>&lt;strong>(1) autojump&lt;/strong>
+github 地址
+&lt;a href="https://github.com/wting/autojump" target="_blank" rel="noopener">autojump&lt;/a>&lt;/p>
+&lt;p>下载并执行&lt;/p>
+&lt;pre>&lt;code class="language-bash">wget https://github.com/downloads/joelthelion/autojump/autojump_v21.1.2.tar.gz
+./install.sh
+&lt;/code>&lt;/pre>
+&lt;p>最后把以下代码加入.zshrc:&lt;/p>
+&lt;pre>&lt;code class="language-bash">[[ -s ~/.autojump/etc/profile.d/autojump.sh ]] &amp;amp;&amp;amp; . ~/.autojump/etc/profile.d/autojump.sh
+&lt;/code>&lt;/pre>
+&lt;h2 id="nodenvm">node(nvm)&lt;/h2>
+&lt;p>nvm github 地址：
+&lt;a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">nvm-sh/nvm&lt;/a>&lt;/p>
+&lt;h3 id="方法一脚本安装">方法一：脚本安装&lt;/h3>
+&lt;p>执行脚本&lt;/p>
+&lt;pre>&lt;code class="language-bash">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash
+# 或者
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash
+&lt;/code>&lt;/pre>
+&lt;p>最后，将下面内容分别添加到 &lt;code>~/.bashrc&lt;/code>, &lt;code>~/.profile&lt;/code>, 和 &lt;code>~/.zshrc&lt;/code> 文件中。&lt;/p>
+&lt;pre>&lt;code>export NVM_DIR=&amp;quot;$([ -z &amp;quot;${XDG_CONFIG_HOME-}&amp;quot; ] &amp;amp;&amp;amp; printf %s &amp;quot;${HOME}/.nvm&amp;quot; || printf %s &amp;quot;${XDG_CONFIG_HOME}/nvm&amp;quot;)&amp;quot;
+[ -s &amp;quot;$NVM_DIR/nvm.sh&amp;quot; ] &amp;amp;&amp;amp; \. &amp;quot;$NVM_DIR/nvm.sh&amp;quot; # This loads nvm
+&lt;/code>&lt;/pre>
+&lt;p>加载配置文件：&lt;/p>
+&lt;pre>&lt;code class="language-bash">source ~/.bashrc
+&lt;/code>&lt;/pre>
+&lt;h3 id="方法二git-安装">方法二：git 安装&lt;/h3>
+&lt;p>将代码克隆到用户目录下：&lt;/p>
+&lt;pre>&lt;code class="language-bash">cd ~/
+git clone https://github.com/nvm-sh/nvm.git .nvm
+&lt;/code>&lt;/pre>
+&lt;p>切换到最新版本&lt;/p>
+&lt;pre>&lt;code class="language-bash">cd ~/.nvm
+git checkout v0.35.1
+&lt;/code>&lt;/pre>
+&lt;p>激活 nvm，在命令行执行：&lt;/p>
+&lt;pre>&lt;code class="language-bash">. nvm.sh
+&lt;/code>&lt;/pre>
+&lt;p>最后，将下面内容分别添加到 &lt;code>~/.bashrc&lt;/code>, &lt;code>~/.profile&lt;/code>, 和 &lt;code>~/.zshrc&lt;/code> 文件中。&lt;/p>
+&lt;pre>&lt;code>export NVM_DIR=&amp;quot;$HOME/.nvm&amp;quot;
+[ -s &amp;quot;$NVM_DIR/nvm.sh&amp;quot; ] &amp;amp;&amp;amp; \. &amp;quot;$NVM_DIR/nvm.sh&amp;quot; # This loads nvm
+[ -s &amp;quot;$NVM_DIR/bash_completion&amp;quot; ] &amp;amp;&amp;amp; \. &amp;quot;$NVM_DIR/bash_completion&amp;quot; # This loads nvm bash_completion
+&lt;/code>&lt;/pre>
+&lt;p>完成之后，通过 &lt;code>nvm -v&lt;/code> 查看版本来验证是否安装成功。&lt;/p>
+&lt;h2 id="docker">docker&lt;/h2>
+&lt;h3 id="安装-docker">安装 Docker&lt;/h3>
+&lt;pre>&lt;code class="language-bash">curl -fsSL https://get.docker.com -o get-docker.sh &amp;amp;&amp;amp; sudo sh get-docker.sh
+&lt;/code>&lt;/pre>
+&lt;h3 id="安装-compose">安装 Compose&lt;/h3>
+&lt;pre>&lt;code class="language-bash">sudo curl -L &amp;quot;https://github.com/docker/compose/releases/download/1.22.0/docke-compose-$(uname -s)-$(uname -m)&amp;quot; -o /usr/local/bin/docker-compose
+# 给Docker Compose 执行权限
+sudo chmod +x /usr/local/bin/docker-compose
+#查看Docker和Docker Compose的版本
+sudo docker version
+sudo docker-compose version
+&lt;/code>&lt;/pre>
+&lt;h3 id="设置镜像源">设置镜像源&lt;/h3>
+&lt;p>执行下面命令进行设置&lt;/p>
+&lt;p>&lt;em>ps: 阿里云镜像源是个人注册阿里云账号之后分配的个人专属镜像源。&lt;/em>&lt;/p>
+&lt;pre>&lt;code class="language-bash">sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json &amp;lt;&amp;lt;-'EOF'
+{
+&amp;quot;registry-mirrors&amp;quot;: [&amp;quot;https://oojjt1xs.mirror.aliyuncs.com&amp;quot;]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+&lt;/code>&lt;/pre>
+&lt;h2 id="vim-配置">vim 配置&lt;/h2>
+&lt;p>有些系统默认没有安装&lt;/p>
+&lt;p>配置文件路径：&lt;/p>
+&lt;ul>
+&lt;li>全局配置文件：&lt;code>/etc/vim/vimrc&lt;/code>&lt;/li>
+&lt;li>当前用户配置文件：&lt;code>~/.vimrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>将下面内容粘贴到配置文件中：&lt;/p>
+&lt;pre>&lt;code>&amp;quot; 左单引号表示单行注释
+&amp;quot; 编码指定 UTF-8
+set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936
+set termencoding=utf-8
+set encoding=utf-8
+set number &amp;quot; 显示行号
+set cursorline &amp;quot; 突出显示当前行
+set ruler &amp;quot; 打开状态栏标尺
+&lt;/code>&lt;/pre>
+&lt;h2 id="设置别名alias">设置别名(alias)&lt;/h2>
+&lt;p>将所有的别名放在单独一个文件 &lt;code>.bash_aliases&lt;/code> 中，这样更加方便管理，ubuntu 也推荐这种做法。&lt;/p>
+&lt;pre>&lt;code class="language-bash">if [ -f ~/.bash_aliases ]; then
+. ~/.bash_aliases
+fi
+&lt;/code>&lt;/pre>
+&lt;p>&lt;strong>注意：等号两侧不能有空格!&lt;/strong>&lt;/p>
+&lt;pre>&lt;code class="language-bash"># 代替键盘上难以触及的 ~ 键
+alias home=&amp;quot;cd ~&amp;quot;
+# 同样也可以为一些深层却很常用的目录设置别名
+# 如：宝塔面包的 nginx 配置目录
+alias ng=&amp;quot;cd /www/server/panel/vhost/nginx&amp;quot;
+# 回退多级目录
+alias bk1=&amp;quot;cd ..&amp;quot;
+alias bk2=&amp;quot;cd ../..&amp;quot;
+alias bk3=&amp;quot;cd ../../..&amp;quot;
+alias bk4=&amp;quot;cd ../../../..&amp;quot;
+alias bk5=&amp;quot;cd ../../../../..&amp;quot;
+# ls 相关
+alias cls='clear'
+alias ll='ls -l'
+alias la='ls -a'
+# git 相关
+alias gs='git status'
+alias glog=&amp;quot;git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Cr eset %s %Cgreen(%cr) %C(bold blue)&amp;lt;%an&amp;gt;%Creset' --abbrev-commit&amp;quot;
+# 解压
+alias -s gz='tar -xzvf'
+alias -s tgz='tar -xzvf'
+alias -s zip='unzip'
+alias -s bz2='tar -xjvf'
+# other
+alias vi='vim'
+alias grep=&amp;quot;grep --color=auto&amp;quot;
+alias tree=&amp;quot;tree -I '*svn|*node_module*'&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item></channel></rss>

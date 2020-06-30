@@ -1,0 +1,4162 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>阿文的网络空间</title><link>/</link><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><description>阿文的网络空间</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Mon, 29 Jun 2020 00:00:00 +0000</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>阿文的网络空间</title><link>/</link></image><item><title>Array.from()</title><link>/doc/oh-my-js/03-array-es6/01-array.from/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/01-array.from/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>Array.from&lt;/code> 方法用于将两类对象转为真正的数组：类似数组的对象（array-like object）和可遍历（iterable）的对象（包括 ES6 新增的数据结构 Set 和 Map）。&lt;/p>
+&lt;h2 id="语法">语法&lt;/h2>
+&lt;pre>&lt;code class="language-js">Array.from(arrayLikeOrIterable[, mapFunction[, thisArg]]);
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>&lt;code>arrayLikeOrIterable&lt;/code>: 第一个参数是类数组或者可迭代对象，为必传参数&lt;/li>
+&lt;li>&lt;code>mapFunction&lt;/code>: 第二个参数是一个函数，会在集合中的每一项都调用，其返回值会插入到新的集合中（类似 map 函数的第二个参数），为可选参数。&lt;/li>
+&lt;li>&lt;code>thisArg&lt;/code>: 调用 &lt;code>mapFunction&lt;/code> 函数时的 &lt;code>this&lt;/code> 指向，不常用，为可选参数。&lt;/li>
+&lt;/ul>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="转化类数组1">转化类数组(1)&lt;/h3>
+&lt;pre>&lt;code class="language-js">const arrayLike = {
+&amp;quot;0&amp;quot;: 10,
+&amp;quot;1&amp;quot;: 20,
+&amp;quot;2&amp;quot;: 30,
+length: 3
+}
+Array.from(arrayLike, (value, index) =&amp;gt; value * 2);
+// [20, 40, 60]
+&lt;/code>&lt;/pre>
+&lt;h3 id="转化类数组2">转化类数组(2)&lt;/h3>
+&lt;pre>&lt;code class="language-js">let arrayLike = {
+&amp;quot;0&amp;quot;: &amp;quot;a&amp;quot;,
+&amp;quot;1&amp;quot;: &amp;quot;b&amp;quot;,
+&amp;quot;2&amp;quot;: &amp;quot;c&amp;quot;,
+length: 3
+};
+// ES5的写法
+var arr1 = [].slice.call(arrayLike); // ['a', 'b', 'c']
+// ES6的写法
+let arr2 = Array.from(arrayLike); // ['a', 'b', 'c']
+&lt;/code>&lt;/pre>
+&lt;h3 id="转化类数组3">转化类数组(3)&lt;/h3>
+&lt;p>&lt;code>Array.from&lt;/code> 会将字符串转化为数组&lt;/p>
+&lt;pre>&lt;code class="language-js">let str = 'foo'
+Array.from(str);
+// [&amp;quot;f&amp;quot;, &amp;quot;o&amp;quot;, &amp;quot;o&amp;quot;]
+&lt;/code>&lt;/pre>
+&lt;h3 id="初始化数组">初始化数组&lt;/h3>
+&lt;p>使用 &lt;code>Array.from&lt;/code> 初始化默认每项元素的值是 &lt;code>undefined&lt;/code>，而使用构造函数初始化默认元素值是 &lt;code>empty&lt;/code>，在 &lt;code>map&lt;/code> 等函数中会跳过 &lt;code>empty&lt;/code> 元素，切记。&lt;/p>
+&lt;pre>&lt;code class="language-js">Array.from({length: 3})
+// [undefined, undefined, undefined]
+Array(3)
+// [empty x 3]
+new Array(3)
+// [empty x 3]
+&lt;/code>&lt;/pre>
+&lt;p>&lt;img src="./imgs/init-array.png" alt="初始化数组">&lt;/p>
+&lt;h3 id="克隆数组">克隆数组&lt;/h3>
+&lt;p>克隆数组的方法有很多，&lt;code>Array.from&lt;/code> 就能很轻易地&lt;strong>浅拷贝&lt;/strong>一个数组：&lt;/p>
+&lt;pre>&lt;code class="language-js">const nums = [ 1, 2, 3 ];
+const nums2 = Array.from(nums);
+console.log(nums2); // [1, 2, 3]
+nums === nums2; // false
+&lt;/code>&lt;/pre>
+&lt;p>这就说明新数组 &lt;code>nums2&lt;/code> 和原数组 &lt;code>nums&lt;/code> 的元素一样，但是已经是两个不同的数组了。&lt;/p>
+&lt;p>下面例子中 &lt;code>nums&lt;/code> 和 &lt;code>nums2&lt;/code> 的（引用类型的）元素是完全相同的，说明用 &lt;code>Array.from&lt;/code> 是&lt;strong>浅拷贝&lt;/strong>一个数组。&lt;/p>
+&lt;pre>&lt;code class="language-js">const nums = [
+[ 1, 2, 3 ],
+[ 'one', 'two', 'three' ]
+]
+const nums2 = Array.from(nums)
+console.log(nums2);
+nums[0] === nums2[0] // true
+nums[1] === nums2[1] // true
+&lt;/code>&lt;/pre>
+&lt;p>下面做一个尝试，对只包含数组类型元素的数组进行深度克隆：&lt;/p>
+&lt;pre>&lt;code class="language-js">function recursiveClone (arr) {
+return Array.isArray(arr) ? Array.from(arr, recursiveClone) : arr;
+}
+const nums = [
+[ 1, 2, 3 ],
+[ 'one', 'two', 'three' ]
+]
+const nums2 = recursiveClone(nums)
+nums[0] === nums2[0] // false
+nums[1] === nums2[1] // false
+&lt;/code>&lt;/pre>
+&lt;p>通过最后的判断可以看出深度克隆成就已经达成！&lt;/p>
+&lt;p>这种深度克隆的方法非常简洁，但同时缺点也很明显，那就是这种方法只适合由基本类型和 Array 类型的元素组成的数组，因此使用这种方法之前需要确定自己克隆对象的类型。&lt;/p>
+&lt;h3 id="数组去重">数组去重&lt;/h3>
+&lt;pre>&lt;code class="language-js">function uniqArr (arr) {
+return Array.from(new Set(arr))
+}
+uniqArr([ 1, 1, 2, 2, 4, 4]) // [1, 2, 4]
+&lt;/code>&lt;/pre>
+&lt;p>类似的数组去重方法还有：&lt;/p>
+&lt;pre>&lt;code class="language-js">function uniqArr (arr) {
+return [...new Set(arr)]
+}
+uniqArr([ 1, 1, 2, 2, 4, 4]) // [1, 2, 4]
+&lt;/code>&lt;/pre>
+&lt;h3 id="填充数组">填充数组&lt;/h3>
+&lt;p>&lt;code>Array.from&lt;/code> 函数可以使用相同的值来初始化一个数组&lt;/p>
+&lt;pre>&lt;code class="language-js">const length = 3
+const init = 0
+const arr = Array.from( { length }, () =&amp;gt; init )
+console.log(arr) // [0, 0, 0]
+&lt;/code>&lt;/pre>
+&lt;blockquote>
+&lt;p>&lt;code>{ length }&lt;/code> 是 &lt;code>{ length: length }&lt;/code> 的简化写法&lt;/p>
+&lt;/blockquote>
+&lt;p>其实，&lt;code>Array.prototype.fill&lt;/code> 函数也能达到「填充」的效果，而且从名字上看，&lt;code>Array.prototype.fill&lt;/code> 才是官方指定的「填充」函数。&lt;/p>
+&lt;pre>&lt;code class="language-js">function fillArray (init, length) {
+return Array(length).fill(init);
+}
+const result = fillArray2(0, 3);
+// =&amp;gt; [0, 0, 0]
+&lt;/code>&lt;/pre>
+&lt;p>关于 &lt;code>Array.prototype.fill&lt;/code> 的详细用法请移步
+&lt;a href="./06-Array.prototype.fill.md">这里&lt;/a>&lt;/p>
+&lt;h3 id="生成数字范围数组">生成数字范围数组&lt;/h3>
+&lt;pre>&lt;code class="language-js">function range(end) {
+return Array.from({ length: end }, (item, index) =&amp;gt; index);
+}
+range(4); // [0, 1, 2, 3]
+&lt;/code>&lt;/pre>
+&lt;h2 id="参考文章">参考文章&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;a href="https://dmitripavlutin.com/javascript-array-from-applications/" target="_blank" rel="noopener">5 Handy Applications of JavaScript Array.from()&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Array.isArray()</title><link>/doc/oh-my-js/03-array-es6/10-array.isarray/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/10-array.isarray/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>Array.isArray()&lt;/code> 方法用于确定一个值是否为 &lt;code>Array&lt;/code> 类型。&lt;/p>
+&lt;p>注意：&lt;code>Array.isArray()&lt;/code> 方法只能由构造函数 &lt;code>Array&lt;/code> 调用，而数组实例无法调用。&lt;/p>
+&lt;p>ps：
+&lt;a href="http://web.mit.edu/jwalden/www/isArray.html" target="_blank" rel="noopener">严格判断 JavaScript 对象是否为数组&lt;/a>&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>value&lt;/td>
+&lt;td>需要检测的值&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>如果被检测的值是 &lt;code>Array&lt;/code> 类型，返回 true ，否则返回 false 。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">Array.isArray([]); // true
+Array.isArray([1]); // true
+Array.isArray(new Array()); // true
+Array.isArray(Array.prototype); // true
+Array.isArray(); // false
+Array.isArray({}); // false
+Array.isArray(null); // false
+Array.isArray(undefined); // false
+Array.isArray(12); // false
+Array.isArray(true); // false
+&lt;/code>&lt;/pre>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">Array.isArray = function(value) {
+return Object.prototype.toString.call(value) === &amp;quot;[Object Array]&amp;quot;;
+};
+&lt;/code>&lt;/pre></description></item><item><title>Array.of()</title><link>/doc/oh-my-js/03-array-es6/02-array.of/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/02-array.of/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>Array.of&lt;/code> 方法用于将一组值转换为数组。基本可以用来替代 &lt;code>Array()&lt;/code> 或者 &lt;code>new Array()&lt;/code>，并且不存在由于参数不同而导致的重载。&lt;/p>
+&lt;p>那么，使用构造函数来创建数组有什么问题呢？请看例子：&lt;/p>
+&lt;pre>&lt;code class="language-js">const arr1 = new Array(3);
+const arr2 = new Array(3, 4);
+const arr3 = new Array('a');
+console.log(arr1); // [empty x 3]
+console.log(arr2); // [3, 4]
+console.log(arr3); // [&amp;quot;a&amp;quot;]
+&lt;/code>&lt;/pre>
+&lt;p>可以总结一下：&lt;/p>
+&lt;ol>
+&lt;li>如果只有一个参数，且参数为 Number 类型，则会得到一个所有元素都为“空”的数组，数组长度等于参数的值；&lt;/li>
+&lt;li>除了第一种情况之外，都会返回一个把参数当做元素的数组。&lt;/li>
+&lt;/ol>
+&lt;p>ps：第一种情况下得到的元素为“空”，这个空不是 &lt;code>null&lt;/code> 或者 &lt;code>undefined&lt;/code>，而是 &lt;code>empty&lt;/code>。另外如果使用 &lt;code>forEach&lt;/code> 和 &lt;code>map&lt;/code> 等方法进行遍历，会跳过这些“空”元素。&lt;/p>
+&lt;p>&lt;code>Array.of&lt;/code> 方法相当于是第二种情况，永远都是将参数当做数组元素来处理。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>arguments&lt;/td>
+&lt;td>任意值，不限个数。作为数组的元素。&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>返回由参数值组成的数组。如果没有参数，就返回一个空数组。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">Array.of(); // []
+Array.of(undefined); // [ undefined ]
+Array.of(1); // [ 1 ]
+Array.of(1, 2); // [ 1, 2 ]
+&lt;/code>&lt;/pre>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">if (!Array.of) {
+function Array.of () {
+return [].slice.call(arguments);
+}
+}
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.copyWithin()</title><link>/doc/oh-my-js/03-array-es6/03-array.prototype.copywithin/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/03-array.prototype.copywithin/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>copyWithin&lt;/code> 方法接收三个参数：target、start 和 end，这三个参数都是整数。&lt;/p>
+&lt;p>&lt;code>copyWithin&lt;/code> 方法会浅复制数组的一部分（从起始索引 start 开始，到结束索引 end 之前结束，不包含结束索引），然后将这部分元素移动到同一数组中的索引是 target 的位置，并返回它。因此这个方法会修改当前数组，但是长度不变。&lt;/p>
+&lt;p>一句话总结：&lt;code>copyWithin&lt;/code> 将数组的一部分元素移动到另一个位置。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var arr = [ 'a', 'b', 'c', 'd', 'e' ];
+arr.copyWithin(0, 3, 4);
+console.log(arr);
+// [&amp;quot;d&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;, &amp;quot;d&amp;quot;, &amp;quot;e&amp;quot;]
+// 被移动的元素，从索引 3 开始，到 4 之前结束（不包含）
+// 将指定的元素移动到索引 0 的位置
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.entries()</title><link>/doc/oh-my-js/03-array-es6/07-array.prototype.entries/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/07-array.prototype.entries/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>返回一个包含数组中每个索引的键值对的 Array Iterator 对象。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var arr = [ 'a', 'b', 'c' ];
+var result = arr.entries();
+result.next();
+// {value: [0, &amp;quot;a&amp;quot;], done: false}
+result.next();
+// {value: [1, &amp;quot;b&amp;quot;], done: false}
+result.next();
+// {value: [2, &amp;quot;c&amp;quot;], done: false}
+result.next();
+// {value: undefined, done: true}
+result.next();
+// {value: undefined, done: true}
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.every()</title><link>/doc/oh-my-js/02-array-es5/05-array.prototype.every/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/02-array-es5/05-array.prototype.every/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>every()&lt;/code> 方法对数组每一项运行给定函数 fn ，如果该函数对每一项都返回 true ，则 &lt;code>every()&lt;/code> 方法返回 true，否则返回 false。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>fn&lt;/td>
+&lt;td>&lt;code>function&lt;/code> 类型，必需。数组中每个元素需要调用的函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>context&lt;/td>
+&lt;td>可选。执行回调时的上下文（this）&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>fn 函数有三个参数，依次是：&lt;/p>
+&lt;ol>
+&lt;li>遍历的数组元素&lt;/li>
+&lt;li>对应的元素索引&lt;/li>
+&lt;li>数组本身&lt;/li>
+&lt;/ol>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>如果数组中每一项都使得给定函数 fn 返回 true，则 &lt;code>every()&lt;/code> 方法返回 true ，否则返回 false 。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="打印-fn-参数值">打印 fn 参数值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+arr.every(function(value, index, array) {
+console.log(value, index, array);
+});
+// a 0 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// b 1 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// c 2 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+&lt;/code>&lt;/pre>
+&lt;h3 id="如果-fn-返回-false-则-every-立即返回-false">如果 fn 返回 false ，则 &lt;code>every()&lt;/code> 立即返回 false。&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+var isEvery = arr.every(function(value, index, array) {
+console.log(value, index, array);
+return value === &amp;quot;b&amp;quot;;
+});
+// a 0 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+console.log(isEvery); // false
+&lt;/code>&lt;/pre>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">Array.prototype.every = function(fn, context) {
+var arr = this;
+var fn = fn;
+var context = context;
+for (var i = 0; i &amp;lt; arr.length; i++) {
+var bool = fn.call(context, arr[i], i, arr);
+if (!bool) return false;
+}
+return true;
+};
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.fill()</title><link>/doc/oh-my-js/03-array-es6/06-array.prototype.fill/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/06-array.prototype.fill/</guid><description>&lt;blockquote>
+&lt;p>填充数组&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>fill&lt;/code> 方法用给定的值填充一个数组（将数组的每个元素都指向这个值）&lt;/p>
+&lt;pre>&lt;code class="language-js">[1, 2, 3].fill(0);
+// [0, 0, 0]
+&lt;/code>&lt;/pre>
+&lt;p>另外还可以指定填充的起始位置和结束位置&lt;/p>
+&lt;pre>&lt;code class="language-js">[1, 2, 3, 4, 5].fill(0, 0, 3);
+// [0, 0, 0, 4, 5]
+// 从索引 0 开始，到索引 3 之前结束
+&lt;/code>&lt;/pre>
+&lt;h2 id="边界情况">边界情况&lt;/h2>
+&lt;h3 id="如果缺少第三个参数即没有指定填充的结束位置默认是填充到数组最后一个元素">如果缺少第三个参数，即没有指定填充的结束位置，默认是填充到数组最后一个元素&lt;/h3>
+&lt;pre>&lt;code class="language-js">[1, 2, 3, 4, 5].fill(0, 2);
+// [1, 2, 0, 0, 0]
+// 从索引 2 开始到数组最后一个元素
+&lt;/code>&lt;/pre>
+&lt;h3 id="后两个参数是负数">后两个参数是负数&lt;/h3>
+&lt;p>如果第二个参数是负数：&lt;/p>
+&lt;pre>&lt;code class="language-js">[1, 2, 3].fill(0, -2);
+// [1, 0, 0]
+// -1 会被当成数组倒数第二个处理
+&lt;/code>&lt;/pre>
+&lt;p>相应的，如果第三个参数也是负数，也会这样处理&lt;/p>
+&lt;pre>&lt;code class="language-js">[1, 2, 3, 4, 5].fill(0, -4, -1);
+// [1, 0, 0, 0, 5]
+// 从倒数第 4 个元素开始，到倒数第一个元素之前结束
+&lt;/code>&lt;/pre>
+&lt;h3 id="第二个参数小于第三个参数">第二个参数小于第三个参数&lt;/h3>
+&lt;p>当第二个参数小于第三个参数的时候，&lt;code>fill&lt;/code> 方法不做任何处理。&lt;/p>
+&lt;pre>&lt;code class="language-js">[1, 2, 3, 4, 5].fill(0, 4, 2);
+// [1, 2, 3, 4, 5]
+[1, 2, 3, 4, 5].fill(0, -2, -4);
+// [1, 2, 3, 4, 5]
+&lt;/code>&lt;/pre>
+&lt;h3 id="第二个参数不是数值">第二个参数不是数值&lt;/h3>
+&lt;pre>&lt;code class="language-js">[1, 2, 3].fill(0, 'a');
+// [0, 0, 0]
+[1, 2, 3].fill(0, true);
+// [1, 0, 0]
+[1, 2, 3].fill(0, false);
+// [0, 0, 0]
+&lt;/code>&lt;/pre>
+&lt;p>可以看到 &lt;code>true&lt;/code> 是一个比较特殊的值，在 &lt;code>fill&lt;/code> 中会被当成 &lt;code>1&lt;/code> 处理。&lt;/p></description></item><item><title>Array.prototype.filter()</title><link>/doc/oh-my-js/02-array-es5/03-array.prototype.filter/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/02-array-es5/03-array.prototype.filter/</guid><description>&lt;blockquote>
+&lt;p>filter: 过滤&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>filter()&lt;/code> 方法对数组中每一项运行给定函数 fn ,返回使该函数返回值为 true 的项组成的数组。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>fn&lt;/td>
+&lt;td>&lt;code>function&lt;/code> 类型，必需。数组中每个元素需要调用的函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>context&lt;/td>
+&lt;td>可选。执行回调时的上下文（this）&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>fn 函数有三个参数，依次是：&lt;/p>
+&lt;ol>
+&lt;li>遍历的数组元素&lt;/li>
+&lt;li>对应的元素索引&lt;/li>
+&lt;li>数组本身&lt;/li>
+&lt;/ol>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>过滤后的新数组，即令给定函数 fn 返回值为 true 的数组元素组成的新数组。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="打印-fn-参数值">打印 fn 参数值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+arr.filter(function(value, index, array) {
+console.log(value, index, array);
+});
+// a 0 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// b 1 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// c 2 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+&lt;/code>&lt;/pre>
+&lt;h3 id="fn-返回值如果不是布尔值则会默认被转换成布尔值">fn 返回值如果不是布尔值，则会默认被转换成布尔值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var data = [0, 1, 2, 3];
+var arrFilter = data.filter(function(item) {
+return item;
+});
+console.log(arrFilter); // [ 1, 2, 3 ]
+&lt;/code>&lt;/pre>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">Array.prototype.filter = function(fn, context) {
+var arr = [];
+for (var i = 0; i &amp;lt; this.length; i++) {
+var bool = fn.call(context, this[i], i, this);
+if (bool) arr.push(this[i]);
+}
+return arr;
+};
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.find()</title><link>/doc/oh-my-js/03-array-es6/04-array.prototype.find/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/04-array.prototype.find/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>find&lt;/code> 方法用于找出第一个符合条件的数组元素并返回，如果不存在就返回 &lt;code>undefined&lt;/code>。&lt;/p>
+&lt;p>类似
+&lt;a href="../02-Array-ES5/01-Array.prototype.forEach">forEach&lt;/a> 和
+&lt;a href="../02-Array-ES5/01-Array.prototype.map">map&lt;/a>，find 方法也接收两个参数：一个函数和函数参数执行时的上下文环境。&lt;/p>
+&lt;p>不同之处在于，当函数参数返回值为 true 时，&lt;code>find&lt;/code> 方法立即结束执行，不再继续遍历，并将使得函数参数返回值为 true 的元素作为 find 的返回值，这个元素就是“找到”的符合条件的元素。&lt;/p>
+&lt;p>如果直到遍历结束时函数参数总也不返回 true，那么说明 find 的返回值为 undefined ，也就说明数组中不存在符合条件的元素。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>callback&lt;/td>
+&lt;td>数组元素依次执行的回调函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>thisValue&lt;/td>
+&lt;td>指定 callback 执行的上下文环境，即 this 的值&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="打印-callback-的参数">打印 callback 的参数&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [ 'a', 'b', 'c' ];
+arr.find(function(value, index, array) {
+console.log(value, index, array);
+});
+// a 0 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// b 1 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// c 2 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+&lt;/code>&lt;/pre>
+&lt;h3 id="find-的返回值">&lt;code>find()&lt;/code> 的返回值&lt;/h3>
+&lt;p>有符合条件的，返回该数组元素，没有符合条件的，返回 &lt;code>undefined&lt;/code>&lt;/p>
+&lt;pre>&lt;code class="language-js">var arr = [ 'a', 'b', 'c' ];
+var result1 = arr.find(function(value, index, array) {
+return value == 'c';
+});
+console.log(result1); // &amp;quot;c&amp;quot;
+var result2 = arr.find(function(value, index, array) {
+return value == 'xyz';
+});
+console.log(result2); // undefined
+&lt;/code>&lt;/pre>
+&lt;h3 id="找到第一个符合条件的方法立即结束执行">找到第一个符合条件的，方法立即结束执行&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [ 'a', 'b', 'b', 'c' ];
+var result1 = arr.find(function(value, index, array) {
+console.log(value);
+return value == 'b';
+});
+// &amp;quot;a&amp;quot;
+// &amp;quot;b&amp;quot;
+console.log(result1); // &amp;quot;b&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h3 id="指定-callback-执行时的-this-指向">指定 callback 执行时的 &lt;code>this&lt;/code> 指向&lt;/h3>
+&lt;pre>&lt;code class="language-js">var ages = [ 10, 12, 26, 15 ];
+var person = {name: 'John', age: 20};
+var age = ages.find(function (value) {
+return value &amp;gt; this.age;
+}, person);
+console.log(age); // 26
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.findIndex()</title><link>/doc/oh-my-js/03-array-es6/05-array.prototype.findindex/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/05-array.prototype.findindex/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>findIndex&lt;/code> 方法用于找出第一个符合条件的数组元素的&lt;code>索引&lt;/code>。&lt;/p>
+&lt;p>可参考
+&lt;a href="./04-Array.prototype.find.md">Array.prototype.find&lt;/a> 方法，两者作用相同，都是找到符合条件的第一个数组元素，不同之处在于 &lt;code>find&lt;/code> 方法返回元素值，而 &lt;code>findIndex&lt;/code> 方法返回元素的&lt;strong>索引&lt;/strong>&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var arr = ['a', 'a', 'b', 'c'];
+var item = arr.find(function (item) {
+return item === 'a';
+})
+var index = arr.findIndex(function (item) {
+return item === 'a';
+})
+console.log(item); // &amp;quot;a&amp;quot;
+console.log(index); // 0
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.forEach()</title><link>/doc/oh-my-js/02-array-es5/01-array.prototype.foreach/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/02-array-es5/01-array.prototype.foreach/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>forEach()&lt;/code> 方法对数组每一项运行给定函数 fn，无返回值。另外，还可以指定函数 fn 的上下文环境（&lt;code>this&lt;/code>）。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>fn&lt;/td>
+&lt;td>&lt;code>function&lt;/code> 类型，必需。数组中每个元素需要调用的函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>context&lt;/td>
+&lt;td>可选。执行回调时的上下文（this）&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>fn 函数支持 3 个参数，依次是：&lt;/p>
+&lt;ol>
+&lt;li>遍历的数组元素&lt;/li>
+&lt;li>对应的元素索引&lt;/li>
+&lt;li>数组本身&lt;/li>
+&lt;/ol>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>无&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="打印-fn-的参数">打印 fn 的参数&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+arr.forEach(function(value, index, array) {
+console.log(value, index, array);
+});
+// a 0 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// b 1 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// c 2 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+&lt;/code>&lt;/pre>
+&lt;h3 id="指定-fn-中-this-的值">指定 fn 中 this 的值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var database = {
+users: [&amp;quot;张含韵&amp;quot;, &amp;quot;江一燕&amp;quot;, &amp;quot;李小璐&amp;quot;],
+sendEmail: function(user) {
+if (this.isValidUser(user)) {
+console.log(&amp;quot;你好，&amp;quot; + user);
+} else {
+console.log(&amp;quot;抱歉，&amp;quot; + user + &amp;quot;，你不是本家人&amp;quot;);
+}
+},
+isValidUser: function(user) {
+return /^张/.test(user);
+}
+};
+// 给每个人法邮件
+database.users.forEach(
+// database.users 中人遍历
+database.sendEmail, // 发送邮件
+database // 使用 database 代替 sendEmail 的this
+);
+// 结果：
+// 你好，张含韵
+// 抱歉，江一燕，你不是本家人
+// 抱歉，李小璐，你不是本家
+&lt;/code>&lt;/pre>
+&lt;h3 id="foreach-不会遍历被删除的元素">&lt;code>forEach&lt;/code> 不会遍历被删除的元素&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+delete arr[1];
+console.log(arr); // [ &amp;quot;a&amp;quot;, , &amp;quot;c&amp;quot; ]
+console.log(arr.length); // 3
+arr.forEach(function(value, index) {
+console.log(value, index);
+});
+// a 0
+// c 2
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.includes()</title><link>/doc/oh-my-js/03-array-es6/10-array.prototype.includes/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/10-array.prototype.includes/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>判断数组实例是否包含给定的值，返回一个布尔值。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>value&lt;/code>&lt;/td>
+&lt;td>必需。被检测的值&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>fromIndex&lt;/code>&lt;/td>
+&lt;td>Number 类型，可选。表示搜索的起始位置，默认为 &lt;code>0&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="基本使用">基本使用&lt;/h3>
+&lt;pre>&lt;code class="language-js">const arr = [ 1, 2, 4 ];
+arr.includes(1); // true
+arr.includes(3); // false
+&lt;/code>&lt;/pre>
+&lt;h3 id="指定-fromindex">指定 &lt;code>fromIndex&lt;/code>&lt;/h3>
+&lt;pre>&lt;code class="language-js">const arr = [ 1, 2, 4 ];
+arr.includes(2, 2);
+// false
+// 从索引 2 开始检测，因此是 false
+arr.includes(2, 1);
+// true
+// 从索引 1 开始检测，结果是 true
+&lt;/code>&lt;/pre>
+&lt;h2 id="边界值">边界值&lt;/h2>
+&lt;h3 id="nan-的判断">NaN 的判断&lt;/h3>
+&lt;p>首先我们知道 &lt;code>NaN&lt;/code> 不等于 &lt;code>NaN&lt;/code>：&lt;/p>
+&lt;pre>&lt;code class="language-js">NaN == NaN // false
+NaN === NaN // false
+&lt;/code>&lt;/pre>
+&lt;p>而 &lt;code>indexOf&lt;/code> 方法内部使用绝对相等（&lt;code>===&lt;/code>）进行判断，因此无法判断 &lt;code>NaN&lt;/code>，但是 &lt;code>includes&lt;/code> 可以：&lt;/p>
+&lt;pre>&lt;code class="language-js">const arr = [ 1, NaN, 4 ];
+arr.indexOf(NaN); // -1
+arr.includes(NaN); // true
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.indexOf()</title><link>/doc/oh-my-js/02-array-es5/06-array.prototype.indexof/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/02-array-es5/06-array.prototype.indexof/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>indexOf()&lt;/code> 方法返回在数组中可以找到一个给定元素的第一个索引（使用全等操作符），如果不存在，则返回 -1 。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>searchElement&lt;/td>
+&lt;td>要查找的元素&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>fromIndex&lt;/td>
+&lt;td>可选。开始查找的位置，如果该索引值大于或等于数组长度，意味着不会在数组里查找，返回 -1 。如果参数提供的是一个负值，则将其作为数组末尾的一个抵消，即 -1 表示从最后一个元素开始查找， -2 表示从倒数第二个元素开始查找，以此类推（查找顺序不变，仍然是从前向后查询数组）。如果抵消后的索引值仍小于 0 ，则整个数组都会被查询。默认值为 0 。&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>首个被找到的元素在数组中的索引，若没有找到则返回 -1 。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="返回首个被查找到的元素的索引">返回首个被查找到的元素的索引&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;, &amp;quot;a&amp;quot;];
+var indexB = arr.indexOf(&amp;quot;b&amp;quot;);
+var indexD = arr.indexOf(&amp;quot;d&amp;quot;);
+console.log(indexB); // 1
+console.log(indexD); // -1
+&lt;/code>&lt;/pre>
+&lt;h3 id="严格相等">严格相等&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+var indexStr = arr.indexOf(&amp;quot;2&amp;quot;);
+var indexNum = arr.indexOf(2);
+console.log(indexStr); // -1
+console.log(indexNum); // 1
+&lt;/code>&lt;/pre>
+&lt;h3 id="使用-fromeindex-参数">使用 &lt;code>fromeIndex&lt;/code> 参数&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;a&amp;quot;];
+var indexB1 = arr.indexOf(&amp;quot;b&amp;quot;);
+var indexB2 = arr.indexOf(&amp;quot;b&amp;quot;, 2);
+console.log(indexB1); // 1
+console.log(indexB2); // 3
+&lt;/code>&lt;/pre>
+&lt;h3 id="fromindex-大于或等于数组长度返回--1">&lt;code>fromIndex&lt;/code> 大于或等于数组长度，返回 -1&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+var index = arr.indexOf(&amp;quot;a&amp;quot;, 5);
+console.log(index); // -1
+&lt;/code>&lt;/pre>
+&lt;h3 id="fromindex-为负值">&lt;code>fromIndex&lt;/code> 为负值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+// -1 表示从倒数第一个元素开始查找
+var index = arr.indexOf(&amp;quot;a&amp;quot;, -1);
+console.log(index); // -1
+&lt;/code>&lt;/pre>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">Array.prototype.indexOf = function(searchElement, fromIndex) {
+var se = searchElement;
+var fi = parseInt(fromIndex) || 0;
+var arr = this;
+var len = arr.length;
+var i = 0;
+if (fi &amp;gt;= len) return -1;
+if (fi &amp;lt; 0) {
+i = len + fi;
+}
+for (; i &amp;lt; arr.length; i++) {
+if (arr[i] === se) {
+return i;
+}
+}
+return -1;
+};
+&lt;/code>&lt;/pre>
+&lt;h2 id="拓展">拓展&lt;/h2>
+&lt;p>&lt;code>indexOf&lt;/code> 只能得到查找元素在数组中首次出现位置的索引，那如果我想要得到该元素在数组中&lt;strong>所有出现位置的索引&lt;/strong>呢？&lt;/p>
+&lt;p>下面是实现方法：&lt;/p>
+&lt;pre>&lt;code class="language-js">/*
+* 返回查找元素在数组中所有的索引组成的数组，如果数组中不存在此元素，返回空数组。
+*/
+Array.prototype.allIndexOf = function(searchElement) {
+var arr = this;
+var se = searchElement;
+var arrIndex = [];
+var index = 0;
+for (var i = 0; i &amp;lt; arr.length; i++) {
+index = arr.indexOf(se, i);
+if (index === -1) {
+return [];
+}
+arrIndex.push(index);
+i = index;
+}
+return arrIndex;
+};
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>测试&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3, 2, 1];
+console.log(arr.allIndexOf(1)); // [0, 4]
+console.log(arr.allIndexOf(9)); // []
+// 嗯，确认过眼神，是我想要的！
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.keys()</title><link>/doc/oh-my-js/03-array-es6/08-array.prototype.keys/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/08-array.prototype.keys/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>返回一个包含数组中每个索引的 Array Iterator 对象。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var arr = [ 'a', 'b', 'c' ];
+var result = arr.keys();
+result.next();
+// {value: 0, done: false}
+result.next();
+// {value: 1, done: false}
+result.next();
+// {value: 2, done: false}
+result.next();
+// {value: undefined, done: true}
+result.next();
+// {value: undefined, done: true}
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.lastIndexOf()</title><link>/doc/oh-my-js/02-array-es5/07-array.prototype.lastindexof/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/02-array-es5/07-array.prototype.lastindexof/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>lastIndexOf()&lt;/code> 方法返回在指定元素在数组中的最后一个的索引，如果不存在则返回 -1 。&lt;/p>
+&lt;p>查找方式为从数组的后面向前查找，从 &lt;code>fromIndex&lt;/code> 处开始（使用全等操作符）。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>searchElement&lt;/td>
+&lt;td>要查找的元素&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>fromIndex&lt;/td>
+&lt;td>可选。开始查找的位置，在此位置开始从后向前查找。如果该值为负值且绝对值大于或等于数组长度，则返回 -1 。如果参数提供的是一个负值，则将其作为数组末尾的一个抵消，即 -1 表示从最后一个元素开始查找， -2 表示从倒数第二个元素开始查找，以此类推（查找顺序不变，仍然是从后向前查询数组）。默认值为数组长度减 1 ，即整个数组都被查找 。&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>首个被找到的元素在数组中的索引，若没有找到则返回 -1 。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="返回首个被查找到的元素的索引">返回首个被查找到的元素的索引&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;a&amp;quot;];
+var indexB = arr.lastIndexOf(&amp;quot;b&amp;quot;);
+var indexD = arr.lastIndexOf(&amp;quot;d&amp;quot;);
+console.log(indexB); // 3
+console.log(indexD); // -1
+&lt;/code>&lt;/pre>
+&lt;h3 id="严格相等">严格相等&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+var indexStr = arr.lastIndexOf(&amp;quot;2&amp;quot;);
+var indexNum = arr.lastIndexOf(2);
+console.log(indexStr); // -1
+console.log(indexNum); // 1
+&lt;/code>&lt;/pre>
+&lt;h3 id="使用-fromeindex-参数">使用 &lt;code>fromeIndex&lt;/code> 参数&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;a&amp;quot;];
+var indexB1 = arr.lastIndexOf(&amp;quot;b&amp;quot;);
+var indexB2 = arr.lastIndexOf(&amp;quot;b&amp;quot;, 2);
+console.log(indexB1); // 3
+console.log(indexB2); // 1
+&lt;/code>&lt;/pre>
+&lt;h3 id="fromindex-为负值">&lt;code>fromIndex&lt;/code> 为负值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;a&amp;quot;];
+var index1 = arr.lastIndexOf(&amp;quot;a&amp;quot;);
+// -2 表示从倒数第二个元素开始查找
+var index2 = arr.lastIndexOf(&amp;quot;a&amp;quot;, -2);
+console.log(index1); // 4
+console.log(index2); // 0
+&lt;/code>&lt;/pre>
+&lt;h3 id="fromindex-为负值且绝对值大于或等于数组长度返回--1">&lt;code>fromIndex&lt;/code> 为负值且绝对值大于或等于数组长度，返回 -1&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+var indexA = arr.lastIndexOf(&amp;quot;a&amp;quot;, 5);
+var indexB = arr.lastIndexOf(&amp;quot;b&amp;quot;, -5);
+console.log(indexA); // 0
+console.log(indexB); // -1
+&lt;/code>&lt;/pre>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">Array.prototype.lastIndexOf = function(searchElement, fromIndex) {
+var se = searchElement;
+var arr = this;
+var len = arr.length;
+var fi = parseInt(fromIndex) || len - 1;
+var i = fi;
+if (fi &amp;lt; 0 &amp;amp;&amp;amp; -fi &amp;gt;= len) return -1;
+if (fi &amp;lt; 0) {
+i = len + fi;
+}
+for (; i &amp;gt;= 0; i--) {
+if (arr[i] === se) {
+return i;
+}
+}
+return -1;
+};
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.map()</title><link>/doc/oh-my-js/02-array-es5/02-array.prototype.map/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/02-array-es5/02-array.prototype.map/</guid><description>&lt;blockquote>
+&lt;p>map: 映射&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>map()&lt;/code> 方法对数组中每一项运行给定函数 callback ，返回值是每次 callback 函数调用的结果组成的数组。&lt;/p>
+&lt;p>另外可以指定函数 callback 的上下文环境（&lt;code>this&lt;/code>）。&lt;/p>
+&lt;p>使用 &lt;code>map()&lt;/code> 方法处理数组时，数组元素的范围是在 &lt;code>callback&lt;/code> 方法第一次调用之前就已经确定了。&lt;/p>
+&lt;p>在 &lt;code>map()&lt;/code> 方法执行过程中：&lt;/p>
+&lt;ul>
+&lt;li>原数组新增加的元素将不会被 &lt;code>callback&lt;/code> 访问到；&lt;/li>
+&lt;li>被删除的元素将不会被访问到。&lt;/li>
+&lt;li>若已经存在的元素被改变或删除了，则它们传递到 &lt;code>callback&lt;/code> 的值是 &lt;code>map()&lt;/code> 方法遍历到它们的那一时刻的值；&lt;/li>
+&lt;/ul>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>callback&lt;/td>
+&lt;td>&lt;code>function&lt;/code> 类型，必需。数组中每个元素需要调用的函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>context&lt;/td>
+&lt;td>可选。执行回调时的上下文（this）&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>callback 函数支持 3 个参数，依次是：&lt;/p>
+&lt;ol>
+&lt;li>遍历的数组元素&lt;/li>
+&lt;li>对应的元素索引&lt;/li>
+&lt;li>数组本身&lt;/li>
+&lt;/ol>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>返回给定函数 callback 调用的结果组成的数组。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="打印-callback-参数值">打印 callback 参数值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+arr.map(function(value, index, array) {
+console.log(value, index, array);
+});
+// a 0 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// b 1 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// c 2 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+&lt;/code>&lt;/pre>
+&lt;h3 id="callback-执行时的-this-值默认为-window-或-global">callback 执行时的 &lt;code>this&lt;/code> 值默认为 &lt;code>window&lt;/code> (或 &lt;code>global&lt;/code>)&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+this.name = &amp;quot;name&amp;quot;;
+arr.map(function() {
+console.log(this.name);
+});
+// name
+// name
+// name
+&lt;/code>&lt;/pre>
+&lt;h3 id="callback-需要有-return-值否则会被映射成-undefined">callback 需要有 return 值，否则会被映射成 &lt;code>undefined&lt;/code>&lt;/h3>
+&lt;pre>&lt;code class="language-js">var data = [1, 2, 3];
+// 无 return 值
+var arrOfSquares = data.map(function(item) {});
+console.log(arrOfSquares); // [undefined, undefined, undefined]
+&lt;/code>&lt;/pre>
+&lt;h3 id="求平方">求平方&lt;/h3>
+&lt;pre>&lt;code class="language-js">var data = [1, 2, 3];
+var arrOfSquares = data.map(function(item) {
+return item * item;
+});
+console.log(arrOfSquares); // [ 1, 4, 9 ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="获取对象数组中的特定属性值">获取对象数组中的特定属性值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var users = [
+{ name: &amp;quot;张三&amp;quot;, age: 18 },
+{ name: &amp;quot;李四&amp;quot;, age: 19 },
+{ name: &amp;quot;王五&amp;quot;, age: 21 }
+];
+var names = users.map(function(user) {
+return user.name;
+});
+console.log(names.join(&amp;quot;，&amp;quot;)); // 张三，李四，王五
+&lt;/code>&lt;/pre>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">if (typeof Array.prototype.map != &amp;quot;function&amp;quot;) {
+Array.prototype.map = function(fn, context) {
+var arr = [];
+if (typeof fn === &amp;quot;function&amp;quot;) {
+for (var i = 0, len = this.length; i &amp;lt; len; k++) {
+arr.push(fn.call(context, this[i], k, this));
+}
+}
+return arr
+};
+}
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.reduce()</title><link>/doc/oh-my-js/02-array-es5/08-array.prototype.reduce/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/02-array-es5/08-array.prototype.reduce/</guid><description>&lt;blockquote>
+&lt;p>reduce: 减少，缩小。但是 &lt;code>reduce()&lt;/code> 方法并无此含义，而是“迭代，递归”。&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>reduce()&lt;/code> 方法从左向右迭代数组所有项，构建一个最终返回的值。&lt;/p>
+&lt;p>&lt;code>reduce()&lt;/code> 方法接收两个参数：一个在每一项上调用的函数和（可选）作为迭代基础的初始值。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>fn&lt;/td>
+&lt;td>迭代时执行的函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>initialValue&lt;/td>
+&lt;td>可选。当做初次调用 fn 的第一个参数值。&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>fn 有 4 个参数：&lt;/p>
+&lt;ol>
+&lt;li>之前值，initialValue 。若缺省 initialValue ，则使用数组第一个元素作为初始值。&lt;/li>
+&lt;li>当前值，若指定 initialValue ，当前值为数组第一个元素，否则使用数组第二个元素。&lt;/li>
+&lt;li>索引值，当前值的索引&lt;/li>
+&lt;li>调用 &lt;code>reduce()&lt;/code> 的数组&lt;/li>
+&lt;/ol>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>数组迭代执行 fn 完毕，最后一次执行 fn 的返回值。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="不指定-initialvalue">不指定 initialValue&lt;/h3>
+&lt;pre>&lt;code class="language-js">var nums = [0, 1, 2, 3, 4];
+var sum = nums.reduce(function(previous, current, index, array) {
+console.log(previous, current, index, array, previous + current);
+return previous + current;
+});
+console.log(sum); // 10
+&lt;/code>&lt;/pre>
+&lt;p>函数 fn 被执行 4 次， 每次的参数和返回值如下：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>previous&lt;/th>
+&lt;th>current&lt;/th>
+&lt;th>index&lt;/th>
+&lt;th>array&lt;/th>
+&lt;th>返回值&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>第一次&lt;/td>
+&lt;td>0&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>[0, 1, 2, 3, 4]&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>第二次&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>2&lt;/td>
+&lt;td>2&lt;/td>
+&lt;td>[0, 1, 2, 3, 4]&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>第三次&lt;/td>
+&lt;td>3&lt;/td>
+&lt;td>3&lt;/td>
+&lt;td>3&lt;/td>
+&lt;td>[0, 1, 2, 3, 4]&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>第四次&lt;/td>
+&lt;td>6&lt;/td>
+&lt;td>4&lt;/td>
+&lt;td>4&lt;/td>
+&lt;td>[0, 1, 2, 3, 4]&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="指定-initialvalue">指定 initialValue&lt;/h3>
+&lt;pre>&lt;code class="language-js">var nums = [0, 1, 2, 3, 4];
+var sum = nums.reduce(function(previous, current, index, array) {
+console.log(previous, current, index, array, previous + current);
+return previous + current;
+}, 100);
+console.log(sum); // 110
+&lt;/code>&lt;/pre>
+&lt;p>函数 fn 被执行 5 次， 每次的参数和返回值如下：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>previous&lt;/th>
+&lt;th>current&lt;/th>
+&lt;th>index&lt;/th>
+&lt;th>array&lt;/th>
+&lt;th>返回值&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>第一次&lt;/td>
+&lt;td>100&lt;/td>
+&lt;td>0&lt;/td>
+&lt;td>0&lt;/td>
+&lt;td>[0, 1, 2, 3, 4]&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>第二次&lt;/td>
+&lt;td>100&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>1&lt;/td>
+&lt;td>[0, 1, 2, 3, 4]&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>第三次&lt;/td>
+&lt;td>101&lt;/td>
+&lt;td>2&lt;/td>
+&lt;td>2&lt;/td>
+&lt;td>[0, 1, 2, 3, 4]&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>第四次&lt;/td>
+&lt;td>103&lt;/td>
+&lt;td>3&lt;/td>
+&lt;td>3&lt;/td>
+&lt;td>[0, 1, 2, 3, 4]&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>第五次&lt;/td>
+&lt;td>106&lt;/td>
+&lt;td>4&lt;/td>
+&lt;td>4&lt;/td>
+&lt;td>[0, 1, 2, 3, 4]&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">// TODO
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.reduceRight()</title><link>/doc/oh-my-js/02-array-es5/09-array.prototype.reduceright/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/02-array-es5/09-array.prototype.reduceright/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>reduceRight()&lt;/code> 方法可参考
+&lt;a href="./08-Array.prototype.reduce.md">reduce 方法&lt;/a>，除迭代方向不同之外，其他功能和 &lt;code>reduce&lt;/code> 保持一致。&lt;/p>
+&lt;p>&lt;code>reduceRight&lt;/code> 是从右向左迭代数组所有项，而 &lt;code>reduce&lt;/code> 是从左向右。&lt;/p></description></item><item><title>Array.prototype.some()</title><link>/doc/oh-my-js/02-array-es5/04-array.prototype.some/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/02-array-es5/04-array.prototype.some/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>some()&lt;/code> 方法对数组每一项运行给定函数 fn ，如果该函数对任意一项返回 true ，则 &lt;code>some()&lt;/code> 方法返回 true，否则返回 false。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>fn&lt;/td>
+&lt;td>&lt;code>function&lt;/code> 类型，必需。数组中每个元素需要调用的函数&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>context&lt;/td>
+&lt;td>可选。执行回调时的上下文（this）&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>fn 函数有三个参数，依次是：&lt;/p>
+&lt;ol>
+&lt;li>遍历的数组元素&lt;/li>
+&lt;li>对应的元素索引&lt;/li>
+&lt;li>数组本身&lt;/li>
+&lt;/ol>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>如果数组中存在使得给定函数 fn 返回 true 的元素，返回 true ，否则返回 false 。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="打印-fn-参数值">打印 fn 参数值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+arr.some(function(value, index, array) {
+console.log(value, index, array);
+});
+// a 0 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// b 1 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// c 2 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+&lt;/code>&lt;/pre>
+&lt;h3 id="如果-fn-返回-true-则-some-立即返回-true">如果 fn 返回 true ，则 &lt;code>some()&lt;/code> 立即返回 true。&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;];
+var some = arr.some(function(value, index, array) {
+console.log(value, index, array);
+return value === &amp;quot;b&amp;quot;;
+});
+// a 0 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+// b 1 [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;]
+console.log(some); // true
+&lt;/code>&lt;/pre>
+&lt;h3 id="fn-返回值如果不是布尔值则会默认被转换成布尔值">fn 返回值如果不是布尔值，则会默认被转换成布尔值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var data = [0, 1, 2, 3];
+var some = data.some(function(item) {
+console.log(item);
+return item;
+});
+// 0
+// 1
+console.log(some); // true
+&lt;/code>&lt;/pre>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">Array.prototype.some = function(fn, context) {
+var arr = this;
+var fn = fn;
+var context = context;
+for (var i = 0; i &amp;lt; arr.length; i++) {
+var bool = fn.call(context, arr[i], i, arr);
+if (!!bool) return true;
+}
+return false;
+};
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.values()</title><link>/doc/oh-my-js/03-array-es6/09-array.prototype.values/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/09-array.prototype.values/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>返回一个包含数组中每个索引对应的值的 Array Iterator 对象。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var arr = [ 'a', 'b', 'c' ];
+var result = arr.values();
+result.next();
+// {value: &amp;quot;a&amp;quot;, done: false}
+result.next();
+// {value: &amp;quot;b&amp;quot;, done: false}
+result.next();
+// {value: &amp;quot;c&amp;quot;, done: false}
+result.next();
+// {value: undefined, done: true}
+result.next();
+// {value: undefined, done: true}
+&lt;/code>&lt;/pre></description></item><item><title>ES3 数组方法总览</title><link>/doc/oh-my-js/01-array-es3/00-readme/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/00-readme/</guid><description>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>名称&lt;/th>
+&lt;th>含义&lt;/th>
+&lt;th>是否修改原数组&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>
+&lt;a href="../01-array.prototype.concat/">concat&lt;/a>&lt;/td>
+&lt;td>合并数组&lt;/td>
+&lt;td>&lt;strong>不修改&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>
+&lt;a href="../02-array.prototype.join/">join&lt;/a>&lt;/td>
+&lt;td>指定一个分隔符，将数组元素拼接成字符串&lt;/td>
+&lt;td>&lt;strong>不修改&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>
+&lt;a href="../03-array.prototype.push/">push&lt;/a>&lt;/td>
+&lt;td>将一个元素&lt;strong>添加&lt;/strong>到数组&lt;strong>末尾&lt;/strong>&lt;/td>
+&lt;td>修改&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>
+&lt;a href="../04-array.prototype.pop/">pop&lt;/a>&lt;/td>
+&lt;td>&lt;strong>删除&lt;/strong>数组&lt;strong>最后一项&lt;/strong>&lt;/td>
+&lt;td>修改&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>
+&lt;a href="../05-array.prototype.shift/">shift&lt;/a>&lt;/td>
+&lt;td>&lt;strong>删除&lt;/strong>数组&lt;strong>第一项&lt;/strong>&lt;/td>
+&lt;td>修改&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>
+&lt;a href="../06-array.prototype.unshift/">unshift&lt;/a>&lt;/td>
+&lt;td>将一个元素&lt;strong>添加&lt;/strong>到数组&lt;strong>开头&lt;/strong>&lt;/td>
+&lt;td>修改&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>
+&lt;a href="../07-array.prototype.slice/">slice&lt;/a>&lt;/td>
+&lt;td>切割数组&lt;/td>
+&lt;td>&lt;strong>不修改&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>
+&lt;a href="../08-array.prototype.splice/">splice&lt;/a>&lt;/td>
+&lt;td>在指定位置增加或删除一个或多个元素&lt;/td>
+&lt;td>修改&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>
+&lt;a href="../09-array.prototype.reverse/">reverse&lt;/a>&lt;/td>
+&lt;td>反转数组顺序&lt;/td>
+&lt;td>修改&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>
+&lt;a href="../10-array.prototype.sort/">sort&lt;/a>&lt;/td>
+&lt;td>对数组排序，可以指定排序规则&lt;/td>
+&lt;td>修改&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item><item><title>ES5 新增数组方法总览</title><link>/doc/oh-my-js/02-array-es5/readme/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/02-array-es5/readme/</guid><description>&lt;h1 id="es5-新增数组方法总览">ES5 新增数组方法总览&lt;/h1>
+&lt;p>ES5 新增了一些数组方法，灵活运用这些方法可以让我们少些很多代码，而且可以在&lt;strong>一定程度上替代&lt;/strong> underscore/lodash 等工具库。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;a href="./01-Array.prototype.forEach.md">&lt;code>forEach&lt;/code>&lt;/a>: 遍历数组一个数组&lt;/li>
+&lt;li>
+&lt;a href="./02-Array.prototype.map.md">&lt;code>map&lt;/code>&lt;/a>: 将数组映射为一个新数组&lt;/li>
+&lt;li>
+&lt;a href="./03-Array.prototype.filter.md">&lt;code>filter&lt;/code>&lt;/a>: 过滤数组，找出符合某种条件的元素，将其组合成新数组&lt;/li>
+&lt;li>
+&lt;a href="./04-Array.prototype.some.md">&lt;code>some&lt;/code>&lt;/a>: 判断是否&lt;strong>一个或多个&lt;/strong>的数组元素符合某种条件的&lt;/li>
+&lt;li>
+&lt;a href="./05-Array.prototype.every.md">&lt;code>every&lt;/code>&lt;/a>: 判断是否&lt;strong>所有&lt;/strong>的数组元素都符合某种条件&lt;/li>
+&lt;li>
+&lt;a href="./06-Array.prototype.indexOf.md">&lt;code>indexOf&lt;/code>&lt;/a>: 得到一个值在数组中&lt;strong>首次&lt;/strong>出现的索引&lt;/li>
+&lt;li>
+&lt;a href="./07-Array.prototype.lastIndexOf.md">&lt;code>lastIndexOf&lt;/code>&lt;/a>: 得到一个值在数组中&lt;strong>最后一次&lt;/strong>出现的索引&lt;/li>
+&lt;li>
+&lt;a href="./08-Array.prototype.reduce.md">&lt;code>reduce&lt;/code>&lt;/a>: 对一个数组进行迭代递归操作&lt;/li>
+&lt;li>
+&lt;a href="./09-Array.prototype.reduceRight.md">&lt;code>reduceRight&lt;/code>&lt;/a>: 作用同 &lt;code>reduce&lt;/code>，但是是从数组最后一项向第一项进行遍历&lt;/li>
+&lt;/ul>
+&lt;p>其中有一部分方法有一些相同之处：相同的参数。&lt;/p>
+&lt;p>第一个参数是一个函数，第二个参数是第一个参数函数执行时的上下文环境，即 &lt;code>this&lt;/code> 指向，第二个参数非必需。&lt;/p>
+&lt;p>而且第一个参数函数有三个参数：数组元素、元素索引和数组本身。&lt;/p>
+&lt;h2 id="注意">注意&lt;/h2>
+&lt;ol>
+&lt;li>这些方法遍历时会跳过值为空的元素。&lt;/li>
+&lt;/ol>
+&lt;p>这里的“值为空”不是指 &lt;code>null&lt;/code> 或 &lt;code>undefined&lt;/code>，而是使用构造函数创建且未指定元素值的数组元素。&lt;/p>
+&lt;pre>&lt;code class="language-js">var arr = new Array(3);
+console.log(arr);
+&lt;/code>&lt;/pre>
+&lt;p>&lt;img src="./imgs/array-empty.png" alt="值为空">&lt;/p>
+&lt;ol start="2">
+&lt;li>在遍历过程中删除元素，回导致遍历提前结束&lt;/li>
+&lt;/ol>
+&lt;p>第一段代码：分别打印：1，2，3，4，5&lt;/p>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3, 4, 5]
+arr.forEach(function (item, index) {
+console.log(item)
+})
+&lt;/code>&lt;/pre>
+&lt;p>第二段代码：分别打印：1，2，4，5&lt;/p>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3, 4, 5]
+arr.forEach(function (item, index) {
+console.log(item)
+if (index === 1) {
+arr.splice(index, 1);
+}
+})
+&lt;/code>&lt;/pre>
+&lt;p>第三段代码：也是分别打印：1，2，4，5&lt;/p>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3, 4, 5]
+arr.forEach(function (item, index) {
+console.log(item)
+if (index === 1) {
+arr.splice(0, 1);
+}
+})
+&lt;/code>&lt;/pre></description></item><item><title>ES6 新增数组方法总览</title><link>/doc/oh-my-js/03-array-es6/readme/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/03-array-es6/readme/</guid><description>&lt;h1 id="es6-新增数组方法总览">ES6 新增数组方法总览&lt;/h1>
+&lt;ul>
+&lt;li>
+&lt;a href="./10-Array.isArray.md">&lt;code>isArray&lt;/code>&lt;/a>: 判断一个值是否是 &lt;code>Array&lt;/code> 类型&lt;/li>
+&lt;/ul></description></item><item><title>Object.assign()</title><link>/doc/oh-my-js/05-object/05-object.assign/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/05-object/05-object.assign/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>ES6 引入 &lt;code>Object.assign&lt;/code> 方法，它用于对象的合并，将源对象（source）的所有可枚举属性，复制到目标对象（target）。&lt;/p>
+&lt;p>如果目标对象和源对象有同名属性，或者多个源对象有同名属性，则后面的属性会覆盖前面的属性。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;p>第一个参数是目标对象，后面的参数都是源对象。&lt;/p>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>合并之后的目标对象。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="0-基本使用">0. 基本使用&lt;/h3>
+&lt;pre>&lt;code class="language-js">const target = { a: 1 };
+const source1 = { a: 2, b: 2, c: 2 };
+const source2 = { b: 3, c: 3, d: 3 };
+Object.assign(target, source1, source2);
+console.log(target); // {a: 2, b: 3, c: 3, d: 3}
+// 可以看到对于同名属性的处理是，后面的
+&lt;/code>&lt;/pre>
+&lt;h3 id="1-同名属性后面覆盖前面">1. 同名属性后面覆盖前面&lt;/h3>
+&lt;pre>&lt;code class="language-js">const target = { a: 1, b: 1 };
+const source1 = { b: 2 , c: 2 };
+const source2 = { c: 3 };
+Object.assign(target, source1, source2);
+console.log(target); // {a: 1, b: 2, c: 3}
+&lt;/code>&lt;/pre>
+&lt;h3 id="2-只有一个参数">2. 只有一个参数&lt;/h3>
+&lt;p>只有一个参数，直接返回该参数&lt;/p>
+&lt;pre>&lt;code class="language-js">const obj = { a: 1 };
+Object.assign(obj) === obj; // true
+&lt;/code>&lt;/pre>
+&lt;p>如果该参数不是对象，则会先转成对象，然后返回。&lt;/p>
+&lt;pre>&lt;code class="language-js">typeof Object.assign(2); // &amp;quot;object&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>参数是 &lt;code>undefined&lt;/code> 或 &lt;code>null&lt;/code>，会报错。&lt;/p>
+&lt;pre>&lt;code class="language-js">Object.assign(undefined); // 报错
+Object.assign(null); // 报错
+&lt;/code>&lt;/pre>
+&lt;h3 id="3-源对象不是-object-类型">3. 源对象不是 Object 类型&lt;/h3>
+&lt;p>如果源对象不是 Object 类型，会先将其转换为对象，如果无法转换，则跳过。&lt;/p>
+&lt;p>因此，&lt;code>undefined&lt;/code> 和 &lt;code>null&lt;/code> 不会报错，数字和布尔值也不会报错，会直接跳过，无任何效果。&lt;/p>
+&lt;p>而字符串会以数组形式拷贝到目标对象。&lt;/p>
+&lt;pre>&lt;code class="language-js">Object.assign({}, undefined); // {}
+Object.assign({}, null); // {}
+Object.assign({}, 1); // {}
+Object.assign({}, true); // {}
+Object.assign({}, 'abcd'); // {0: &amp;quot;a&amp;quot;, 1: &amp;quot;b&amp;quot;, 2: &amp;quot;c&amp;quot;, 3: &amp;quot;d&amp;quot;}
+Object.assign({}, { a: 1 }); // { a: 1 }
+&lt;/code>&lt;/pre>
+&lt;h3 id="4-assign-是浅拷贝">4. assign() 是浅拷贝&lt;/h3>
+&lt;p>如果源对象的某个属性值是对象，那么目标对象拷贝得到的是这个对象的引用。&lt;/p>
+&lt;p>此属性发生任何变化，都会反映到目标对象上。&lt;/p>
+&lt;pre>&lt;code class="language-js">const obj = {
+person: { name: 'jack' }
+};
+const obj2 = Object.assign({}, obj);
+obj.person.name = 'tom';
+console.log(obj2.person.name); // &amp;quot;tom&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h3 id="5-数组的处理">5. 数组的处理&lt;/h3>
+&lt;p>Object.assign 可以用来处理数组，但是会把数组视为对象。&lt;/p>
+&lt;pre>&lt;code class="language-js">Object.assign([1, 2, 3], [4, 5]); // [4, 5, 3]
+&lt;/code>&lt;/pre></description></item><item><title>Object.create()</title><link>/doc/oh-my-js/05-object/08-object.create/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/05-object/08-object.create/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>Object.create()&lt;/code> 方法用于创建一个新对象，并且将新对象的 &lt;code>__proto__&lt;/code> 指向一个现有的对象。&lt;/p>
+&lt;p>&lt;code>Object.create()&lt;/code> 接收两个参数，第一个参数就是新对象的原型对象，第二个参数（可选）是一个用于向新建对象自身添加属性的&lt;strong>对象&lt;/strong>，&lt;strong>对象的格式对应
+&lt;a href="./07-Object.defineProperty.md">Object.defineProperty()&lt;/a> 的第二个参数&lt;/strong>。&lt;/p>
+&lt;p>&lt;code>Object.create()&lt;/code> 返回值是新创建的已经指定了原型和属性的对象。&lt;/p>
+&lt;p>::: danger 注意
+第二个参数可以不传，但不能为 &lt;code>null&lt;/code> 或者&lt;strong>非原始包装对象&lt;/strong>，否则会抛出 &lt;code>TypeError&lt;/code> 异常。
+:::&lt;/p>
+&lt;h2 id="例子">例子&lt;/h2>
+&lt;h3 id="利用-objectcreate-实现继承">利用 &lt;code>Object.create()&lt;/code> 实现继承&lt;/h3>
+&lt;p>关于原型，我们应该知道函数具有一个 &lt;code>prototype&lt;/code> 属性，这个属性值是一个对象，它默认有一个 &lt;code>constructor&lt;/code> 属性，指向这个函数本身，因此需要在子类继承父类之后，将子类 &lt;code>prototype.constructor&lt;/code> 指向子类本身。&lt;/p>
+&lt;pre>&lt;code class="language-js">var Person = function () {
+this.sex = 'all'
+}
+Person.prototype = {
+eat: function () { console.log('eat!') }
+};
+var Man = function () {
+// 继承 Person 构造函数内部（非prototype）的属性
+Person.call(this)
+this.sex = 'man'
+}
+// 子类继承父类
+Man.prototype = Object.create(Person.prototype)
+// 修正 constructor 指向
+Man.prototype.constructor = Man
+&lt;/code>&lt;/pre>
+&lt;p>可以通过打印来验证我们的想法：&lt;/p>
+&lt;pre>&lt;code class="language-js">console.log(Man.prototype === Person.prototype) // false
+console.log(Man.prototype.__proto__ === Person.prototype) // true
+console.log(Man.prototype.constructor === Man)
+var p1 = new Person()
+var m1 = new Man()
+console.log(m1.eat === p1.eat) // true
+Person.prototype.play = function () {
+console.log('play')
+}
+p1.play() // play
+m1.play() // play
+&lt;/code>&lt;/pre>
+&lt;h3 id="继承多个对象">继承多个对象&lt;/h3>
+&lt;h2 id="参考链接">参考链接&lt;/h2>
+&lt;p>
+&lt;a href="https://javascript.ruanyifeng.com/stdlib/wrapper.html" target="_blank" rel="noopener">包装对象&lt;/a>&lt;/p></description></item><item><title>Object.defineProperty</title><link>/doc/oh-my-js/05-object/07-object.defineproperty/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/05-object/07-object.defineproperty/</guid><description>&lt;p>::: tip
+&lt;a href="mailto:Vue.js@2.x">Vue.js@2.x&lt;/a> 的响应式系统就是利用 Object.defineProperty 实现的，参考
+&lt;a href="https://cn.vuejs.org/v2/guide/reactivity.html" target="_blank" rel="noopener">深入响应式原理&lt;/a>
+:::&lt;/p>
+&lt;h2 id="用法">用法&lt;/h2>
+&lt;p>这个方法在一个对象上定义一个新属性，或者修改一个已经存在的属性。并返回这个对象。&lt;/p>
+&lt;pre>&lt;code class="language-js">Object.defineProperty(obj, prop, descriptor);
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>&lt;code>obj&lt;/code>: 目标对象&lt;/li>
+&lt;li>&lt;code>prop&lt;/code>: 要操作的属性&lt;/li>
+&lt;li>&lt;code>descriptor&lt;/code>: 用于指定对象属性的特性，这些特性包括：
+&lt;ul>
+&lt;li>&lt;code>value&lt;/code>: 属性的值，默认为 &lt;code>undefined&lt;/code>&lt;/li>
+&lt;li>&lt;code>writable&lt;/code>: 属性的值是否可以被重写，默认为 &lt;code>true&lt;/code>&lt;/li>
+&lt;li>&lt;code>get&lt;/code>: 获取属性值的时候触发的函数，默认为 undefined&lt;/li>
+&lt;li>&lt;code>set&lt;/code>: 设置属性值的时候触发的函数，默认为 undefined&lt;/li>
+&lt;li>&lt;code>configurable&lt;/code>: 是否可以删除目标属性或是否可以再次修改属性的特性，默认为 true&lt;/li>
+&lt;li>&lt;code>enumerable&lt;/code>: 此属性是否可以被枚举（使用for&amp;hellip;in或Object.keys()），默认为 true&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="修改属性的-value">修改属性的 &lt;code>value&lt;/code>&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = { name: 'jack', age: 18 };
+Object.defineProperty( obj, 'age', {
+value: 22
+});
+console.log( obj.age ); // 22
+// age 属性已经被修改
+&lt;/code>&lt;/pre>
+&lt;p>如果对象不存在这个属性，就会创建这个属性&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = { name: 'jack' };
+Object.defineProperty( obj, 'age', {
+value: 22
+});
+console.log( obj ); // {name: &amp;quot;jack&amp;quot;, age: 22}
+&lt;/code>&lt;/pre>
+&lt;h3 id="修改属性的-writable">修改属性的 &lt;code>writable&lt;/code>&lt;/h3>
+&lt;p>将 &lt;code>writable&lt;/code> 设置为 &lt;code>false&lt;/code> 之后，无法直接修改属性值，必须使用 &lt;code>Object.defineProperty&lt;/code> 方法修改其值。&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = { name: 'jack', age: 18 };
+// 此时可以直接修改 age 属性
+obj.age = 22;
+console.log( obj.age ); // 22
+// 现在将 writable 设置为 false
+Object.defineProperty( obj, 'age', {
+writable: false
+});
+// 再次直接对属性赋值，不起作用，也不报错
+obj.age = 18;
+console.log( obj.age ); // 22
+// 此时使用 Object.defineProperty 方法修改，修改成功
+Object.defineProperty( obj, 'age', {
+value: 18
+});
+console.log( obj.age ); // 18
+// 将 `writable` 恢复为 `true` 之后可以直接进行赋值
+Object.defineProperty( obj, 'age', {
+writable: true
+});
+obj.age = 20;
+console.log( obj.age ); // 20
+&lt;/code>&lt;/pre>
+&lt;h2 id="enumerable">&lt;code>enumerable&lt;/code>&lt;/h2>
+&lt;p>&lt;code>enumerable&lt;/code> 用来表示此属性是否可以被枚举，比如使用 &lt;code>for in&lt;/code> 和 &lt;code>Object.keys()&lt;/code> 时是否会被遍历。&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = { name: 'jack', age: 18 };
+for (k in obj) {
+console.log(k, obj[k]);
+}
+// name jack
+// age 18
+console.log( Object.keys(obj) );
+// [ &amp;quot;name&amp;quot;, &amp;quot;age&amp;quot; ]
+console.log( Object.values(obj) );
+// [ &amp;quot;jack&amp;quot;, 18 ]
+// 然后将 age 属性的 `enumerable` 设置为 `false`，就会发现 age 属性不会被遍历到
+Object.defineProperty( obj, 'age', {
+enumerable: false
+})
+for (k in obj) {
+console.log(k, obj[k]);
+}
+// name jack
+console.log( Object.keys(obj) );
+// [ &amp;quot;name&amp;quot; ]
+console.log( Object.values(obj) );
+// [ &amp;quot;jack&amp;quot; ]
+&lt;/code>&lt;/pre>
+&lt;h2 id="set-和-get">set 和 get&lt;/h2>
+&lt;p>先来看 get，&lt;code>get&lt;/code> 方法会在获取 &lt;code>age&lt;/code> 属性的时候执行，并将其返回值作为 &lt;code>age&lt;/code> 属性的值。&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = { name: 'jack', age: 18 };
+Object.defineProperty( obj, 'age', {
+get: function () {
+return 'get age';
+}
+})
+console.log( obj.age );
+// &amp;quot;get age&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>再来看 set&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = { name: 'jack', age: 18 };
+Object.defineProperty( obj, 'age', {
+set: function ( newValue ) {
+console.log( 'newValue:', newValue )
+}
+});
+obj.age = 22;
+console.log( 'age:', obj.age )
+// newValue: 22
+// age: undefined
+&lt;/code>&lt;/pre>
+&lt;p>set 方法接收一个参数，即将要给 &lt;code>age&lt;/code> 设置的新值。&lt;/p>
+&lt;p>set 方法的返回值是最终 &lt;code>age&lt;/code> 属性的值，如果 set 方法没有返回值，则为 undefined。&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = { name: 'jack', age: 18 };
+Object.defineProperty( obj, 'age', {
+set: function ( newValue ) {
+return newValue;
+}
+});
+obj.age = 22;
+console.log( 'age:', obj.age )
+// newValue: 22
+// age: undefined
+&lt;/code>&lt;/pre></description></item><item><title>Object.entries()</title><link>/doc/oh-my-js/05-object/04-object.entries/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/05-object/04-object.entries/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>ES6 引入 &lt;code>Object.entries&lt;/code> 方法，它返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（enumerable）属性的键值对数组。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>obj&lt;/td>
+&lt;td>Object 类型，必需。要处理的对象&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>数组类型&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="1-普通对象">1. 普通对象&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = { foo: 'bar', boo: 123 };
+console.log( Object.entries(obj) ); // [ [&amp;quot;foo&amp;quot;, &amp;quot;bar&amp;quot;], [&amp;quot;boo&amp;quot;, 123] ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="2-类数组对象">2. 类数组对象&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = { 0: 'a', 1: 'b', 2: 'c' };
+console.log( Object.entries(obj) ); // [ [&amp;quot;0&amp;quot;, &amp;quot;a&amp;quot;], [&amp;quot;1&amp;quot;, &amp;quot;b&amp;quot;], [&amp;quot;2&amp;quot;, &amp;quot;c&amp;quot;] ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="3-随机索引的类数组对象">3. 随机索引的类数组对象&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = { 100: 'a', 2: 'b', 7: 'c' };
+console.log( Object.values(obj) ); // [ [&amp;quot;2&amp;quot;, &amp;quot;b&amp;quot;], [&amp;quot;7&amp;quot;, &amp;quot;c&amp;quot;], [&amp;quot;100&amp;quot;, &amp;quot;a&amp;quot;] ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="4">4.&lt;/h3>
+&lt;h3 id="5-异常">5. 异常&lt;/h3>
+&lt;pre>&lt;code class="language-js">Object.values( 'foo' ); // [ 'f', 'o', 'o' ]
+&lt;/code>&lt;/pre></description></item><item><title>Object.is()</title><link>/doc/oh-my-js/05-object/06-object.is/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/05-object/06-object.is/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>ES6 引入 &lt;code>Object.is&lt;/code> 方法，它用于比较两个值是否严格相等。&lt;/p>
+&lt;p>相等运算符（&lt;code>==&lt;/code>）会自动转换类型，严格相等运算符 &lt;code>NaN&lt;/code> 不等于自身，而且 &lt;code>+0&lt;/code> 等于 &lt;code>-0&lt;/code>。&lt;/p>
+&lt;p>&lt;code>Object.is()&lt;/code> 方法和严格相等运算符基本一致，不同之处有两个，一是 &lt;code>+0&lt;/code> 不等于 &lt;code>-0&lt;/code>，二是 &lt;code>NaN&lt;/code> 等于自身。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;p>两个进行比较的值&lt;/p>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>如果两个参数相等，返回 &lt;code>true&lt;/code> ，否则返回 &lt;code>false&lt;/code> 。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="0-基本使用">0. 基本使用&lt;/h3>
+&lt;pre>&lt;code class="language-js">Object.is({}, {}); // false
+Object.is(&amp;quot;abc&amp;quot;, &amp;quot;abc&amp;quot;); // true
+&lt;/code>&lt;/pre>
+&lt;h3 id="1-objectis-不会自动转换类型">1. Object.is() 不会自动转换类型&lt;/h3>
+&lt;pre>&lt;code class="language-js">console.log(&amp;quot;5&amp;quot; == 5); // true
+console.log(Object.is(&amp;quot;5&amp;quot;, 5)); // false
+&lt;/code>&lt;/pre>
+&lt;h3 id="2-objectis-和-严格相等的区别">2. Object.is() 和 严格相等（&lt;code>===&lt;/code>）的区别&lt;/h3>
+&lt;pre>&lt;code class="language-js">console.log(Object.is(NaN, NaN)); // true
+console.log(NaN === NaN); // false
+console.log(Object.is(-1, +1)); // false
+console.log(+1 === -1);
+&lt;/code>&lt;/pre></description></item><item><title>Object.keys()</title><link>/doc/oh-my-js/05-object/02-object.keys/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/05-object/02-object.keys/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>ES6 引入 &lt;code>Object.keys&lt;/code> 方法，它返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（enumerable）属性的键名。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>obj&lt;/td>
+&lt;td>Object 类型，必需。要处理的对象&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>一个表示给定对象的所有可枚举属性的字符串数组&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="0-基本使用">0. 基本使用&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = {
+name: 'jack',
+age: 20,
+sex: 'man'
+};
+var keys = Object.keys(arr); // [&amp;quot;name&amp;quot;, &amp;quot;age&amp;quot;, &amp;quot;sex&amp;quot;]
+&lt;/code>&lt;/pre>
+&lt;h3 id="1-简单数组">1. 简单数组&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [ 'a', 'b', 'c' ];
+console.log( Object.keys(arr) ); // [ '0', '1', '2' ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="2-类数组对象">2. 类数组对象&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = { 0: 'a', 1: 'b', 2: 'c' };
+console.log( Object.keys(obj) ); // [ '0', '1', '2' ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="3-随机索引的类数组对象">3. 随机索引的类数组对象&lt;/h3>
+&lt;p>注意顺序，按照索引从小到大进行遍历。&lt;/p>
+&lt;pre>&lt;code class="language-js">var anObj = { 100: 'a', 2: 'b', 7: 'c' };
+console.log( Object.keys(anObj) ); // [ '2', '7', '100' ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="4-包含不可枚举属性">4. 包含不可枚举属性&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = Object.create({}, {
+getFoo: {
+value: function () { return this.foo; }
+}
+});
+obj.foo = 1;
+console.log( Object.keys(obj) ); // [ 'foo' ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="5-异常处理">5. 异常处理&lt;/h3>
+&lt;p>ES5 中，如果参数是原始值，会抛出异常。ES6 中则会强制转化为一个对象。&lt;/p>
+&lt;pre>&lt;code class="language-js">Object.keys( 'foo' ); // TypeError: &amp;quot;foo&amp;quot; is not an object (ES5 code)
+Object.keys( 'foo' ); // [ '0', '1', '2' ]
+&lt;/code>&lt;/pre></description></item><item><title>Object.prototype.hasOwnProperty()</title><link>/doc/oh-my-js/05-object/01-object.prototype.hasownproperty/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/05-object/01-object.prototype.hasownproperty/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>JavaScript 对象既可以有自己的属性，也可以从原型继承。通过 &lt;code>hasOwnProperty&lt;/code> 可以区分继承属性和非继承属性。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>prop&lt;/td>
+&lt;td>String 类型，必需。要检测的属性名&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>布尔值，对象自身是否拥有被检测的属性。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="判断自身属性-prop-是否存在">判断自身属性 prop 是否存在&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = new Object();
+obj.prop = 'ok';
+function changeObj () {
+obj.newProp = obj.prop;
+delete obj.prop;
+}
+obj.hasOwnProperty('prop'); // true
+changeObj();
+obj.hasOwnProperty('prop'); // false
+&lt;/code>&lt;/pre>
+&lt;h3 id="区分自身属性和继承属性">区分自身属性和继承属性&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = new Object();
+obj.prop = 'ok';
+obj.hasOwnProperty('prop'); // true
+obj.hasOwnProperty('toString'); // false
+obj.hasOwnProperty('hasOwnProperty'); // false
+&lt;/code>&lt;/pre>
+&lt;h3 id="在遍历一个对象所有自身属性时使用">在遍历一个对象所有自身属性时使用&lt;/h3>
+&lt;p>注意：&lt;code>for...in&lt;/code> 循环只会遍历可枚举属性&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = new Object();
+obj.prop = 'ok';
+Object.prototype.name = 'name';
+for (var k in obj) {
+if (obj.hasOwnProperty(k)) {
+console.log('hasOwnProperty: ', k);
+} else {
+console.log('Not hasOwnProperty: ', k);
+}
+}
+&lt;/code>&lt;/pre>
+&lt;h3 id="hasownproperty-被改写">&lt;code>hasOwnProperty&lt;/code> 被改写&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = {
+hasOwnProperty: function () {
+return false;
+},
+prop: 'ok'
+};
+obj.hasOwnProperty('prop'); // 永远都返回 false
+// 为避免这种情况，可以使用 Object 原型链上的 hasOwnProperty 属性来判断
+Object.prototype.hasOwnProperty.call(obj, 'prop');
+&lt;/code>&lt;/pre></description></item><item><title>Object.values()</title><link>/doc/oh-my-js/05-object/03-object.values/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/05-object/03-object.values/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>ES6 引入 &lt;code>Object.values&lt;/code> 方法，它返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（enumerable）属性的键值&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>obj&lt;/td>
+&lt;td>Object 类型，必需。要处理的对象&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>数组类型&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="1-普通对象">1. 普通对象&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = { foo: 'bar', boo: 123 };
+console.log( Object.values(obj) ); // [ 'bar', 123 ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="2-类数组对象">2. 类数组对象&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = { 0: 'a', 1: 'b', 2: 'c' };
+console.log( Object.values(obj) ); // [ 'a', 'b', 'c' ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="3-随机索引的类数组对象">3. 随机索引的类数组对象&lt;/h3>
+&lt;pre>&lt;code class="language-js">var obj = { 100: 'a', 2: 'b', 7: 'c' };
+console.log( Object.values(obj) ); // [ 'b', 'c', 'a' ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="4">4.&lt;/h3>
+&lt;h3 id="5-异常">5. 异常&lt;/h3>
+&lt;pre>&lt;code class="language-js">Object.values( 'foo' ); // [ 'f', 'o', 'o' ]
+&lt;/code>&lt;/pre></description></item><item><title>padStart 和 padEnd</title><link>/doc/oh-my-js/04-string/009-string.prototype-padstart-padend/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/009-string.prototype-padstart-padend/</guid><description>&lt;h2 id="padstart">padStart&lt;/h2>
+&lt;pre>&lt;code class="language-js">'7'.padStart(2, 0); // &amp;quot;07&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h2 id="padend">padEnd&lt;/h2>
+&lt;h2 id="相关文章">相关文章&lt;/h2>
+&lt;p>
+&lt;a href="https://www.zhangxinxu.com/wordpress/2018/07/js-padstart-padend/" target="_blank" rel="noopener">JS字符串补全方法padStart()和padEnd()简介&lt;/a>&lt;/p></description></item><item><title>Regexp.prototype.exec()</title><link>/doc/oh-my-js/06-regexp/03-regexp.prototype.exec/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/06-regexp/03-regexp.prototype.exec/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>在一个指定字符串中执行一个搜索匹配。返回一个数组或 &lt;code>null&lt;/code>。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>必需。要匹配正则表达式的字符串。&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>如果匹配成功，&lt;code>exec()&lt;/code> 方法返回一个数组，并更新正则表达式对象的属性。&lt;/p>
+&lt;p>返回的数组将完全匹配成功的文本作为第一项，将正则括号里匹配成功的作为数组元素填充到后面。&lt;/p>
+&lt;p>如果匹配失败，返回 &lt;code>null&lt;/code>。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="返回值-1">返回值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var str = 'leftTop';
+var reg = /^([a-z]*)([A-Z]\w*)*/;
+var result = reg.exec(str);
+console.log( result );
+// [
+// 0: &amp;quot;leftTop&amp;quot;
+// 1: &amp;quot;left&amp;quot;
+// 2: &amp;quot;Top&amp;quot;
+// groups: undefined
+// index: 0
+// input: &amp;quot;leftTop&amp;quot;
+// length: 3
+// ]
+&lt;/code>&lt;/pre>
+&lt;p>数组第一个元素：完全匹配成功的文本&lt;/p>
+&lt;p>数组第二个元素：匹配到正则第一个括号内表达式的文本&lt;/p>
+&lt;p>数组第三个元素：匹配到正则第二个括号内表达式的文本&lt;/p>
+&lt;p>（以此类推……）&lt;/p>
+&lt;p>数组的 &lt;code>index&lt;/code> 属性：匹配成功的文本首个字符在原表达式中的索引&lt;/p>
+&lt;p>数组的 &lt;code>input&lt;/code> 属性：用于匹配正则表达式的原始字符串&lt;/p>
+&lt;h3 id="返回-null">返回 null&lt;/h3>
+&lt;pre>&lt;code class="language-js">var reg = /abc/;
+var str = 'javascript';
+var result = reg.exec(str);
+consle.log(result); // null
+&lt;/code>&lt;/pre>
+&lt;h3 id="更新正则表达式对象的属性">更新正则表达式对象的属性&lt;/h3>
+&lt;p>正则表达式在有 &lt;code>g&lt;/code> 标志的情况下，每次执行 &lt;code>exec()&lt;/code> 方法后，会更新正则表达式的 &lt;code>lastIndex&lt;/code> 属性。&lt;/p>
+&lt;pre>&lt;code class="language-js">var reg = /(hello \S+)/g; // 有 g 标志
+var str = 'This is a hello world! This is a hello regexp!'
+console.log(reg.lastIndex);
+// 0
+reg.exec(str);
+// [
+// 0: &amp;quot;hello world!&amp;quot;
+// 1: &amp;quot;hello world!&amp;quot;
+// groups: undefined
+// index: 10
+// input: &amp;quot;This is a hello world! This is a hello regexp!&amp;quot;
+// length: 2
+// ]
+console.log(reg.lastIndex);
+// 22
+// 即 world! 后面的那个空格的索引
+reg.exec(str); // 第二次执行 exec() 时，从 reg.lastIndex 开始向后索引
+// [
+// 0: &amp;quot;hello regexp!&amp;quot;
+// 1: &amp;quot;hello regexp!&amp;quot;
+// groups: undefined
+// index: 33
+// input: &amp;quot;This is a hello world! This is a hello regexp!&amp;quot;
+// length: 2
+// ]
+&lt;/code>&lt;/pre></description></item><item><title>Regexp.prototype.test()</title><link>/doc/oh-my-js/06-regexp/02-regexp.prototype.test/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/06-regexp/02-regexp.prototype.test/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>检测字符串中是否含有与 regexp 相匹配的文本。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>string&lt;/td>
+&lt;td>必需。要检测的字符串&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>如果字符串 string 中含有与 regexp 匹配的文本，就返回 true，否则返回 false&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var reg = /java/i;
+reg.test('javascript'); // 返回 true
+reg.test('ECMAScript'); // 返回 false
+&lt;/code>&lt;/pre>
+&lt;pre>&lt;code class="language-js">var reg = /java$/i;
+reg.test('javascript'); // false
+&lt;/code>&lt;/pre></description></item><item><title>String.prototype.includes</title><link>/doc/oh-my-js/04-string/006-string.prototype.includes/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/006-string.prototype.includes/</guid><description>&lt;h2 id="基本使用">基本使用&lt;/h2>
+&lt;p>判断字符串中是否包含另外一个字符串。&lt;/p>
+&lt;pre>&lt;code class="language-js">&amp;quot;JavaScript&amp;quot;.includes(&amp;quot;Java&amp;quot;); // true
+&amp;quot;JavaScript&amp;quot;.includes(&amp;quot;java&amp;quot;); // false
+&amp;quot;Java&amp;quot;.includes(&amp;quot;JavaScript&amp;quot;); // false
+&lt;/code>&lt;/pre>
+&lt;h2 id="深入研究">深入研究&lt;/h2>
+&lt;p>如果参数不是字符串呢？&lt;/p>
+&lt;pre>&lt;code class="language-js">&amp;quot;123&amp;quot;.includes(123); // true
+&amp;quot;[object Object]&amp;quot;.includes({}); // true
+&amp;quot;&amp;quot;.includes([]); // true
+&amp;quot;true&amp;quot;.includes(true); // true
+&amp;quot;null&amp;quot;.includes(null); // true
+&amp;quot;NaN&amp;quot;.includes(NaN); // true
+&amp;quot;undefined&amp;quot;.includes(); // true
+&lt;/code>&lt;/pre>
+&lt;p>相信你看了上面的几个例子，会和我一样做出一个大胆猜测： &lt;code>includes&lt;/code> 方法内部会首先对参数进行字符串转化的操作，因为&lt;/p>
+&lt;p>将参数转化为字符串，实际上是调用了构造函数 &lt;code>String()&lt;/code> 方法：&lt;/p>
+&lt;pre>&lt;code class="language-js">String({});
+// &amp;quot;[object Object]&amp;quot;
+String([]);
+// &amp;quot;&amp;quot;
+String(true);
+// &amp;quot;true&amp;quot;
+String(333);
+// &amp;quot;333&amp;quot;
+String(null);
+// &amp;quot;null&amp;quot;
+String(NaN);
+// &amp;quot;NaN&amp;quot;
+String(undefined);
+// &amp;quot;undefined&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h2 id="题外话">题外话&lt;/h2>
+&lt;p>其实一开始我第一反应不是 &lt;code>String()&lt;/code> 方法，而是 &lt;code>toString&lt;/code> 方法，每种变量类型都拥有 &lt;code>toString&lt;/code> 方法，但是有两个例外：&lt;code>undefined&lt;/code> 和 &lt;code>null&lt;/code>&lt;/p>
+&lt;pre>&lt;code class="language-js">null.toString()
+// Uncaught TypeError: Cannot read property 'toString' of null
+// undefined.toString()
+// Uncaught TypeError: Cannot read property 'toString' of undefined
+&lt;/code>&lt;/pre></description></item><item><title>String.prototype.match</title><link>/doc/oh-my-js/04-string/004.string.prototype.match/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/004.string.prototype.match/</guid><description>&lt;h2 id="stringprototypematch">String.prototype.match&lt;/h2>
+&lt;h2 id="stringprototypematchall">String.prototype.matchAll&lt;/h2></description></item><item><title>String.prototype.match()</title><link>/doc/oh-my-js/04-string/05-string.prototype.match/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/05-string.prototype.match/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>检测字符串中是否含有与 regexp 相匹配的文本。&lt;/p>
+&lt;p>如果正则表达式不包含 &lt;code>g&lt;/code> 标志，则 &lt;code>match()&lt;/code> 方法返回值和 &lt;code>RegExp.exec()&lt;/code> 返回值是相同的。&lt;/p>
+&lt;p>如果正则表达式包含 &lt;code>g&lt;/code> 标志，则返回一个数组，包含所有匹配的字符串，而不是匹配对象（即不会返回 &lt;code>input&lt;/code> 属性和 &lt;code>index&lt;/code> 属性）。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>regexp&lt;/td>
+&lt;td>必需。如果传入一个非正则表达式，则会使用 &lt;code>new RegExp()&lt;/code> 将其隐式转换为正则表达式对象&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>见描述&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="是否包含-g-的区别">是否包含 &lt;code>g&lt;/code> 的区别&lt;/h3>
+&lt;pre>&lt;code class="language-js">'This is a hello world!'.match(/(hello \S+)/g); // [&amp;quot;hello world!&amp;quot;]
+var matches = /(hello \S+)/.exec('This is a hello world!');
+console.log(matches);
+// [
+// 0: &amp;quot;hello world!&amp;quot;
+// 1: &amp;quot;hello world!&amp;quot;
+// groups: ined
+// index: 10
+// input: s is a hello world!&amp;quot;
+// length: 2
+// ]
+&lt;/code>&lt;/pre></description></item><item><title>String.prototype.repeat()</title><link>/doc/oh-my-js/04-string/008-string.prototype.repeat/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/008-string.prototype.repeat/</guid><description/></item><item><title>String.prototype.replace()</title><link>/doc/oh-my-js/04-string/06-string.prototype.replace/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/06-string.prototype.replace/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>replace&lt;/code> 方法接收两个参数，第一个参数在字符串中匹配到的内容会被第二个参数替换掉。&lt;/p>
+&lt;p>&lt;code>replace&lt;/code> 方法不修改字符串本身，而只是返回一个新的替换后的字符串。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>regexp&lt;/td>
+&lt;td>必需。如果传入一个非正则表达式，则会使用 &lt;code>new RegExp()&lt;/code> 将其隐式转换为正则表达式对象&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="最简单的替换">最简单的替换&lt;/h3>
+&lt;pre>&lt;code class="language-js">var str = 'aabb';
+str.replace('a', 'x');
+// 'xabb' 只有第一个字母 a 被替换为字母 x
+&lt;/code>&lt;/pre>
+&lt;h3 id="第一个参数是正则">第一个参数是正则&lt;/h3>
+&lt;pre>&lt;code class="language-js">const time = '2019-04-01 13:10:10';
+const date = new Date(time.replace(/-/g, '/'));
+&lt;/code>&lt;/pre>
+&lt;h3 id="两个参数都是正则">两个参数都是正则&lt;/h3>
+&lt;p>将手机号码中间四位数字替换为星号 &lt;code>*&lt;/code>.&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = '18012345678';
+str.replace(/(\d{3})(\d{4})(\d{4})/, '$1****$3');
+// 180****5678
+&lt;/code>&lt;/pre>
+&lt;h3 id="第二个参数是函数">第二个参数是函数&lt;/h3>
+&lt;p>当第二个参数是函数时，这个函数会当被当做迭代器使用，它接收的参数分别是：&lt;/p>
+&lt;ol>
+&lt;li>匹配到的字符串&lt;/li>
+&lt;li>&lt;code>$1&lt;/code>: 正则表达式分组内容，没有分组则没有该参数&lt;/li>
+&lt;li>&lt;code>$2&lt;/code>: 第二个分组&lt;/li>
+&lt;li>&amp;hellip;更多的分组，如果有的话&lt;/li>
+&lt;li>匹配项在字符串中的 index&lt;/li>
+&lt;li>原字符串&lt;/li>
+&lt;/ol>
+&lt;p>这个方法可以用于获取查询字符串中的参数&lt;/p>
+&lt;pre>&lt;code class="language-js">// 假设 url 如下
+// https://www.baidu.com/s?ie=UTF-8&amp;amp;wd=regexp
+// 可以使用 window.location.search.slice(1) 来获取查询字符串
+var querystring = 'ie=UTF-8&amp;amp;wd=regexp';
+var params = parse(querystring);
+console.log(params);
+// {ie: &amp;quot;UTF-8&amp;quot;, wd: &amp;quot;regexp&amp;quot;}
+function parse (querystring) {
+var querystring = querystring || '';
+// 1. 参数的键名和键值都不包含=&amp;amp;这两个符号
+// 2. 键值可能为空
+var reg = /([^=&amp;amp;]+)=([^=&amp;amp;]*)/ig;
+var json = {};
+querystring.replace(reg, function (match, $1, $2) {
+var args = [].slice.call(arguments);
+console.log(args); // 打印参数
+json[$1] = $2
+})
+return json;
+}
+// [&amp;quot;ie=UTF-8&amp;quot;, &amp;quot;ie&amp;quot;, &amp;quot;UTF-8&amp;quot;, 0, &amp;quot;ie=UTF-8&amp;amp;wd=regexp&amp;quot;]
+// [&amp;quot;wd=regexp&amp;quot;, &amp;quot;wd&amp;quot;, &amp;quot;regexp&amp;quot;, 9, &amp;quot;ie=UTF-8&amp;amp;wd=regexp&amp;quot;]
+&lt;/code>&lt;/pre></description></item><item><title>String.prototype.search()</title><link>/doc/oh-my-js/04-string/04-string.prototype.search/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/04-string.prototype.search/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>检测字符串中是否含有与 regexp 相匹配的文本。类似于 &lt;code>Regexp.prototype.test&lt;/code> 方法。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>regexp&lt;/td>
+&lt;td>必需。如果传入一个非正则表达式，则会使用 &lt;code>new RegExp()&lt;/code> 将其隐式转换为正则表达式对象&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>如果匹配成功，则返回正则表达式在字符串中首次匹配项的索引。否则，返回 &lt;code>-1&lt;/code>&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var reg = /java/i;
+'javascript'.search(reg); // 0
+'learn java'.search(reg); // 6
+'ECMAScript'.search(reg); // -1
+&lt;/code>&lt;/pre></description></item><item><title>String.prototype.slice</title><link>/doc/oh-my-js/04-string/002-string.prototype.slice/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/002-string.prototype.slice/</guid><description>&lt;p>slice() 方法用于从字符串中切割出一部分，它接收两个参数：切割范围的起始索引和结束索引。&lt;/p>
+&lt;p>例如：&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = &amp;quot;github&amp;quot;
+var newStr = str.slice(1, 2);
+console.log(str); // &amp;quot;github&amp;quot;
+console.log(newStr); // &amp;quot;i&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>通过结果可以看出两点：&lt;/p>
+&lt;ol>
+&lt;li>此方法不修改原始变量，需要定义新变量接收其返回值&lt;/li>
+&lt;li>切割范围包含起始索引，不包含结束索引&lt;/li>
+&lt;/ol>
+&lt;p>再来看第二个列子，省略结束索引参数：&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = &amp;quot;github&amp;quot;
+var newStr = str.slice(1);
+console.log(newStr); // &amp;quot;ithub&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>第三个例子&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = &amp;quot;github&amp;quot;
+var newStr = str.slice(-3);
+console.log(newStr); // &amp;quot;hub&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>第四个例子&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = &amp;quot;github&amp;quot;
+var newStr = str.slice(-3);
+console.log(newStr); // &amp;quot;hub&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;pre>&lt;code class="language-js">var str = &amp;quot;github&amp;quot;
+var newStr = str.slice();
+console.log(newStr); // &amp;quot;github&amp;quot;
+&lt;/code>&lt;/pre></description></item><item><title>String.prototype.split</title><link>/doc/oh-my-js/04-string/003.string.prototype.split/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/003.string.prototype.split/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>把一个字符串或者一个正则表达式当做分隔符，把一个字符串分割成一个数组，并返回这个数组。（不会改变原字符串）&lt;/p>
+&lt;p>它和 &lt;code>Array.prototype.join()&lt;/code> 的操作是相反的。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>regexp&lt;/td>
+&lt;td>分隔符，必需。如果传入一个非正则表达式，则会使用 &lt;code>new RegExp()&lt;/code> 将其隐式转换为正则表达式对象&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="例子-1">例子 1&lt;/h3>
+&lt;pre>&lt;code class="language-js">var str = &amp;quot;a🅱️c:d&amp;quot;;
+var reg = /:/;
+// 以英文冒号: 为分隔符
+str.split(reg); // [&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;c&amp;quot;, &amp;quot;d&amp;quot;]
+&lt;/code>&lt;/pre>
+&lt;h3 id="例子-2">例子 2&lt;/h3>
+&lt;pre>&lt;code class="language-js">var str = &amp;quot;hello world&amp;quot;;
+var reg = /\s/;
+// 以空格为分隔符
+str.split(reg); // [ &amp;quot;hello&amp;quot;, &amp;quot;world&amp;quot; ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="例子-3-实例-转化查询字符串为-json-格式">例子 3: 实例-转化查询字符串为 json 格式&lt;/h3>
+&lt;p>示例网址：
+&lt;a href="https://www.baidu.com/s?ie=UTF-8&amp;amp;wd=JavaScript" target="_blank" rel="noopener">https://www.baidu.com/s?ie=UTF-8&amp;amp;wd=JavaScript&lt;/a>，在这个页面指向下面代码会得到 url 中 JSON 格式的参数。&lt;/p>
+&lt;pre>&lt;code class="language-js{6,8,12}">function getParams(url) {
+if (!url || typeof url !== &amp;quot;string&amp;quot;) {
+return {};
+}
+// 得到 ? 后面的查询字符串
+var qs = url.split(&amp;quot;?&amp;quot;)[1];
+// 通过 &amp;amp; 分隔不同的参数
+var qsArr = qs.split(&amp;quot;&amp;amp;&amp;quot;);
+var json = {};
+qsArr.forEach(function(item) {
+// 通过 = 分隔参数的键名和键值
+var temp = item.split(&amp;quot;=&amp;quot;);
+json[temp[0]] = temp[1];
+});
+return json;
+}
+var url = &amp;quot;https://www.baidu.com/s?ie=UTF-8&amp;amp;wd=JavaScript&amp;quot;;
+getParams(url); // {ie: &amp;quot;UTF-8&amp;quot;, wd: &amp;quot;JavaScript&amp;quot;}
+&lt;/code>&lt;/pre></description></item><item><title>千位符</title><link>/doc/oh-my-js/06-regexp/demo-mile-format/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/06-regexp/demo-mile-format/</guid><description>&lt;p>什么叫千位符&lt;/p>
+&lt;p>将 &lt;code>12345678&lt;/code> 转化为 &lt;code>12,345,678&lt;/code>（注：暂时不考虑小数）。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;a href="https://www.tuicool.com/articles/ArQZfui" target="_blank" rel="noopener">千位分隔符的完整攻略&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://www.cnblogs.com/rubylouvre/archive/2010/03/09/1681222.html" target="_blank" rel="noopener">javascript 正则表达式&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://www.cnblogs.com/kernel0815/p/3375249.html" target="_blank" rel="noopener">正则基础之 —— 环视 (Lookaround)&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>去除字符串的头尾空格</title><link>/doc/oh-my-js/04-string/005-string.prototype.trim/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/005-string.prototype.trim/</guid><description>&lt;h2 id="trim">trim&lt;/h2>
+&lt;p>&lt;code>trim&lt;/code> 创建字符串的一个副本，并移除字符串&lt;strong>两端&lt;/strong>的连续空白符，然后返回新字符串（并不会修改原字符串本身）。&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = ' a b c '
+var newStr = str.trim()
+console.log(str) // &amp;quot; a b c &amp;quot;
+console.log(newStr) // &amp;quot;a b c&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h2 id="trimstart-和-trimleft">trimStart 和 trimLeft&lt;/h2>
+&lt;p>&lt;code>trimStart&lt;/code> 会创建字符串的一个副本，并移除字符串**左端（开头）**的连续空白符，然后返回新字符串（并不会修改原字符串本身）。 &lt;code>trimLeft&lt;/code> 是 &lt;code>trimStart&lt;/code> 的别名。&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = ' a b c '
+var newStr1 = str.trimStart()
+var newStr2 = str.trimLeft()
+console.log(newStr1) // &amp;quot;a b c &amp;quot;
+console.log(newStr2) // &amp;quot;a b c &amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h2 id="trimend-和-trimright">trimEnd 和 trimRight&lt;/h2>
+&lt;p>&lt;code>trimRight&lt;/code> 创建字符串的一个副本，并移除字符串**右端（结尾）**的连续空白符，然后返回新字符串（并不会修改原字符串本身）。&lt;code>trimRight&lt;/code> 是 &lt;code>trimEnd&lt;/code> 的别名。&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = ' a b c '
+var newStr1 = str.trimEnd()
+var newStr2 = str.trimRight()
+console.log(newStr1) // &amp;quot; a b c&amp;quot;
+console.log(newStr2) // &amp;quot; a b c&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h2 id="通过正则简单实现">通过正则简单实现：&lt;/h2>
+&lt;pre>&lt;code class="language-js">if(!String.prototype.trim) {
+String.prototype.trim = function () {
+return this.replace(/^\s+|\s+$/g,'');
+};
+}
+if(!String.prototype.trimLeft) {
+String.prototype.trimLeft = function () {
+return this.replace(/^\s+/,'');
+};
+}
+if(!String.prototype.trimRight) {
+String.prototype.trimRight = function () {
+return this.replace(/\s+$/,'');
+};
+}
+&lt;/code>&lt;/pre>
+&lt;p>用到的正则：&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>\s&lt;/code> 匹配任何空白字符&lt;/li>
+&lt;li>&lt;code>+&lt;/code> 匹配至少 1 个元字符&lt;/li>
+&lt;li>&lt;code>^&lt;/code> 字符串必须以指定的字符开始&lt;/li>
+&lt;li>&lt;code>$&lt;/code> 字符串必须以指定的字符结束&lt;/li>
+&lt;li>&lt;code>|&lt;/code> 或者&lt;/li>
+&lt;li>&lt;code>g&lt;/code> 全局匹配&lt;/li>
+&lt;/ol>
+&lt;h2 id="more">more：&lt;/h2>
+&lt;ul>
+&lt;li>更多的实现方式参考：
+&lt;a href="http://www.cnblogs.com/rubylouvre/archive/2009/09/18/1568794.html" target="_blank" rel="noopener">JavaScript trim函数大赏 - 司徒正美&lt;/a>&lt;/li>
+&lt;li>MDN 文档：
+&lt;a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/Trim" target="_blank" rel="noopener">String.prototype.trim() - MDN&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>字符串大小写转换</title><link>/doc/oh-my-js/04-string/001-string.prototype-tolowercase-touppercase/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/001-string.prototype-tolowercase-touppercase/</guid><description>&lt;h2 id="stringprototypetolowercase">String.prototype.toLowerCase&lt;/h2>
+&lt;p>&lt;code>toLowerCase&lt;/code> 将字符串转换为小写，会将调用该方法的字符串转为小写形式，并返回。&lt;/p>
+&lt;p>不会影响字符串本身。&lt;/p>
+&lt;p>&lt;code>toLowerCase&lt;/code> 返回一个新的字符串，转换为小写形式之后的字符串。&lt;/p>
+&lt;p>例如：&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = 'GitHub'
+var newStr = str.toLowerCase();
+console.log(str); // GitHub
+console.log(newStr); // github
+&lt;/code>&lt;/pre>
+&lt;h2 id="stringprototypetouppercase">String.prototype.toUpperCase()&lt;/h2>
+&lt;p>&lt;code>toUpperCase&lt;/code> 会将调用该方法的字符串转为大写形式，并返回。&lt;/p>
+&lt;p>&lt;code>toUpperCase&lt;/code> 不会影响字符串本身。&lt;/p>
+&lt;p>返回一个新的字符串，转换为大写形式之后的字符串。&lt;/p>
+&lt;p>例如：&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = 'GitHub'
+var newStr = str.toUpperCase();
+console.log(str); // GitHub
+console.log(newStr); // GITHUB
+&lt;/code>&lt;/pre></description></item><item><title>将字符串转化为标签</title><link>/doc/oh-my-js/04-string/000-transform-string-to-tag/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/04-string/000-transform-string-to-tag/</guid><description>&lt;ul>
+&lt;li>italics&lt;/li>
+&lt;li>big&lt;/li>
+&lt;li>small&lt;/li>
+&lt;li>anchor&lt;/li>
+&lt;li>blink&lt;/li>
+&lt;li>bold&lt;/li>
+&lt;li>fontsize&lt;/li>
+&lt;li>fontcolor&lt;/li>
+&lt;li>link&lt;/li>
+&lt;li>normalize&lt;/li>
+&lt;/ul></description></item><item><title>正则表达式使用案例</title><link>/doc/oh-my-js/06-regexp/100-regexp-demos/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/06-regexp/100-regexp-demos/</guid><description>&lt;h2 id="隐藏手机号码中间-4-位数字">隐藏手机号码中间 4 位数字：&lt;/h2>
+&lt;ul>
+&lt;li>前三位数字：&lt;code>^(\d{3})&lt;/code>&lt;/li>
+&lt;li>中间 4 位数字：&lt;code>\d{4}&lt;/code>&lt;/li>
+&lt;li>最后 4 位数字：&lt;code>(\d{4})$&lt;/code>&lt;/li>
+&lt;li>子表达式：&lt;code>()&lt;/code> 中的内容是一个子表达式，&lt;code>$1&lt;/code> 表示第一个子表达式，&lt;code>$2&lt;/code> 表示第二个子表达式，依次类推。&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var str = '18012345678'
+var newStr = str.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2')
+console.log(newStr) // 180****5678
+&lt;/code>&lt;/pre>
+&lt;h2 id="判断字符串是否为数字">判断字符串是否为数字&lt;/h2>
+&lt;p>要考虑的问题：&lt;/p>
+&lt;ul>
+&lt;li>数字有正负&lt;/li>
+&lt;li>数字有整数和小数之分&lt;/li>
+&lt;li>特殊数字 &lt;code>0&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>进一步分析：&lt;/p>
+&lt;ul>
+&lt;li>正负：以 &lt;code>-&lt;/code> 开头为负数，直接以数字开头为正数，因此可以确定正则开头部分为 &lt;code>/^-?/&lt;/code>；&lt;/li>
+&lt;li>整数：整数的第一位应当是大于 0 的数字，如果是多位整数，则后面几位数字范围是 &lt;code>0-9&lt;/code> ，对应的正则为 &lt;code>/[1-9][0-9]*$/&lt;/code>&lt;/li>
+&lt;li>小数：小数有整数部分和小数部分，通过小数点 &lt;code>.&lt;/code> 分隔开。通过上面分析，整数部分应该是 &lt;code>/[1-9][0-9]*/&lt;/code> 。而小数点需转义为 &lt;code>/\./&lt;/code> 。小数部分可以全为 &lt;code>0&lt;/code> ，如 &lt;code>10.00&lt;/code> ，因此小数部分无需过多限制，对应的正则为 &lt;code>/[0-9]+/&lt;/code> 。&lt;/li>
+&lt;li>&lt;code>0&lt;/code>：对应的正则是 &lt;code>/0/&lt;/code> 。&lt;/li>
+&lt;/ul>
+&lt;p>整数、小数、&lt;code>0&lt;/code> 三种情况的逻辑关系为“或”，因此需要将他们使用 &lt;code>|&lt;/code> 连接合并起来:&lt;/p>
+&lt;pre>&lt;code class="language-js">var regNum = /(^-?[1-9][0-9]*$)|(^-?[1-9][0-9]*\.[0-9]+)|(^-?0$)/
+&lt;/code>&lt;/pre>
+&lt;p>另外，元字符 &lt;code>\d&lt;/code> 等价于 &lt;code>[0-9]&lt;/code>，上面正则也可以写成这样：&lt;/p>
+&lt;pre>&lt;code class="language-js">var regNum = /(^-?[1-9]\d*$)|(^-?[1-9]\d*\.\d+)|(^-?0$)/
+&lt;/code>&lt;/pre>
+&lt;h2 id="取出指定字符">取出指定字符&lt;/h2>
+&lt;p>有这样一个字符串，穿插着“【男播】”、“【女播】”、“【正文】”、“同期声”、“【CLIP】”五个随机出现的词组，现在需要对这个字符串进行一些操作。&lt;/p>
+&lt;p>提取“【男播】”与下一个相邻词组之间的内容：&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = &amp;quot;【男播】aaa【男播】bbb【女播】ccc【正文】ddd【同期声】ccc【CLIP】ddd【男播】eee【女播】fff【男播】ggg&amp;quot;;
+var reg = /男播】([^【]*)【|男播】([^【]*)$/gi;
+var arr = [];
+str.replace(reg, function (match, $1, $2) {
+$1 ? arr.push($1) : '';
+$2 ? arr.push($2) : '';
+})
+var result = arr.join(' ');
+console.log(result);
+&lt;/code>&lt;/pre></description></item><item><title>正则表达式基础知识</title><link>/doc/oh-my-js/06-regexp/00-regexp-basic/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/06-regexp/00-regexp-basic/</guid><description>&lt;blockquote>
+&lt;p>正则表达式验证工具：
+&lt;a href="https://regexper.com/" target="_blank" rel="noopener">https://regexper.com/&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;blockquote>
+&lt;p>
+&lt;a href="https://github.com/ziishaned/learn-regex/blob/master/translations/README-cn.md" target="_blank" rel="noopener">正则表达式教程&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="创建正则表达式">创建正则表达式&lt;/h2>
+&lt;h3 id="通过构造函数创建">通过构造函数创建&lt;/h3>
+&lt;pre>&lt;code class="language-js">var reg1 = new RegExp('a');
+var reg2 = new RegExp('[a-zA-Z]', 'gi');
+var reg3 = new RegExp(/[a-zA-Z]/, 'gi');
+&lt;/code>&lt;/pre>
+&lt;h3 id="通过字面量创建">通过字面量创建&lt;/h3>
+&lt;pre>&lt;code class="language-js">var reg = /[a-zA-Z]/gi;
+&lt;/code>&lt;/pre>
+&lt;h2 id="修饰符">修饰符&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>修饰符&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>i&lt;/code>&lt;/td>
+&lt;td>执行对大小写不敏感的匹配&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>g&lt;/code>&lt;/td>
+&lt;td>执行全局匹配（查找所有匹配，而非在找到第一个匹配后停止）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>m&lt;/code>&lt;/td>
+&lt;td>执行多行匹配&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>s&lt;/code>&lt;/td>
+&lt;td>执行单行匹配&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="正则对象属性">正则对象属性&lt;/h2>
+&lt;blockquote>
+&lt;p>属性均为只读，无法设置其值&lt;/p>
+&lt;/blockquote>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>属性&lt;/th>
+&lt;th>含义&lt;/th>
+&lt;th>默认值&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>global&lt;/code>&lt;/td>
+&lt;td>是否全文搜索&lt;/td>
+&lt;td>&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>ignoreCase&lt;/code>&lt;/td>
+&lt;td>是否大小写敏感&lt;/td>
+&lt;td>&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>multiline&lt;/code>&lt;/td>
+&lt;td>多行搜索&lt;/td>
+&lt;td>&lt;code>false&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>lastIndex&lt;/code>&lt;/td>
+&lt;td>是当前表达式匹配内容的最后一个字符的下一个位置&lt;/td>
+&lt;td>无&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>source&lt;/code>&lt;/td>
+&lt;td>正则表达式的文本字符串&lt;/td>
+&lt;td>无&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>示例：&lt;/p>
+&lt;pre>&lt;code class="language-js">var reg1 = /\w/;
+var reg2 = /\w/gim;
+console.log(reg1.global); // false
+console.log(reg1.ignoreCase); // false
+console.log(reg1.multiline); // false
+console.log(reg1.source); // &amp;quot;\w&amp;quot;
+console.log(reg2.global); // true
+console.log(reg2.ignoreCase); // true
+console.log(reg2.multiline); // true
+console.log(reg2.source); // &amp;quot;\w&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h2 id="方括号">方括号&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>表达式&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>[abc]&lt;/code>&lt;/td>
+&lt;td>匹配方括号之间的任何字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>[^abc]&lt;/code>&lt;/td>
+&lt;td>匹配任何不在方括号之间的字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>[0-9]&lt;/code>&lt;/td>
+&lt;td>匹配任何从 0 至 9 的数字&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>[a-z]&lt;/code>&lt;/td>
+&lt;td>匹配任何从小写 a 到小写 z 的字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>[A-Z]&lt;/code>&lt;/td>
+&lt;td>匹配任何从大写 A 到大写 Z 的字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>[A-z]&lt;/code>&lt;/td>
+&lt;td>匹配任何从大写 A 到小写 z 的字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>[adgk]&lt;/code>&lt;/td>
+&lt;td>匹配给定集合内的任何字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>[^adgk]&lt;/code>&lt;/td>
+&lt;td>匹配给定集合外的任何字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>(red|blue|green)&lt;/code>&lt;/td>
+&lt;td>匹配任何指定的选项&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="子表达式">子表达式&lt;/h2>
+&lt;p>用括号括起来的正则表达式。例如：&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = 'hello world';
+var reg = /(\w*)\s*(\w*)/;
+var ans = str.replace(reg, '$2 $1')
+console.log(ans); // world hello
+&lt;/code>&lt;/pre>
+&lt;p>如 &lt;code>/(\w*)\s*(\w*)/&lt;/code> 中，第一个括号 &lt;code>(\w*)&lt;/code> 匹配到的字符串（本例中是 &lt;code>hello&lt;/code>），记为 &lt;code>$1&lt;/code>，第二个括号 &lt;code>(\w*)&lt;/code> 匹配到的字符串（本例中是 &lt;code>world&lt;/code>），记为 &lt;code>$2&lt;/code>。&lt;/p>
+&lt;p>简单地说：从左到右，以分组的左括号为标志，第一个出现的分组的序号为 1，第二个为 2，以此类推。&lt;/p>
+&lt;p>复杂地说：分组 0 对应整个正则表达式实际上组号分配过程是要从左向右扫描两遍的：第一遍只给未命名组分配，第二遍只给命名组分配－－因此所有命名组的组号都大于未命名的组号。可以使用 &lt;code>(?:exp)&lt;/code> 这样的语法来剥夺一个分组对组号分配的参与权。&lt;/p>
+&lt;p>参考：
+&lt;a href="https://www.cnblogs.com/zichi/p/4343009.html" target="_blank" rel="noopener">我所认识的javascript正则表达式&lt;/a>&lt;/p>
+&lt;h2 id="元字符">元字符&lt;/h2>
+&lt;p>元字符是拥有特殊含义的字符：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>元字符&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>.&lt;/code>&lt;/td>
+&lt;td>匹配除 \n 以外的任何字符（注意元字符是小数点）。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>\w&lt;/code>&lt;/td>
+&lt;td>匹配大小写英文字符及数字 &lt;code>0&lt;/code> 到 &lt;code>9&lt;/code> 之间的任意一个及下划线，相当于 &lt;code>[a-zA-Z0-9_]&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>\W&lt;/code>&lt;/td>
+&lt;td>不匹配大小写英文字符及数字 &lt;code>0&lt;/code> 到 &lt;code>9&lt;/code> 之间的任意一个，相当于 &lt;code>[^a-zA-Z0-9_]&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>\s&lt;/code>&lt;/td>
+&lt;td>匹配任何空白字符，相当于 &lt;code>[ \f\n\r\t\v]&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>\S&lt;/code>&lt;/td>
+&lt;td>匹配任何非空白字符，相当于 &lt;code>[^\s]&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>\b&lt;/code>&lt;/td>
+&lt;td>匹配单词边界&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>\B&lt;/code>&lt;/td>
+&lt;td>匹配非单词边界&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>\d&lt;/code>&lt;/td>
+&lt;td>匹配任何 &lt;code>0&lt;/code> 到 &lt;code>9&lt;/code> 之间的单个数字，相当于 &lt;code>[0-9]&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>\D&lt;/code>&lt;/td>
+&lt;td>不匹配任何 &lt;code>0&lt;/code> 到 &lt;code>9&lt;/code> 之间的单个数字，相当于 &lt;code>[^0-9]&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>[\u4e00-\u9fa5]&lt;/code>&lt;/td>
+&lt;td>匹配任意单个汉字（这里用的是 &lt;code>Unicode&lt;/code> 编码表示汉字的 )&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>助记：&lt;/p>
+&lt;ul>
+&lt;li>w: word&lt;/li>
+&lt;li>s: space&lt;/li>
+&lt;li>d: digit&lt;/li>
+&lt;/ul>
+&lt;h2 id="量词限定符">量词（限定符）&lt;/h2>
+&lt;p>上面的元字符都是针对单个字符匹配的，要想同时匹配多个字符的话，还需要借助限定符。&lt;/p>
+&lt;p>下面是一些常见的限定符 ( 下表中 &lt;code>n&lt;/code> 和 &lt;code>m&lt;/code> 都是表示整数，并且 &lt;code>0 &amp;lt; n &amp;lt; m&lt;/code>) ：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>限定符&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>{n}&lt;/code>&lt;/td>
+&lt;td>匹配 &lt;code>n&lt;/code> 个元字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>{n,}&lt;/code>&lt;/td>
+&lt;td>匹配至少 &lt;code>n&lt;/code> 个元字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>{n,m}&lt;/code>&lt;/td>
+&lt;td>匹配 &lt;code>n&lt;/code> 到 &lt;code>m&lt;/code> 个元字符&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>*&lt;/code>&lt;/td>
+&lt;td>匹配 0 到多个元字符，相当于 &lt;code>{0,}&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>?&lt;/code>&lt;/td>
+&lt;td>匹配 0 到 1 个元字符，相当于 &lt;code>{0,1}&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>+&lt;/code>&lt;/td>
+&lt;td>匹配至少 1 个元字符，相当于 &lt;code>{1,}&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>^&lt;/code>&lt;/td>
+&lt;td>字符串必须以指定的字符开始&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>$&lt;/code>&lt;/td>
+&lt;td>字符串必须以指定的字符结束&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="其他">其他&lt;/h2>
+&lt;ol>
+&lt;li>
+&lt;p>由于在正则表达式中&lt;code>\&lt;/code>、&lt;code>?&lt;/code>、&lt;code>*&lt;/code>、&lt;code>^&lt;/code>、&lt;code>$&lt;/code>、&lt;code>+&lt;/code>、&lt;code>(&lt;/code>、&lt;code>)&lt;/code>、&lt;code>|&lt;/code>、&lt;code>{&lt;/code>、&lt;code>[&lt;/code>等字符已经具有一定特殊意义，如果需要用它们的原始意义，则应该对它进行转义，例如希望在字符串中至少有一个“ \ ”，那么正则表达式应该这么写： &lt;code>\\+&lt;/code> 。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>可以将多个元字符或者原义文本字符用括号括起来形成一个分组，比如 &lt;code>^(13)[4-9]\d{8}$&lt;/code> 表示任意以 &lt;code>13&lt;/code> 开头的移动手机号码。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>另外对于中文字符的匹配是采用其对应的 &lt;code>Unicode&lt;/code> 编码来匹配的，对于单个 &lt;code>Unicode&lt;/code> 字符，如 &lt;code>\u4e00&lt;/code> 表示汉字“一”， &lt;code>\u9fa5&lt;/code> 表示汉字“龥”，在 &lt;code>Unicode&lt;/code> 编码中这分别是所能表示的汉字的第一个和最后一个的 &lt;code>Unicode&lt;/code> 编码，在 &lt;code>Unicode&lt;/code> 编码中能表示 20901 个汉字。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>关于 &lt;code>\b&lt;/code> 的用法，它代表单词的开始或者结尾，以字符串 &lt;code>123a 345b 456 789d&lt;/code> 作为示例字符串，如果正则表达式是 &lt;code>\b\d{3}\b&lt;/code>，则仅能匹配 &lt;code>456&lt;/code> 。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>可以使用 &lt;code>|&lt;/code> 来表示或的关系，例如 &lt;code>[z|j|q]&lt;/code> 表示匹配 &lt;code>z&lt;/code> 、 &lt;code>j&lt;/code> 、 &lt;code>q&lt;/code> 之中的任意一个字母。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>正则验证工具：
+&lt;a href="https://regexper.com/" target="_blank" rel="noopener">https://regexper.com/&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ol></description></item><item><title>正则表达式的 lastIndex 属性</title><link>/doc/oh-my-js/06-regexp/01-regexp.prototype.lastindex/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/06-regexp/01-regexp.prototype.lastindex/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>在每个实例化的正则对象中，都存在一个 &lt;code>lastIndex&lt;/code> 属性，初始值为 &lt;code>0&lt;/code> 。&lt;/p>
+&lt;p>&lt;code>lastIndex&lt;/code> 属性是进行正则匹配操作的开始的位置&lt;/p>
+&lt;p>如果正则表达式不带 &lt;code>g&lt;/code> 标志，则 &lt;code>lastIndex&lt;/code> 始终为 &lt;code>0&lt;/code>。&lt;/p>
+&lt;p>如果正则表达式带有 &lt;code>g&lt;/code> 标志，匹配成功则将匹配内容最后一个字符串在原字符串中的索引加 1 设置为 &lt;code>lastIndex&lt;/code> 的值，匹配失败则重置为 &lt;code>0&lt;/code>。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="返回值">返回值&lt;/h3>
+&lt;pre>&lt;code class="language-js">var reg1 = /ab/;
+var reg2 = /ab/g;
+var str = 'abcabc';
+console.log(reg1.lastIndex, reg1.test(str)); // 0 true
+console.log(reg1.lastIndex, reg1.test(str)); // 0 true
+console.log(reg1.lastIndex, reg1.test(str)); // 0 true
+console.log(reg2.lastIndex, reg2.test(str)); // 0 true
+console.log(reg2.lastIndex, reg2.test(str)); // 2 true
+console.log(reg2.lastIndex, reg2.test(str)); // 5 false
+// 当 lastIndex 为 5 时，正则匹配从 str[5] 的位置开始，结果为 false
+&lt;/code>&lt;/pre></description></item><item><title>正则表达式预查</title><link>/doc/oh-my-js/06-regexp/0-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E9%A2%84%E6%9F%A5/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/06-regexp/0-%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E9%A2%84%E6%9F%A5/</guid><description>&lt;h2 id="预查格式">预查格式&lt;/h2>
+&lt;p>&lt;code>(?=pattern)&lt;/code>&lt;/p>
+&lt;h2 id="上代码">上代码&lt;/h2>
+&lt;p>通俗点说，就是 &lt;strong>预查不消耗字符串&lt;/strong>，仅仅是用来确认是否匹配成功。&lt;/p>
+&lt;pre>&lt;code class="language-js">var str = &amp;quot;abc&amp;quot;;
+var reg1 = /a(?=b)bc/;
+var reg2 = /a(b)bc/;
+console.log(reg1.test(str)); // true
+console.log(reg2.test(str)); // false
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>reg1&lt;/code> 中的预查 &lt;code>(?=b)&lt;/code> 并没有消耗掉匹配到的字符 &lt;code>b&lt;/code>，而是确认 &lt;code>a&lt;/code> 后面的字符是 &lt;code>b&lt;/code>，因此 &lt;code>a&lt;/code> 后面的字符 &lt;code>bc&lt;/code> 和 预查后面的正则 &lt;code>bc&lt;/code> 匹配成功，最后结果为 &lt;code>true&lt;/code>。&lt;/p>
+&lt;p>而 &lt;code>reg2&lt;/code> 中的 &lt;code>(b)&lt;/code> 将 &lt;code>str&lt;/code> 中的 &lt;code>b&lt;/code> 消耗掉，&lt;code>str&lt;/code> 中只剩一个字符 &lt;code>c&lt;/code>，无法与 &lt;code>reg2&lt;/code> 中 &lt;code>(b)&lt;/code> 后面的 &lt;code>bc&lt;/code> 相匹配，最后结果为 &lt;code>false&lt;/code>。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="千分制表示一个数字">千分制表示一个数字&lt;/h3>
+&lt;p>如何给一串数字用千分制表示？比如 &lt;code>99999999999&lt;/code> 变成 &lt;code>99, 999, 999, 999&lt;/code>。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;code>$&amp;amp;&lt;/code> 表示与正则表达式相匹配的字符&lt;/p>
+&lt;/blockquote>
+&lt;pre>&lt;code class="language-js">var reg = /\d{1,3}(?=(\d{3})+$)/g;
+var f = '99999999999'.replace(reg, '$&amp;amp;, ');
+console.log(f); // 99, 999, 999, 999
+&lt;/code>&lt;/pre>
+&lt;p>正则表达式中的 &lt;code>$&lt;/code> 很重要，它保证了每一个匹配到的字符串后面都是三个数字。如果没有 &lt;code>$&lt;/code>，会怎样？&lt;/p>
+&lt;pre>&lt;code class="language-js">var reg = /\d{1,3}(?=(\d{3})+)/g;
+var f = '99999999999'.replace(reg, '$&amp;amp;, ');
+console.log(f); // 999, 999, 99, 999
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.concat()</title><link>/doc/oh-my-js/01-array-es3/01-array.prototype.concat/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/01-array.prototype.concat/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>方法 &lt;code>concat()&lt;/code> 将创建并返回一个新数组，然后将所有参数都添加到新数组中。它并不修改原数组 。如果要进行 &lt;code>concat()&lt;/code> 操作的参数是一个数组，那么添加的是数组中的元素，而不是数组。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>valueX&lt;/td>
+&lt;td>必需。可以使具体的值，也可以是数组对象，可以是任意多个。&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>一个新数组&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;ul>
+&lt;li>参数为具体的值&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2];
+arr.concat(4, 5); // [ 1, 2, 4, 5 ]
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>参数为数组对象&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2];
+arr.concat([4, 5]); // [ 1, 2, 4, 5 ]
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>多个参数&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2];
+arr.concat([4, 5], [6, 7]); // [ 1, 2, 4, 5, 6, 7 ]
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>参数为数组对象，且元素也为数组对象&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2];
+arr.concat(4, [5, [6, 7]]); // [ 1, 2, 4, 5, [ 6, 7 ] ]
+&lt;/code>&lt;/pre>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">/*
+* 模拟原生 Array.concat()
+*/
+Array.prototype.concat = function() {
+var args = arguments;
+var arr = this;
+for (var i = 0; i &amp;lt; args.length; i++) {
+var item = args[i];
+if (item instanceof Array) {
+for (var j = 0; j &amp;lt; item.length; j++) {
+arr.push(item[j]);
+}
+} else {
+arr.push(item);
+}
+}
+return arr;
+};
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.join()</title><link>/doc/oh-my-js/01-array-es3/02-array.prototype.join/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/02-array.prototype.join/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>所有的数组元素都被转化成字符串，再用一个分隔符将这些字符串连接起来。如果元素是 &lt;code>undefined&lt;/code> 或者 &lt;code>null&lt;/code>，则会被转换成空字符串。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>separator&lt;/td>
+&lt;td>可选。 指定要选的分隔符，如果省略，则使用逗号为分隔符。&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>一个字符串&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="1数组元素为基本类型">（1）数组元素为基本类型&lt;/h3>
+&lt;pre>&lt;code class="language-js">var names = [&amp;quot;李白&amp;quot;, &amp;quot;杜甫&amp;quot;, &amp;quot;苏轼&amp;quot;];
+names.join(); // &amp;quot;李白,杜甫,苏轼&amp;quot;
+names.join(&amp;quot;、&amp;quot;); // &amp;quot;李白、杜甫、苏轼&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h3 id="2数组元素为数组对象">（2）数组元素为数组对象&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, [3, 4]];
+arr.join(); // &amp;quot;1,2,3,4&amp;quot;
+arr.join(&amp;quot;+&amp;quot;); // &amp;quot;1+2+3,4&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h3 id="3数组元素为对象">（3）数组元素为对象&lt;/h3>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, { name: &amp;quot;zwc&amp;quot; }];
+arr.join(); // &amp;quot;1,2,[object Object]&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h3 id="4小结">（4）小结&lt;/h3>
+&lt;p>实际上 &lt;code>join()&lt;/code> 方法是对数组中每一项元素都进行了 &lt;code>toString()&lt;/code> 操作转换成字符串之后进行的拼接。&lt;/p>
+&lt;p>&lt;code>undefined&lt;/code> 和 &lt;code>null&lt;/code> 执行 &lt;code>toString()&lt;/code> 则会报错，因此将其转化为空字符串&lt;/p>
+&lt;pre>&lt;code class="language-js">({ type: &amp;quot;object&amp;quot; }.toString()); // &amp;quot;[object Object]&amp;quot;
+[3, 4].toString(); // &amp;quot;3,4&amp;quot;
+true.toString(); // &amp;quot;true&amp;quot;
+(function() {
+console.log(&amp;quot;hello&amp;quot;);
+}.toString()); // &amp;quot;function () { console.log('hello') }&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h2 id="模拟实现">模拟实现&lt;/h2>
+&lt;pre>&lt;code class="language-js">/*
+* 模拟原生 Array.join()
+*/
+Array.prototype.join = function() {
+var sep = (arguments &amp;amp;&amp;amp; arguments[0]) || &amp;quot;,&amp;quot;;
+var str = &amp;quot;&amp;quot;;
+for (var i = 0; i &amp;lt; this.length; i++) {
+var item = this[i];
+item === undefined || null ? &amp;quot;&amp;quot; : item;
+str += sep + item.toString();
+}
+return str.replace(sep, &amp;quot;&amp;quot;);
+};
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.push()</title><link>/doc/oh-my-js/01-array-es3/03-array.prototype.push/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/03-array.prototype.push/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>将一个或多个元素添加到数组的末尾，并返回新数组的长度（对原数组进行修改）&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>elementN&lt;/td>
+&lt;td>必需，个数为至少一个。被添加到数组末尾的元素。&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>新的 &lt;code>length&lt;/code> 属性值。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+var newLength1 = arr.push(4); // 4
+var newLength2 = arr.push(5, 6); // 6
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.pop()</title><link>/doc/oh-my-js/01-array-es3/04-array.prototype.pop/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/04-array.prototype.pop/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>从一个数组中&lt;strong>删除并返回最后一个元素&lt;/strong>。（修改原数组）&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;p>无&lt;/p>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>从数组中删除的元素（当数组为空时返回 &lt;code>undefined&lt;/code>）&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+var delEle = arr.pop(); // 3
+[].pop(); // undefined
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.shift()</title><link>/doc/oh-my-js/01-array-es3/05-array.prototype.shift/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/05-array.prototype.shift/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>从一个数组中&lt;strong>删除并返回第一个元素&lt;/strong>。（修改原数组）&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;p>无&lt;/p>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>从数组中删除的元素（当数组为空时返回 &lt;code>undefined&lt;/code>）&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+var delEle = arr.shift(); // 1
+[].shift(); // undefined
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.unshift()</title><link>/doc/oh-my-js/01-array-es3/06-array.prototype.unshift/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/06-array.prototype.unshift/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>将一个或多个元素&lt;strong>添加&lt;/strong>到数组的开头，并返回&lt;strong>新数组的长度&lt;/strong>。（修改原数组）&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>elementN&lt;/td>
+&lt;td>必需，个数为至少一个。要添加到数组开头的元素&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">[].unshift(); // undefined
+var arr = [1, 2, 3];
+var newLength1 = arr.unshift(4); // 4
+console.log(arr); // [ 4, 1, 2, 3 ]
+var newLength2 = arr.unshift(5, 6); // 6
+console.log(arr); // [ 5, 6, 4, 1, 2, 3 ]
+var newLength3 = arr.unshift([7, 8]); // 7
+console.log(arr); // [ [7, 8], 5, 6, 4, 1, 2, 3 ]
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.slice()</title><link>/doc/oh-my-js/01-array-es3/07-array.prototype.slice/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/07-array.prototype.slice/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>对数组实例的部分元素进行&lt;strong>浅拷贝&lt;/strong>，拷贝的范围由参数 &lt;code>begin&lt;/code> 和 &lt;code>end&lt;/code> 决定，不会修改原数组。&lt;/p>
+&lt;p>既然是浅拷贝，那么：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>如果该元素是个对象引用（不是实际的对象）， &lt;code>slice&lt;/code> 会拷贝这个对象引用到新的数组里。两个对象引用都引用了同一个对象。如果被引用的对象发生改变，则新的和原来的数组中的这个元素也会发生改变。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>对于字符串、数字和布尔值来说（不是 &lt;code>String&lt;/code>、&lt;code>Number&lt;/code> 和 &lt;code>Boolean&lt;/code> 对象），&lt;code>slice&lt;/code> 会拷贝这些值到新的数组里。在别的数组里修改这些字符串或者数字或者布尔值，将不会影响另一个数组。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>如果向两个数组中任一一个数组中添加了新元素，则另一个不会受到影响。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;h3 id="begin可选">&lt;code>begin&lt;/code>（可选）&lt;/h3>
+&lt;p>从该索引处开始提取原数组中的元素。如果该参数为负数，则表示从原数组中的倒数第几个开始提取，&lt;code>slice(-2)&lt;/code> 表示提取原数组中的倒数第二个元素到最后一个元素（包含最后一个元素）。如果省略 &lt;code>begin&lt;/code> ，则 &lt;code>slice&lt;/code> 从索引 0 开始。&lt;/p>
+&lt;h3 id="end-可选">&lt;code>end&lt;/code> （可选）&lt;/h3>
+&lt;p>在该索引处结束提取原数组元素，&lt;code>slice&lt;/code> 会提取原数组中索引从 &lt;code>begin&lt;/code> 到 &lt;code>end&lt;/code> 的所有元素（包含 &lt;code>begin&lt;/code>，但不包含 &lt;code>end&lt;/code>）&lt;/p>
+&lt;p>&lt;code>slice(1, 4)&lt;/code> 提取原数组中的第二个元素开始知道第四个元素的所有元素（索引为 1,2,3 的元素）&lt;/p>
+&lt;p>如果该参数为负数，则它表示在原数组中的倒数第几个元素结束抽取。&lt;code>slice(-2, -1)&lt;/code> 表示抽取了原数组中的倒数第二个元素到最后一个元素（不包含最后一个元素，也就是只有倒数第二个元素）。&lt;/p>
+&lt;p>如果 &lt;code>end&lt;/code> 被省略，则 &lt;code>slice&lt;/code> 会一直提取到原数组末尾。&lt;/p>
+&lt;p>如果 &lt;code>end&lt;/code> 大于数组长度， &lt;code>slice&lt;/code> 也会一直提取到原数组末尾。&lt;/p>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>返回数组类型的切割结果&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;ul>
+&lt;li>省略 &lt;code>begin&lt;/code> 和 &lt;code>end&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+var newArr = arr.slice(); // [ 1, 2, 3 ]
+arr.push(4);
+console.log(arr); // [ 1, 2, 3, 4 ]
+console.log(newArr); // [ 1, 2, 3 ]
+&lt;/code>&lt;/pre>
+&lt;h2 id="其他用法">其他用法&lt;/h2>
+&lt;ul>
+&lt;li>数组浅拷贝&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+var newArr = arr.slice();
+console.log(newArr); // [1, 2, 3]
+// 修改原数组和新数组，相互不影响
+arr.push(4);
+newArr.push(5);
+console.log(arr); // [1, 2, 3, 4]
+console.log(newArr); // [1, 2, 3, 5]
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>将类数组对象转化为数组&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">// 转化元素
+Array.prototype.slice.call(document.querySelectorAll(&amp;quot;div&amp;quot;));
+// 或者使用简单的写法
+[].slice.call(document.querySelectorAll(&amp;quot;div&amp;quot;));
+// 转化函数的参数列表
+function fn() {
+var args = arguments;
+var arr = Array.prototype.slice.call(args);
+console.log(args);
+console.log(arr);
+}
+fn(1, 2, 3);
+// Arguments(3) [1, 2, 3, callee: ƒ, Symbol(Symbol.iterator): ƒ]
+// [1, 2, 3]
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.splice()</title><link>/doc/oh-my-js/01-array-es3/08-array.prototype.splice/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/08-array.prototype.splice/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>在指定索引处删除数组元素或者增加数组元素。因此，&lt;code>splice()&lt;/code> 方法要比 &lt;code>push()&lt;/code>，&lt;code>pop()&lt;/code>，&lt;code>shift()&lt;/code>，&lt;code>unshift()&lt;/code> 更为强大和灵活，当然，也更复杂。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;h3 id="start">&lt;code>start&lt;/code>&lt;/h3>
+&lt;p>指定修改的开始位置。如果超出了数组的长度，则从数组末尾开始添加内容，如果是负值，则表示从数组末位开始的第几位。&lt;/p>
+&lt;p>若只使用 &lt;code>start&lt;/code> 参数而不使用 &lt;code>deleteCount&lt;/code>、&lt;code>item&lt;/code>，如：&lt;code>array.splice(start)&lt;/code>，表示删除 &lt;code>[start, end]&lt;/code> 的元素。&lt;/p>
+&lt;h3 id="deletecount-可选">&lt;code>deleteCount&lt;/code> （可选）&lt;/h3>
+&lt;p>表示要移除的数组的元素的个数。如果 &lt;code>deleteCount&lt;/code> 是 0，则不移除元素。这种情况下，至少应该添加一个新元素。如果 &lt;code>deleteCount&lt;/code> 大于 &lt;code>start&lt;/code> 之后的元素的总数，则从 &lt;code>start&lt;/code> 后面的元素豆浆被删除（含第 &lt;code>start&lt;/code> 位）。&lt;/p>
+&lt;p>如果 &lt;code>deleteCount&lt;/code> 被省略，则相当于 &lt;code>arr.lengtrh-start&lt;/code>。&lt;/p>
+&lt;h3 id="item1-item2--可选">&lt;code>item1, item2, ...&lt;/code> （可选）&lt;/h3>
+&lt;p>要添加进数组的元素，从 &lt;code>start&lt;/code> 位置开始，如果不指定，则 &lt;code>splice&lt;/code> 将只删除数组元素。&lt;/p>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>返回由被删除的元素组成的一个数组。&lt;/p>
+&lt;p>如果只删除了一个元素，则返回只包含了一个元素的数组，如果没有删除元素，则返回空数组。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;p>&lt;code>splice&lt;/code> 功能很强大，可以在指定位置增加或删除元素&lt;/p>
+&lt;ul>
+&lt;li>删除&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+arr.splice(0, 2);
+// 从索引 0 开始删除 2 个元素（包含索引为 0 的元素）
+console.log(arr);
+// [3]
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>增加&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+arr.splice(0, 0, 4, 5);
+// 如果不需要删除元素，将第二个参数指定为 0
+// 从索引 0 开始删除 0 个元素，将元素 4 和 5 从索引为 0 的位置依次插入
+console.log(arr);
+// [4, 5, 1, 2, 3]
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>同时删除和增加&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+arr.splice(1, 2, 4, 5); // [ 2, 3 ]
+console.log(arr);
+// [ 1, 4, 5 ]
+// 从索引为 1 的位置开始删除 2 个元素，然后将 4 和 5 在索引为 1 处插入
+&lt;/code>&lt;/pre>
+&lt;h2 id="边界情况">边界情况&lt;/h2>
+&lt;ul>
+&lt;li>只有 &lt;code>start&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+arr.splice(2); // [ 3 ]
+console.log(arr); // [ 1, 2 ]
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>&lt;code>deleteCount&lt;/code> 为 0&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3];
+arr.splice(1, 0); // []
+console.log(arr); // [ 1, 2, 3 ]
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>&lt;code>deleteCount&lt;/code> 大于 &lt;code>start&lt;/code> 之后元素的总和&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var arr = [1, 2, 3, 4];
+arr.splice(1, 4); // [ 2, 3, 4 ]
+console.log(arr); // [ 1 ]
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.reverse()</title><link>/doc/oh-my-js/01-array-es3/09-array.prototype.reverse/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/09-array.prototype.reverse/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>&lt;code>reverse()&lt;/code> 方法用于颠倒数组中元素的顺序。（修改原数组）&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;p>无&lt;/p>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>返回颠倒顺序后的数组。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;pre>&lt;code class="language-js">var numbers = [1, 2, 3, 4];
+numbers.reverse();
+console.log(numbers); // [4, 3, 2, 1]
+&lt;/code>&lt;/pre></description></item><item><title>Array.prototype.sort()</title><link>/doc/oh-my-js/01-array-es3/10-array.prototype.sort/</link><pubDate>Sun, 05 May 2019 00:00:00 +0100</pubDate><guid>/doc/oh-my-js/01-array-es3/10-array.prototype.sort/</guid><description>&lt;h2 id="描述">描述&lt;/h2>
+&lt;p>对数组的元素进行排序（修改原数组），并返回数组，默认排序顺序是根据字符串 Unicode 码点。&lt;/p>
+&lt;p>为了实现排序，&lt;code>sort()&lt;/code> 方法会调用每个数组项的 &lt;code>toString()&lt;/code> 方法，然后比较得到的字符串，以确定如何排序。&lt;/p>
+&lt;p>另外，&lt;code>sort()&lt;/code> 可以接受一个比较函数作为参数，以便我们指定哪个值位于哪个值的前面。&lt;/p>
+&lt;h2 id="参数">参数&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>参数&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>compareFunction&lt;/td>
+&lt;td>function 类型，可选。用来指定按某种顺序进行排列的函数。如果省略，元素按照转换为字符串的各个字符的 Unicode 位点进行排序&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="返回值">返回值&lt;/h2>
+&lt;p>返回排序后的数组，原数组已经被排序后的数组代替。&lt;/p>
+&lt;h2 id="示例">示例&lt;/h2>
+&lt;h3 id="一维数组排序">一维数组排序&lt;/h3>
+&lt;ul>
+&lt;li>不指定排序方法&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var scores = [1, 10, 21, 2];
+scores.sort();
+console.log(scores); // [ 1, 10, 2, 21 ]
+// 10 在 2 之前，这是因为在 Unicode 指针顺序中&amp;quot;10&amp;quot;在&amp;quot;2&amp;quot;之前
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>按数字大小升序&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var numbers = [4, 2, 5, 1, 3];
+numbers.sort(function(a, b) {
+return a - b;
+});
+console.log(numbers); // [ 1, 2, 3, 4, 5 ]
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>按数字大小降序&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-js">var numbers = [4, 2, 5, 1, 3];
+numbers.sort(function(a, b) {
+return b - a;
+});
+console.log(numbers); // [ 1, 2, 3, 4, 5 ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="二维数组排序">二维数组排序&lt;/h3>
+&lt;p>数组元素为对象，按照对象某个属性对其排序，在表格排序中常常见到。&lt;/p>
+&lt;h4 id="按照-sortno-属性从小到大排序">按照 &lt;code>sortNo&lt;/code> 属性从小到大排序：&lt;/h4>
+&lt;pre>&lt;code class="language-js">var arr = [
+{ sortNo: 2 },
+{ sortNo: 1 },
+{ sortNo: 5 },
+{ sortNo: 6 },
+{ sortNo: 7 },
+{ sortNo: 3 },
+{ sortNo: 9 },
+{ sortNo: 4 },
+{ sortNo: 0 }
+];
+arr.sort(function(a, b) {
+return a.sortNo - b.sortNo;
+});
+console.log(arr);
+//输出结果
+//{ 'sortNo': 0}
+//{ 'sortNo': 1}
+//{ 'sortNo': 2}
+//{ 'sortNo': 3}
+//{ 'sortNo': 4}
+//{ 'sortNo': 5}
+//{ 'sortNo': 6}
+//{ 'sortNo': 7}
+//{ 'sortNo': 9}
+&lt;/code>&lt;/pre>
+&lt;h4 id="多条件排序">多条件排序&lt;/h4>
+&lt;p>按照 &lt;code>sortNo&lt;/code> 属性从小到大排序，如果 &lt;code>sortNo&lt;/code> 相同，则按照 &lt;code>sortNo2&lt;/code> 从大到小排序：&lt;/p>
+&lt;pre>&lt;code class="language-js">var arr = [
+{ sortNo: 2, sortNo2: 3 },
+{ sortNo: 1, sortNo2: 3 },
+{ sortNo: 5, sortNo2: 3 },
+{ sortNo: 6, sortNo2: 3 },
+{ sortNo: 7, sortNo2: 3 },
+{ sortNo: 3, sortNo2: 4 },
+{ sortNo: 3, sortNo2: 2 },
+{ sortNo: 3, sortNo2: 1 },
+{ sortNo: 3, sortNo2: 3 },
+{ sortNo: 8, sortNo2: 3 },
+{ sortNo: 4, sortNo2: 1 },
+{ sortNo: 4, sortNo2: 2 }
+];
+arr.sort(function(a, b) {
+if (a.sortNo == b.sortNo) {
+return b.sortNo2 - a.sortNo2;
+}
+return a.sortNo - b.sortNo;
+});
+console.log(arr);
+// [
+// {sortNo: 1, sortNo2: 3}
+// {sortNo: 2, sortNo2: 3}
+// {sortNo: 3, sortNo2: 4}
+// {sortNo: 3, sortNo2: 3}
+// {sortNo: 3, sortNo2: 2}
+// {sortNo: 3, sortNo2: 1}
+// {sortNo: 4, sortNo2: 2}
+// {sortNo: 4, sortNo2: 1}
+// {sortNo: 5, sortNo2: 3}
+// {sortNo: 6, sortNo2: 3}
+// {sortNo: 7, sortNo2: 3}
+// {sortNo: 8, sortNo2: 3}
+// ]
+&lt;/code>&lt;/pre>
+&lt;h3 id="数字数组随机排序洗牌算法">数字数组随机排序（洗牌算法）&lt;/h3>
+&lt;p>将下面代码在 chrome 开发工具的 console 控制台执行，每次执行都会打印不同的结果。&lt;/p>
+&lt;pre>&lt;code class="language-js">var arr = [ 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ];
+arr.sort(function(a, b) {
+return Math.random() &amp;gt; 0.5 ? 1 : -1;
+});
+console.log(arr);
+// [9, 7, 10, 5, 4, 13, 3, 8, 6, 12, 11]
+&lt;/code>&lt;/pre></description></item><item><title>ActionVue</title><link>/project/actionvue/</link><pubDate>Mon, 29 Jun 2020 00:00:00 +0000</pubDate><guid>/project/actionvue/</guid><description>&lt;p>&lt;span style="text-shadow: none;">&lt;a class="github-button" href="https://github.com/wencaizhang/ActionVue" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star this on GitHub">Star&lt;/a>&lt;script async defer src="https://buttons.github.io/buttons.js">&lt;/script>&lt;/span>&lt;/p></description></item><item><title>如何创建一个 Vue.js 插件</title><link>/post/2019/2019-11-28-how-to-create-a-plugin-of-vue.js/</link><pubDate>Thu, 28 Nov 2019 15:39:43 +0800</pubDate><guid>/post/2019/2019-11-28-how-to-create-a-plugin-of-vue.js/</guid><description>&lt;h2 id="vuejs-插件介绍">Vue.js 插件介绍&lt;/h2>
+&lt;p>Vue.js 插件以一种更优雅的方式来为 Vue 添加全局功能。&lt;/p>
+&lt;p>插件的使用方法很简单，只需要在 &lt;code>new Vue()&lt;/code> 之前通过 Vue.js 提供的 &lt;code>use&lt;/code> 方法来注册（启用）插件即可：&lt;/p>
+&lt;pre>&lt;code class="language-js">import MyPlugin from &amp;quot;MyPlugin&amp;quot;;
+// 要在 new Vue() 之前调用 use 方法
+Vue.use(MyPlugin)
+// 也可以传入一个可选的选项对象
+Vue.use(MyPlugin, { someOption: true })
+&lt;/code>&lt;/pre>
+&lt;h2 id="如何自己开发一个插件">如何自己开发一个插件&lt;/h2>
+&lt;p>上面讲到，通过 &lt;code>Vue.use&lt;/code> 方法来注册插件， &lt;code>Vue.use&lt;/code> 方法接收两个参数，第一个是插件，第二个是一个可选的选项对象&lt;/p>
+&lt;pre>&lt;code class="language-js">Vue.use(MyPlugin, { someOption: true })
+&lt;/code>&lt;/pre>
+&lt;p>而 &lt;code>Vue.use&lt;/code> 方法执行时是调用由 &lt;code>MyPlugin&lt;/code> 提供的 &lt;code>install&lt;/code> 方法，因此上面代码相当于：&lt;/p>
+&lt;pre>&lt;code class="language-js">MyPlugin.install(Vue, { someOption: true })
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>install&lt;/code> 方法接收两个参数，&lt;code>Vue&lt;/code> 构造函数和调用插件时传入的可选的选项对象。&lt;/p>
+&lt;p>因此，只要是一个向外暴露 &lt;code>install&lt;/code> 方法的模块，就可以作为 Vue 的插件，例如：&lt;/p>
+&lt;pre>&lt;code class="language-js">// MyPlugin.js
+MyPlugin.install = function (Vue, options) {
+console.log('hello, MyPlugin');
+}
+export default MyPlugin;
+&lt;/code>&lt;/pre>
+&lt;p>这便是一个最简单的 Vue.js 插件了。&lt;/p>
+&lt;p>当然，我们开发插件不可能只是为了打印一句话，而是有更重要的使命等待我们去完成，因为 &lt;code>install&lt;/code> 方法第一个参数是 &lt;code>Vue&lt;/code> 构造函数，所以你可以围绕着 &lt;code>Vue&lt;/code> 来扩展更多更强大的功能，另外 &lt;code>install&lt;/code> 第二个参数可以接收一个配置选项对象，这样可以使你提供的功能更加灵活更具有可配置性。&lt;/p>
+&lt;pre>&lt;code class="language-js">MyPlugin.install = function (Vue, options) {
+// 1. 添加全局方法或属性
+Vue.myGlobalMethod = function () {
+// 逻辑...
+}
+// 2. 添加全局资源
+Vue.directive('my-directive', {
+bind (el, binding, vnode, oldVnode) {
+// 逻辑...
+}
+})
+// 3. 注入组件选项
+Vue.mixin({
+created: function () {
+// 逻辑...
+}
+})
+// 4. 添加实例方法
+Vue.prototype.$myMethod = function (methodOptions) {
+// 逻辑...
+}
+}
+&lt;/code>&lt;/pre>
+&lt;p>ps: 有的同学担心插件会被多次注册，其实 &lt;code>Vue.use&lt;/code> 会自动阻止多次注册相同插件，届时即使多次调用也只会注册一次该插件。&lt;/p>
+&lt;h2 id="live-demos">live demos&lt;/h2>
+&lt;p>我们常见的库
+&lt;a href="https://element.eleme.cn/#/zh-CN/component/quickstart#wan-zheng-yin-ru" target="_blank" rel="noopener">Element UI&lt;/a> 也是以插件形式引入，而且组件库内部的单个组件也都是插件形式存在，如
+&lt;a href="https://github.com/ElemeFE/element/blob/dev/packages/button/index.js" target="_blank" rel="noopener">ElButton&lt;/a>&lt;/p>
+&lt;p>另外，
+&lt;a href="https://github.com/vuejs/awesome-vue#components--libraries" target="_blank" rel="noopener">awesome-vue&lt;/a> 集合了大量由社区贡献的插件和库，有兴趣的同学可以自行研究学习。&lt;/p>
+&lt;h2 id="相关链接">相关链接：&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;a href="https://element.eleme.cn/#/zh-CN/component/quickstart#wan-zheng-yin-ru" target="_blank" rel="noopener">Element UI 文档&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://github.com/ElemeFE/element" target="_blank" rel="noopener">Element UI 源码&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://cn.vuejs.org/v2/guide/plugins.html" target="_blank" rel="noopener">插件 - Vue.js 文档&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Request Methods With Axios</title><link>/post/2019/2019-11-22-request-methods-with-axios/</link><pubDate>Fri, 22 Nov 2019 15:46:45 +0800</pubDate><guid>/post/2019/2019-11-22-request-methods-with-axios/</guid><description>&lt;p>Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中&lt;/p>
+&lt;p>Axios 有以下特点：&lt;/p>
+&lt;ul>
+&lt;li>支持浏览器和node.js&lt;/li>
+&lt;li>支持promise&lt;/li>
+&lt;li>能拦截请求和响应&lt;/li>
+&lt;li>能转换请求和响应数据&lt;/li>
+&lt;li>能取消请求&lt;/li>
+&lt;li>自动转换JSON数据&lt;/li>
+&lt;li>浏览器端支持防止CSRF(跨站请求伪造)&lt;/li>
+&lt;/ul>
+&lt;p>axios 的详细使用都可以在
+&lt;a href="https://github.com/axios/axios" target="_blank" rel="noopener">https://github.com/axios/axios&lt;/a> 中看到，本文主要将在项目实践中如何进一步封装 axios ，使得 axios 更符合实际需求。&lt;/p>
+&lt;h2 id="封装步骤">封装步骤&lt;/h2>
+&lt;h3 id="全局配置">全局配置&lt;/h3>
+&lt;p>全局配置是指配置 &lt;code>baseURL&lt;/code> &lt;code>timeout&lt;/code> 等选项。&lt;/p>
+&lt;p>全局配置会影响到每个请求，可以直接对 axios 配置，也可以创建 axios 的实例，对实例进行配置。&lt;/p>
+&lt;p>axios 和 axios 实例的区别就在于，axios 可以创建多个实例，不同实例之间的配置可以不同，并且不会影响到 axios 这个源头。&lt;/p>
+&lt;p>直接配置 axios：&lt;/p>
+&lt;pre>&lt;code class="language-js">axios.defaults.baseURL = 'https://api.example.com';
+axios.defaults.timeout = 2000;
+&lt;/code>&lt;/pre>
+&lt;p>或者配置 axios 实例：&lt;/p>
+&lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
+// 创建 axios 实例
+const request = axios.create({
+baseURL: &amp;quot;https://api.example.com&amp;quot;,
+timeout: 2000, // 请求超时时间
+});
+&lt;/code>&lt;/pre>
+&lt;h3 id="拦截器">拦截器&lt;/h3>
+&lt;p>axios 拦截器分为「请求拦截器」和「响应拦截器」，它们相当于是项目 http 请求的大门。&lt;/p>
+&lt;p>每次发送请求时要经过「请求拦截器」这道门，每次请求得到响应时也要经过「响应拦截器」这道门。&lt;/p>
+&lt;p>有了拦截器，方便我们对每个请求进行一些处理，比如：&lt;/p>
+&lt;ol>
+&lt;li>发送请求时，判断用户的登录状态或者用户权限，不满足条件的或者跳转登录页面或者弹窗提示&lt;/li>
+&lt;li>发送请求时，添加特定的 headers&lt;/li>
+&lt;li>请求得到响应时，根据响应状态码做不同处理：
+&lt;ul>
+&lt;li>200: 响应成功&lt;/li>
+&lt;li>404: 未找到资源&lt;/li>
+&lt;li>409: 用户没有相应权限&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
+// 创建 axios 实例
+const request = axios.create({
+baseURL: &amp;quot;[/cmp/v1](https://api.example.com)&amp;quot;,
+timeout: 2000 // 请求超时时间
+});
+// request 拦截器
+request.interceptors.request.use(
+confit =&amp;gt; {
+// 设置 token，或者其他设置
+config.headers[&amp;quot;token&amp;quot;] = 'token_123';
+return config;
+},
+err =&amp;gt; {
+return Promise.reject(err)
+},
+);
+// response 拦截器
+request.interceptors.response.use(
+resp =&amp;gt; resp.data,
+error =&amp;gt; {
+if (error.response) {
+const data = error.response.data;
+let msg = data.desc || data.exception || '';
+switch (error.response.status) {
+case 401:
+// 提示：登录过期，跳转登录页面重新登录
+break;
+case 403:
+// 提示：权限不足
+break;
+case 404:
+// 提示：资源不存在
+break;
+default:
+// 提示：请求失败
+break;
+}
+}
+return Promise.reject(error);
+}
+);
+&lt;/code>&lt;/pre>
+&lt;h3 id="封装各类型请求">封装各类型请求&lt;/h3>
+&lt;p>这一步封装主要是为了统一 axios 中不同请求类型的参数要求。&lt;/p>
+&lt;p>以 POST 和 GET 为例，封装之前&lt;/p>
+&lt;pre>&lt;code class="language-js">const payload = { ID: 12345 }
+// get 请求，params 属性值是携带的参数
+axios.get('/user', {
+params: payload
+})
+// post 请求
+axios.post('/user', payload)
+&lt;/code>&lt;/pre>
+&lt;p>封装之后：&lt;/p>
+&lt;pre>&lt;code class="language-js">const payload = { ID: 12345 }
+GET('/user', payload)
+POST('/user', payload)
+&lt;/code>&lt;/pre>
+&lt;p>封装之后，每种类型的请求方法都接受两个参数：url 和需要传递到服务端的数据 payload。&lt;/p>
+&lt;p>这里我封装了 &lt;code>GET&lt;/code> &lt;code>POST&lt;/code> &lt;code>PUT&lt;/code> &lt;code>DELETE&lt;/code> 四种方法，分别对应 &lt;code>get&lt;/code> &lt;code>post&lt;/code> &lt;code>put&lt;/code> &lt;code>delete&lt;/code> 类型的请求：&lt;/p>
+&lt;pre>&lt;code class="language-js">export function GET (url, payload) {
+return request.get(url, {
+params: payload
+});
+}
+export function POST (url, payload) {
+return request.post(url, payload);
+}
+export function PUT (url, payload) {
+return request.put(url, payload);
+}
+export function DELETE (url, payload) {
+return request.delete(url, {
+data: payload
+});
+}
+&lt;/code>&lt;/pre>
+&lt;p>使用方法：&lt;/p>
+&lt;pre>&lt;code class="language-js">// 示例：
+import { GET, POST, PUT, DELETE } from '@/utils/request.js'
+const payload = { username: 'admin', password: '123456' }
+POST('/login', payload)
+.then(resp =&amp;gt; {
+// 请求成功
+})
+.catch(err =&amp;gt; {
+// 请求失败
+})
+.finally {
+// 成功/失败都会执行这里代码
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="其他">其他&lt;/h2>
+&lt;h3 id="post-请求数据格式">post 请求数据格式&lt;/h3>
+&lt;p>默认情况下，axios 中 post 请求的 &lt;code>Content-Type&lt;/code> 字段对应的值是 &lt;code>application/json&lt;/code> ，此时是以 json 格式向服务端发送数据。&lt;/p>
+&lt;p>如果想要以 &lt;code>FormData&lt;/code> 形式发送数据，你可以这样解决&lt;/p>
+&lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
+import qs from 'qs';
+const data = { 'bar': 123 };
+const options = {
+url,
+method: 'POST',
+data: qs.stringify(data),
+headers: { 'content-type': 'application/x-www-form-urlencoded' },
+};
+axios(options);
+&lt;/code>&lt;/pre>
+&lt;p>那么前面对 POST 方法的封装也要进行修改：&lt;/p>
+&lt;pre>&lt;code class="language-js">import qs from 'qs';
+export function POST (url, payload) {
+const options = {
+url,
+method: 'POST',
+data: qs.stringify(data),
+headers: { 'content-type': 'application/x-www-form-urlencoded' },
+};
+return request(options);
+}
+&lt;/code>&lt;/pre>
+&lt;!--
+疑问：
+全局设置是否有效
+// 设置 post 请求的 Content-Type
+request.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+-->
+&lt;h3 id="挂载到-vue-原型上">挂载到 vue 原型上&lt;/h3>
+&lt;pre>&lt;code class="language-js">import { GET, POST, PUT, DELETE } from '@/utils/request.js'
+Vue.prototype.$http = {
+get: GET,
+post: POST,
+put: PUT,
+delete: DELETE
+}
+&lt;/code>&lt;/pre>
+&lt;p>挂载到原型上之后，就可以在任意的 vue 组件内通过 vue 实例调用请求：&lt;/p>
+&lt;pre>&lt;code class="language-js">this.$http.get('/user', { id: 123 })
+&lt;/code>&lt;/pre>
+&lt;h2 id="完整代码">完整代码&lt;/h2>
+&lt;details>
+&lt;summary>
+完整的 request.js 代码在此，请点击展开完整代码
+&lt;/summary>
+&lt;pre>&lt;code class="language-js">// request.js
+import axios from &amp;quot;axios&amp;quot;;
+// 创建 axios 实例
+const request = axios.create({
+baseURL: &amp;quot;https://api.example.com&amp;quot;,
+timeout: 2000, // 请求超时时间
+});
+// request 拦截器
+request.interceptors.request.use(
+confit =&amp;gt; {
+// 设置 token，或者其他设置
+config.headers[&amp;quot;token&amp;quot;] = 'token_123';
+return config;
+},
+err =&amp;gt; {
+return Promise.reject(err)
+},
+);
+// response 拦截器
+request.interceptors.response.use(
+resp =&amp;gt; resp.data,
+error =&amp;gt; {
+if (error.response) {
+const data = error.response.data;
+let msg = data.desc || data.exception || '';
+switch (error.response.status) {
+case 401:
+// 提示：登录过期，跳转登录页面重新登录
+break;
+case 403:
+// 提示：权限不足
+break;
+case 404:
+// 提示：资源不存在
+break;
+default:
+// 提示：请求失败
+break;
+}
+}
+return Promise.reject(error);
+}
+);
+export function GET (url, payload) {
+return request.get(url, {
+params: payload
+});
+}
+export function POST (url, payload) {
+return request.post(url, payload);
+}
+export function PUT (url, payload) {
+return request.put(url, payload);
+}
+export function PATCH (url, payload) {
+return request.patch(url, payload);
+}
+export function DELETE (url, payload) {
+return request.delete(url, {
+params: payload
+});
+}
+&lt;/code>&lt;/pre>
+&lt;/details>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Get the Beginning and Ending in a Unit of Time via Momentjs</title><link>/post/2019/2019-11-19-get-the-beginning-and-ending-in-a-unit-of-time-via-momentjs/</link><pubDate>Tue, 19 Nov 2019 17:04:31 +0800</pubDate><guid>/post/2019/2019-11-19-get-the-beginning-and-ending-in-a-unit-of-time-via-momentjs/</guid><description>&lt;blockquote>
+&lt;p>根据 &lt;code>moment.js&lt;/code> 得到一个单位时间或者时间段（如本周，上周，本月，上月，当前季度，上个季度）的开始结束时间&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;a href="https://momentjs.com/" target="_blank" rel="noopener">momentjs 文档&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>主要利用以下几项 API：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>format()&lt;/code>: 得到格式化的时间&lt;/li>
+&lt;li>&lt;code>startOf()&lt;/code>: 得到一个单位时间的开始时间点，
+&lt;a href="https://momentjs.com/docs/#/manipulating/start-of/" target="_blank" rel="noopener">文档&lt;/a>&lt;/li>
+&lt;li>&lt;code>endOf()&lt;/code>: 得到一个单位时间的结束时间点&lt;/li>
+&lt;li>&lt;code>add()&lt;/code>: 在指定时间点的基础上，加上一个时间段&lt;/li>
+&lt;li>&lt;code>subtract()&lt;/code>: 在指定时间点的基础上，减去一个时间段&lt;/li>
+&lt;li>&lt;code>week()&lt;/code>: 获取或设置一个时间对象的周数（第几周）&lt;/li>
+&lt;li>&lt;code>month()&lt;/code>: 获取或设置一个时间对象的月份&lt;/li>
+&lt;li>&lt;code>quarter()&lt;/code>: 获取或设置一个时间对象的季度&lt;/li>
+&lt;/ul>
+&lt;h2 id="天">天&lt;/h2>
+&lt;pre>&lt;code class="language-js">// 获取当天开始结束时间
+function getCurrDays () {
+let date = moment()
+let start = date.startOf('days').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('days').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 获取昨天的开始结束时间
+function getYesterday () {
+let date = moment().subtract('days',1);
+let start = date.startOf('days').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('days').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 获取明天的开始结束时间
+function getTomorrow () {
+let date = moment().add('days',1);
+let start = date.startOf('days').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('days').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="周">周&lt;/h2>
+&lt;p>获取某一周（本周，上周，下周）的开始结束时间，一周从周日开始到周六结束。&lt;/p>
+&lt;pre>&lt;code class="language-js">// 本周
+function getCurrWeekDays () {
+let date = moment()
+let start = date.startOf('week').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('week').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 上一周
+function getLastWeekDays () {
+let date = moment().week(moment().week() - 1)
+let start = date.startOf('week').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('week').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 下一周
+function getNextWeekDays () {
+let date = moment().week(moment().week() + 1)
+let start = date.startOf('week').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('week').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="月">月&lt;/h2>
+&lt;pre>&lt;code class="language-js">// 本月
+function getCurrMonthDays () {
+let date = moment()
+let start = date.startOf('month').format('YYYY-MM-DD')
+let end = date.endOf('month').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 上个月
+function getLastMonthDays () {
+let date = moment().month(moment().month() - 1)
+let start = date.startOf('month').format('YYYY-MM-DD')
+let end = date.endOf('month').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 下个月
+function getNextMonthDays () {
+let date = moment().month(moment().month() + 1)
+let start = date.startOf('month').format('YYYY-MM-DD')
+let end = date.endOf('month').format('YYYY-MM-DD')
+return [ start, end ];
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="季度">季度&lt;/h2>
+&lt;pre>&lt;code class="language-js">// 当前季度
+function getCurrQuarter () {
+let date = moment()
+let start = date.startOf('quarter').format('YYYY-MM-DD')
+let end = date.endOf('quarter').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 上个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() - 1)
+let start = date.startOf('quarter').format('YYYY-MM-DD')
+let end = date.endOf('quarter').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 下个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() + 1)
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="dry--">DRY -&lt;/h2>
+&lt;blockquote>
+&lt;p>Don&amp;rsquo;t repeat yourself.&lt;/p>
+&lt;/blockquote>
+&lt;p>上面代码中可以看到有一个固定结构重复了好多次：&lt;/p>
+&lt;pre>&lt;code class="language-js">function getX () {
+let date = x
+let start = date.startOf('时间单位类型').format('格式化')
+let end = date.endOf('时间单位类型').format('格式化')
+return [ start, end ];
+}
+&lt;/code>&lt;/pre>
+&lt;p>所以我们可以专门封装一个函数，接收三个参数（时间，时间单位，格式化），返回开始和结束时间。&lt;/p>
+&lt;pre>&lt;code class="language-js">function getDuringTime (date, type, format) {
+let start = date.startOf(type).format(format)
+let end = date.endOf(type).format(format)
+return [ start, end ];
+}
+&lt;/code>&lt;/pre>
+&lt;p>有了此工具函数，将上面代码汇总如下：&lt;/p>
+&lt;pre>&lt;code class="language-js">/**
+* @param {date} date [momentjs 时间对象]
+* @param {String} type [单位时间类型]
+* @param {String} format [时间格式]
+* type 可以接收的值： year, month, quarter, week, isoWeek, day, date, hour, minute, second
+*/
+function getDuringTime (date=moment(), type='days', format='YYYY-MM-DD HH:mm:ss') {
+let start = date.startOf(type).format(format)
+let end = date.endOf(type).format(format)
+return [ start, end ];
+}
+// 获取当天开始结束时间
+function getCurrDays () {
+let date = moment()
+return getDuringTime(date, 'days', 'YYYY-MM-DD')
+}
+// 获取昨天的开始结束时间
+function getYesterday () {
+let date = moment().subtract('days',1)
+return getDuringTime(date, 'days', 'YYYY-MM-DD')
+}
+// 获取明天的开始结束时间
+function getTomorrow () {
+let date = moment().add('days',1)
+return getDuringTime(date, 'days', 'YYYY-MM-DD')
+}
+// 获取某一周（本周，上周，下周）的开始结束时间，一周从周日开始到周六结束。
+// 本周
+function getCurrWeekDays () {
+let date = moment()
+return getDuringTime(date, 'week', 'YYYY-MM-DD')
+}
+// 上一周
+function getLastWeekDays () {
+let date = moment().week(moment().week() - 1)
+return getDuringTime(date, 'week', 'YYYY-MM-DD')
+}
+// 下一周
+function getNextWeekDays () {
+let date = moment().week(moment().week() + 1)
+return getDuringTime(date, 'week', 'YYYY-MM-DD')
+}
+// 本月
+function getCurrMonthDays () {
+let date = moment()
+return getDuringTime(date, 'month', 'YYYY-MM-DD')
+}
+// 上个月
+function getLastMonthDays () {
+let date = moment().month(moment().month() - 1)
+return getDuringTime(date, 'month', 'YYYY-MM-DD')
+}
+// 下个月
+function getNextMonthDays () {
+let date = moment().month(moment().month() + 1)
+return getDuringTime(date, 'month', 'YYYY-MM-DD')
+}
+// 当前季度
+function getCurrQuarter () {
+let date = moment()
+return getDuringTime(date, 'quarter', 'YYYY-MM-DD')
+}
+// 上个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() - 1)
+return getDuringTime(date, 'quarter', 'YYYY-MM-DD')
+}
+// 下个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() + 1)
+return getDuringTime(date, 'quarter', 'YYYY-MM-DD')
+}
+&lt;/code>&lt;/pre>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Basic Setup for Ubuntu</title><link>/post/2019/2019-11-17-basic-setup-for-ubuntu/</link><pubDate>Sun, 17 Nov 2019 09:49:31 +0800</pubDate><guid>/post/2019/2019-11-17-basic-setup-for-ubuntu/</guid><description>&lt;blockquote>
+&lt;p>Ubuntu 基础设置，包含一些常用软件安装，配置文件修改等等。&lt;/p>
+&lt;/blockquote>
+&lt;p>这篇文章的意义在于，当你拿到一个新的 Ubuntu 系统之后，直接按照本文的步骤进行设置，就可以得到一个顺手的开发/部署环境。不再需要逐项搜索每个软件的安装步骤了。&lt;/p>
+&lt;ul>
+&lt;li>设置国内软件镜像源&lt;/li>
+&lt;li>node&lt;/li>
+&lt;li>git&lt;/li>
+&lt;li>docker&lt;/li>
+&lt;li>nginx&lt;/li>
+&lt;li>oh-my-zsh&lt;/li>
+&lt;li>alias&lt;/li>
+&lt;li>vim&lt;/li>
+&lt;/ul>
+&lt;h2 id="设置系统软件镜像源">设置系统软件镜像源&lt;/h2>
+&lt;p>配置系统源第一件事是修改镜像源，这样方便后续其他软件的安装。在国内可以选择阿里云的源。&lt;/p>
+&lt;pre>&lt;code class="language-bash"># 编辑源文件
+sudo vim /etc/apt/sources.list
+# 在VIM编辑器内替换默认源为阿里云
+:0,$ s/archive.ubuntu.com/mirrors.aliyun.com/
+# 保存源文件并退出
+:wq
+&lt;/code>&lt;/pre>
+&lt;h2 id="包管理工具安装">包管理工具安装&lt;/h2>
+&lt;p>&lt;strong>先更新&lt;/strong>&lt;/p>
+&lt;pre>&lt;code class="language-bash">sudo apt update &amp;amp;&amp;amp; apt upgrade -y
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>
+&lt;a href="https://www.sysgeek.cn/apt-vs-apt-get/" target="_blank" rel="noopener">Linux中apt与apt-get命令的区别与解释&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://www.cnblogs.com/fenglongyu/p/8654991.html" target="_blank" rel="noopener">linux命令系列 sudo apt-get update和upgrade的区别&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>安装常用软件&lt;/strong>&lt;/p>
+&lt;p>通常会有一些是默认安装的，比如 git vim wget curl vim，如果没有，用下面方式安装即可。&lt;/p>
+&lt;pre>&lt;code class="language-bash">sudo apt install zsh nginx tree -y
+&lt;/code>&lt;/pre>
+&lt;h2 id="oh-my-zsh">oh-my-zsh&lt;/h2>
+&lt;p>关于 zsh 和 oh-my-zsh 可以参考：
+&lt;a href="https://zhuanlan.zhihu.com/p/19556676" target="_blank" rel="noopener">终极 Shell——ZSH&lt;/a>&lt;/p>
+&lt;h3 id="安装">安装&lt;/h3>
+&lt;p>脚本安装：&lt;/p>
+&lt;pre>&lt;code class="language-bash">wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
+&lt;/code>&lt;/pre>
+&lt;p>或者手动安装:&lt;/p>
+&lt;pre>&lt;code class="language-bash">git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
+&lt;/code>&lt;/pre>
+&lt;p>安装完成之后退出当前会话重新打开一个终端窗口即可。&lt;/p>
+&lt;h3 id="插件">插件&lt;/h3>
+&lt;p>&lt;strong>(1) autojump&lt;/strong>
+github 地址
+&lt;a href="https://github.com/wting/autojump" target="_blank" rel="noopener">autojump&lt;/a>&lt;/p>
+&lt;p>下载并执行&lt;/p>
+&lt;pre>&lt;code class="language-bash">wget https://github.com/downloads/joelthelion/autojump/autojump_v21.1.2.tar.gz
+./install.sh
+&lt;/code>&lt;/pre>
+&lt;p>最后把以下代码加入.zshrc:&lt;/p>
+&lt;pre>&lt;code class="language-bash">[[ -s ~/.autojump/etc/profile.d/autojump.sh ]] &amp;amp;&amp;amp; . ~/.autojump/etc/profile.d/autojump.sh
+&lt;/code>&lt;/pre>
+&lt;h2 id="nodenvm">node(nvm)&lt;/h2>
+&lt;p>nvm github 地址：
+&lt;a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">nvm-sh/nvm&lt;/a>&lt;/p>
+&lt;h3 id="方法一脚本安装">方法一：脚本安装&lt;/h3>
+&lt;p>执行脚本&lt;/p>
+&lt;pre>&lt;code class="language-bash">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash
+# 或者
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash
+&lt;/code>&lt;/pre>
+&lt;p>最后，将下面内容分别添加到 &lt;code>~/.bashrc&lt;/code>, &lt;code>~/.profile&lt;/code>, 和 &lt;code>~/.zshrc&lt;/code> 文件中。&lt;/p>
+&lt;pre>&lt;code>export NVM_DIR=&amp;quot;$([ -z &amp;quot;${XDG_CONFIG_HOME-}&amp;quot; ] &amp;amp;&amp;amp; printf %s &amp;quot;${HOME}/.nvm&amp;quot; || printf %s &amp;quot;${XDG_CONFIG_HOME}/nvm&amp;quot;)&amp;quot;
+[ -s &amp;quot;$NVM_DIR/nvm.sh&amp;quot; ] &amp;amp;&amp;amp; \. &amp;quot;$NVM_DIR/nvm.sh&amp;quot; # This loads nvm
+&lt;/code>&lt;/pre>
+&lt;p>加载配置文件：&lt;/p>
+&lt;pre>&lt;code class="language-bash">source ~/.bashrc
+&lt;/code>&lt;/pre>
+&lt;h3 id="方法二git-安装">方法二：git 安装&lt;/h3>
+&lt;p>将代码克隆到用户目录下：&lt;/p>
+&lt;pre>&lt;code class="language-bash">cd ~/
+git clone https://github.com/nvm-sh/nvm.git .nvm
+&lt;/code>&lt;/pre>
+&lt;p>切换到最新版本&lt;/p>
+&lt;pre>&lt;code class="language-bash">cd ~/.nvm
+git checkout v0.35.1
+&lt;/code>&lt;/pre>
+&lt;p>激活 nvm，在命令行执行：&lt;/p>
+&lt;pre>&lt;code class="language-bash">. nvm.sh
+&lt;/code>&lt;/pre>
+&lt;p>最后，将下面内容分别添加到 &lt;code>~/.bashrc&lt;/code>, &lt;code>~/.profile&lt;/code>, 和 &lt;code>~/.zshrc&lt;/code> 文件中。&lt;/p>
+&lt;pre>&lt;code>export NVM_DIR=&amp;quot;$HOME/.nvm&amp;quot;
+[ -s &amp;quot;$NVM_DIR/nvm.sh&amp;quot; ] &amp;amp;&amp;amp; \. &amp;quot;$NVM_DIR/nvm.sh&amp;quot; # This loads nvm
+[ -s &amp;quot;$NVM_DIR/bash_completion&amp;quot; ] &amp;amp;&amp;amp; \. &amp;quot;$NVM_DIR/bash_completion&amp;quot; # This loads nvm bash_completion
+&lt;/code>&lt;/pre>
+&lt;p>完成之后，通过 &lt;code>nvm -v&lt;/code> 查看版本来验证是否安装成功。&lt;/p>
+&lt;h2 id="docker">docker&lt;/h2>
+&lt;h3 id="安装-docker">安装 Docker&lt;/h3>
+&lt;pre>&lt;code class="language-bash">curl -fsSL https://get.docker.com -o get-docker.sh &amp;amp;&amp;amp; sudo sh get-docker.sh
+&lt;/code>&lt;/pre>
+&lt;h3 id="安装-compose">安装 Compose&lt;/h3>
+&lt;pre>&lt;code class="language-bash">sudo curl -L &amp;quot;https://github.com/docker/compose/releases/download/1.22.0/docke-compose-$(uname -s)-$(uname -m)&amp;quot; -o /usr/local/bin/docker-compose
+# 给Docker Compose 执行权限
+sudo chmod +x /usr/local/bin/docker-compose
+#查看Docker和Docker Compose的版本
+sudo docker version
+sudo docker-compose version
+&lt;/code>&lt;/pre>
+&lt;h3 id="设置镜像源">设置镜像源&lt;/h3>
+&lt;p>执行下面命令进行设置&lt;/p>
+&lt;p>&lt;em>ps: 阿里云镜像源是个人注册阿里云账号之后分配的个人专属镜像源。&lt;/em>&lt;/p>
+&lt;pre>&lt;code class="language-bash">sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json &amp;lt;&amp;lt;-'EOF'
+{
+&amp;quot;registry-mirrors&amp;quot;: [&amp;quot;https://oojjt1xs.mirror.aliyuncs.com&amp;quot;]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+&lt;/code>&lt;/pre>
+&lt;h2 id="vim-配置">vim 配置&lt;/h2>
+&lt;p>有些系统默认没有安装&lt;/p>
+&lt;p>配置文件路径：&lt;/p>
+&lt;ul>
+&lt;li>全局配置文件：&lt;code>/etc/vim/vimrc&lt;/code>&lt;/li>
+&lt;li>当前用户配置文件：&lt;code>~/.vimrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>将下面内容粘贴到配置文件中：&lt;/p>
+&lt;pre>&lt;code>&amp;quot; 左单引号表示单行注释
+&amp;quot; 编码指定 UTF-8
+set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936
+set termencoding=utf-8
+set encoding=utf-8
+set number &amp;quot; 显示行号
+set cursorline &amp;quot; 突出显示当前行
+set ruler &amp;quot; 打开状态栏标尺
+&lt;/code>&lt;/pre>
+&lt;h2 id="设置别名alias">设置别名(alias)&lt;/h2>
+&lt;p>将所有的别名放在单独一个文件 &lt;code>.bash_aliases&lt;/code> 中，这样更加方便管理，ubuntu 也推荐这种做法。&lt;/p>
+&lt;pre>&lt;code class="language-bash">if [ -f ~/.bash_aliases ]; then
+. ~/.bash_aliases
+fi
+&lt;/code>&lt;/pre>
+&lt;p>&lt;strong>注意：等号两侧不能有空格!&lt;/strong>&lt;/p>
+&lt;pre>&lt;code class="language-bash"># 代替键盘上难以触及的 ~ 键
+alias home=&amp;quot;cd ~&amp;quot;
+# 同样也可以为一些深层却很常用的目录设置别名
+# 如：宝塔面包的 nginx 配置目录
+alias ng=&amp;quot;cd /www/server/panel/vhost/nginx&amp;quot;
+# 回退多级目录
+alias bk1=&amp;quot;cd ..&amp;quot;
+alias bk2=&amp;quot;cd ../..&amp;quot;
+alias bk3=&amp;quot;cd ../../..&amp;quot;
+alias bk4=&amp;quot;cd ../../../..&amp;quot;
+alias bk5=&amp;quot;cd ../../../../..&amp;quot;
+# ls 相关
+alias cls='clear'
+alias ll='ls -l'
+alias la='ls -a'
+# git 相关
+alias gs='git status'
+alias glog=&amp;quot;git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Cr eset %s %Cgreen(%cr) %C(bold blue)&amp;lt;%an&amp;gt;%Creset' --abbrev-commit&amp;quot;
+# 解压
+alias -s gz='tar -xzvf'
+alias -s tgz='tar -xzvf'
+alias -s zip='unzip'
+alias -s bz2='tar -xjvf'
+# other
+alias vi='vim'
+alias grep=&amp;quot;grep --color=auto&amp;quot;
+alias tree=&amp;quot;tree -I '*svn|*node_module*'&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Basic Usage of Nginx</title><link>/post/2019/2019-11-16-basic-usage-of-nginx/</link><pubDate>Sat, 16 Nov 2019 11:16:00 +0800</pubDate><guid>/post/2019/2019-11-16-basic-usage-of-nginx/</guid><description>&lt;h2 id="安装">安装&lt;/h2>
+&lt;pre>&lt;code class="language-bash"># ubuntu
+sudo apt install nginx -y
+&lt;/code>&lt;/pre>
+&lt;h2 id="命令">命令&lt;/h2>
+&lt;h3 id="nginx命令">nginx 命令&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th align="left">描述&lt;/th>
+&lt;th align="left">命令&lt;/th>
+&lt;th align="left">命令二&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td align="left">启动&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">停止&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx -s stop&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -s stop&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">重启&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx -s restart&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -s restart&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">重载配置文件&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx -s reload&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -s reload&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="nginx目录">nginx 目录&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th align="left">描述&lt;/th>
+&lt;th align="left">命令&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td align="left">nginx 安装目录&lt;/td>
+&lt;td align="left">&lt;code>/usr/sbin/nginx&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">默认网站根目录&lt;/td>
+&lt;td align="left">&lt;code>/usr/share/nginx/html&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">配置文件&lt;/td>
+&lt;td align="left">&lt;code>/etc/nginx/nginx.conf &lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="查找nginx安装目录的命令">查找 nginx 安装目录的命令&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th align="left">描述&lt;/th>
+&lt;th align="left">命令&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td align="left">查找 nginx 安装目录&lt;/td>
+&lt;td align="left">&lt;code>which nginx&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">查找 nginx 配置文件&lt;/td>
+&lt;td align="left">&lt;code>sudo find / -name nginx.conf&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">检测配置文件语法是否正确：&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -t&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="常见使用场景">常见使用场景&lt;/h2>
+&lt;h3 id="一-静态网站">(一) 静态网站&lt;/h3>
+&lt;p>指定域名和对应的网站根目录位置，&lt;code>server_name&lt;/code> 可以是域名、二级域名，也可以是 ip 地址。&lt;/p>
+&lt;pre>&lt;code>server {
+listen 80;
+server_name demo.example.com;
+location / {
+root /www/demo/;
+index index.html index.htm;
+}
+}
+&lt;/code>&lt;/pre>
+&lt;h3 id="二-反向代理">(二) 反向代理&lt;/h3>
+&lt;p>场景：&lt;/p>
+&lt;ul>
+&lt;li>解决跨域问题，利用 nginx 来访问其他域名下的接口&lt;/li>
+&lt;li>当 docker 服务的端口映射到宿主机上某个端口（如 8080）时，可以设置二级域名代理 8080 端口。&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code>server {
+server_name docker.example.com;
+listen 80;
+location / {
+proxy_pass http://localhost:8000;
+proxy_set_header Host $host;
+proxy_set_header X-Forward-For $remote_addr;
+}
+}
+&lt;/code>&lt;/pre>
+&lt;h3 id="三-负载均衡">(三) 负载均衡&lt;/h3>
+&lt;pre>&lt;code>upstream backend {
+server backend1.example.com weight=5;
+server backend2.example.com:8080;
+server unix:/tmp/backend3;
+}
+server {
+location / {
+proxy_pass http://backend;
+}
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="一些学习资源">一些学习资源&lt;/h2>
+&lt;p>
+&lt;a href="http://www.nginx.cn/doc/" target="_blank" rel="noopener">Nginx中文文档&lt;/a>&lt;/p></description></item><item><title>JavaScript 中 this 总结</title><link>/post/2019/2019-09-29-this-in-javascript/</link><pubDate>Sun, 29 Sep 2019 14:49:00 +0000</pubDate><guid>/post/2019/2019-09-29-this-in-javascript/</guid><description>&lt;p>JavaScript 中的 &lt;code>this&lt;/code> 总是指向一个对象，而具体指向哪个对象是在函数运行时的环境动态绑定的，而非函数被声明时的环境。&lt;/p>
+&lt;p>但是 ES6 标准新增的箭头函数中的 &lt;code>this&lt;/code> 却是由被声明的环境即上下文来确定的。&lt;/p>
+&lt;p>&lt;code>this&lt;/code> 的指向大致分为下面 5 种：&lt;/p>
+&lt;ul>
+&lt;li>作为对象的方法调用&lt;/li>
+&lt;li>作为普通函数调用&lt;/li>
+&lt;li>作为构造器调用&lt;/li>
+&lt;li>通过 &lt;code>call&lt;/code> 和 &lt;code>apply&lt;/code> 调用&lt;/li>
+&lt;li>箭头函数&lt;/li>
+&lt;/ul>
+&lt;h2 id="情况一作为普通函数调用">情况一：作为普通函数调用&lt;/h2>
+&lt;p>当函数作为普通函数或者匿名函数调用时，&lt;code>this&lt;/code> 总是指向全局对象，在浏览器中这个全局对象是 &lt;code>window&lt;/code>，在 nodejs 中全局对象是 &lt;code>global&lt;/code>，这里讨论的是浏览器端，所有代码都可以在 chrome 开发者工具的 console 面板中执行。&lt;/p>
+&lt;p>ES5 规范提出了「严格模式」，在整个脚本文件第一行或者函数内第一行添加一条语句 &lt;code>'use strict';&lt;/code> 即可开启严格模式。&lt;/p>
+&lt;p>如果启用「严格模式」，那么 &lt;code>this&lt;/code> 就不再是指向全局对象，而是 &lt;code>undefined&lt;/code> 。&lt;/p>
+&lt;p>&lt;strong>1) 普通函数：&lt;/strong>&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name';
+function printName1 () {
+console.log(this === window); // true
+console.log(this.name); // &amp;quot;global object&amp;quot;
+}
+function printName2 () {
+&amp;quot;use strict&amp;quot;; // 启用严格模式
+console.log(this); // undefined
+}
+printName1();
+printName2();
+&lt;/code>&lt;/pre>
+&lt;p>&lt;strong>2) 匿名函数：&lt;/strong>&lt;/p>
+&lt;p>匿名函数自执行，这种形式封装公用库的时候最常见：&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name';
+(function () {
+console.log(this === window); // true
+console.log(this.name); // &amp;quot;global object&amp;quot;
+})()
+&lt;/code>&lt;/pre>
+&lt;p>作为参数的匿名函数：&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name';
+setTimeout(function () {
+console.log(this === window); // true
+console.log(this.name); // &amp;quot;global object&amp;quot;
+}, 100);
+[1, 2, 3].forEach(function (item) {
+console.log(item, this.name)
+// 1 &amp;quot;global name&amp;quot;
+// 2 &amp;quot;global name&amp;quot;
+// 3 &amp;quot;global name&amp;quot;
+});
+&lt;/code>&lt;/pre>
+&lt;h2 id="情况二作为对象的方法调用">情况二：作为对象的方法调用&lt;/h2>
+&lt;p>当函数作为对象当属性方法调用时，&lt;code>this&lt;/code> 总指向这个对象。&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = {
+name: 'obj',
+printName: function () {
+console.log(this === obj); // true
+console.log(this.name); // &amp;quot;obj&amp;quot;
+}
+}
+obj.printName();
+&lt;/code>&lt;/pre>
+&lt;p>但是如果一个对象的属性方法又赋值给了其他变量，那么 &lt;code>this&lt;/code> 将发生变化，其指向只有在函数执行那一刻才能确定。例如：&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = {
+name: 'obj',
+printName: function () {
+console.log(this === obj); // true
+console.log(this.name); // &amp;quot;obj&amp;quot;
+}
+}
+var myPrintName = obj.printName;
+window.name = 'global name';
+myPrintName();
+// false
+// &amp;quot;global name&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>当 &lt;code>myPrintName&lt;/code> 执行时，就要按照普通函数来判断 &lt;code>this&lt;/code> 指向了。&lt;/p>
+&lt;p>再来一个例子：&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = {
+name: 'obj',
+printName: function () {
+console.log(this === obj); // true
+console.log(this.name); // &amp;quot;obj&amp;quot;
+}
+}
+var obj2 = {
+name: 'obj2',
+}
+obj2.printName = obj.printName;
+obj2.printName();
+// false
+// &amp;quot;obj2&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>当 &lt;code>obj2.printName&lt;/code> 执行时，&lt;code>printName&lt;/code> 是作为 &lt;code>obj2&lt;/code> 的属性方法来调用的，因此 &lt;code>this&lt;/code> 指向 &lt;code>obj2&lt;/code> 这个对象。&lt;/p>
+&lt;p>所以说，JavaScript 中的 this 指向无法在定义时判断，只有在其执行时才能判断。&lt;/p>
+&lt;h2 id="情况三作为构造器调用">情况三：作为构造器调用&lt;/h2>
+&lt;p>在 JavaScript 中没有「类」的概念（直到 ES6 才有类的出现），而是把函数作为构造器，通过 new 操作符来生成实例。&lt;/p>
+&lt;p>那么在构造函数中 &lt;code>this&lt;/code> 就指向新生成的实例。&lt;/p>
+&lt;pre>&lt;code class="language-js">var MyClass = function () {
+// 给实例添加 name 属性
+this.name = 'myclass'
+this.printName = function () {
+return this.name
+}
+}
+var obj = new MyClass()
+obj.printName() // &amp;quot;myclass&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h2 id="情况四显式指定-this">情况四：显式指定 &lt;code>this&lt;/code>&lt;/h2>
+&lt;p>前面的几种方法都是被动地根据代码执行时的环境来判断 &lt;code>this&lt;/code> 具体指向哪里，那么有没有办法主动指定 &lt;code>this&lt;/code> 指向呢。&lt;/p>
+&lt;p>答案当然是有的，甚至它们的出场率还相当高。&lt;/p>
+&lt;p>常见的显式指定 &lt;code>this&lt;/code> 的方法主要是 &lt;code>call&lt;/code>，&lt;code>apply&lt;/code> 和 &lt;code>bind&lt;/code> 来，在函数式编程中几乎离不开这三个方法。&lt;/p>
+&lt;p>先定义如下变量：&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name'
+function printName () {
+console.log(this.name)
+}
+var obj1 = { name: 'obj1' }
+var obj2 = { name: 'obj2' }
+var obj3 = { name: 'obj3' }
+&lt;/code>&lt;/pre>
+&lt;p>默认情况 this 指向全局对象 window&lt;/p>
+&lt;pre>&lt;code class="language-js">printName() // &amp;quot;global name&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>使用 &lt;code>call&lt;/code> 来改变 &lt;code>this&lt;/code> 指向：&lt;/p>
+&lt;pre>&lt;code class="language-js">printName.call(obj1) // &amp;quot;obj1&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>使用 &lt;code>apply&lt;/code> 来改变 &lt;code>this&lt;/code> 指向：&lt;/p>
+&lt;pre>&lt;code class="language-js">printName.apply(obj2) // &amp;quot;obj2&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>使用 &lt;code>bind&lt;/code> 来改变 &lt;code>this&lt;/code> 指向：&lt;/p>
+&lt;pre>&lt;code class="language-js">var printName2 = printName.bind(obj3)
+printName2() // &amp;quot;obj3&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>除此之外，还有一些函数也可以修改 this 指向，例如：forEach, map, filter, some, every 等。以 &lt;code>forEach&lt;/code> 为例：&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = { name: 'zwc' }
+var arr = [ 1, 2 ]
+arr.forEach(function (item, index) {
+console.log(item, this)
+})
+// 1 Window
+// 2 Window
+arr.forEach(function (item, index) {
+console.log(item, this)
+}, obj)
+// 1 {name: &amp;quot;zwc&amp;quot;}
+// 2 {name: &amp;quot;zwc&amp;quot;}
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>forEach&lt;/code> 第一个参数接收一个函数作为迭代器，用来处理数组中每一项元素，这个函数通常是一个匿名函数，函数内部的 &lt;code>this&lt;/code> 指向全局对象。&lt;/p>
+&lt;p>&lt;code>forEach&lt;/code> 第二个参数可以接收一个对象，这个对象就是参数函数中的 &lt;code>this&lt;/code> 指向。&lt;/p>
+&lt;p>根据打印结果可以看到，在 &lt;code>forEach&lt;/code> 的迭代器函数中的 &lt;code>this&lt;/code> 已经指向了 &lt;code>obj&lt;/code> 。&lt;/p>
+&lt;h2 id="情况五es6箭头函数">情况五：ES6箭头函数&lt;/h2>
+&lt;h3 id="箭头函数简介">箭头函数简介&lt;/h3>
+&lt;p>ES6 允许使用「箭头」（=&amp;gt;）定义函数。&lt;/p>
+&lt;pre>&lt;code class="language-js">var f = v =&amp;gt; v;
+// 等同于
+var f = function (v) {
+return v;
+};
+&lt;/code>&lt;/pre>
+&lt;p>除了形式更简洁之外，箭头函数没有自己的 &lt;code>this&lt;/code>，而是&lt;strong>从自己作用域链的上一层继承 &lt;code>this&lt;/code>&lt;/strong>。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>箭头函数总是从自己作用域链的上一层继承 &lt;code>this&lt;/code>。&lt;/strong>&lt;/p>
+&lt;p>神马意思呢？我的理解就是箭头函数内部的 &lt;code>this&lt;/code> 指向永远是箭头函数被定义时所在的作用域的 &lt;code>this&lt;/code>，并且无法修改。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="无法绑定-this">无法绑定 this&lt;/h3>
+&lt;p>使用 call 来调用箭头函数时，第一个参数会被忽略，也就是说无法修改 this 指向。apply 和 bind 也是同样现象。&lt;/p>
+&lt;pre>&lt;code class="language-js">var printName = () =&amp;gt; {
+console.log(this === window); // true
+}
+var obj = { name: 'obj' }
+printName.call(obj);
+&lt;/code>&lt;/pre>
+&lt;h3 id="例子一">例子一&lt;/h3>
+&lt;p>来看一个例子，在不使用箭头函数的情况下，我们知道构造器函数内部 this 指向对象实例，而匿名函数的 this 是指向全局对象的，因此想要通过定时器打印对象实例的 &lt;code>age&lt;/code> 属性，只能用一个变量 &lt;code>self&lt;/code> 保存 &lt;code>this&lt;/code> 的引用（即闭包）&lt;/p>
+&lt;pre>&lt;code class="language-js">function Person(){
+// 构造器函数内部 this 指向对象实例
+this.age = 0;
+var self = this;
+setInterval(function () {
+// 匿名函数中 this 指向全局对象
+console.log(self.age++)
+}, 1000);
+}
+var p = new Person();
+&lt;/code>&lt;/pre>
+&lt;p>使用箭头函数之后，因为箭头函数的 &lt;code>this&lt;/code> 继承自其被定义时所在环境的 &lt;code>this&lt;/code>，在本例中这个 this 就是实例对象：&lt;/p>
+&lt;pre>&lt;code class="language-js">function Person(){
+// 构造器函数内部 this 指向对象实例
+this.age = 0;
+setInterval(() =&amp;gt; {
+// 这里的 this 也指向构造函数的 this
+console.log(this.age++)
+}, 1000);
+}
+var p = new Person();
+&lt;/code>&lt;/pre>
+&lt;h3 id="例子二">例子二&lt;/h3>
+&lt;p>再说一个更实用的例子：在 Vue.js 中使用箭头函数&lt;/p>
+&lt;pre>&lt;code class="language-js">import axios from 'axios';
+export default {
+methods: {
+fetch () {
+axios.get('/userinfo')
+.then(resp =&amp;gt; {
+this.sayHi(); // this 指向 vue 实例
+})
+.catch(err =&amp;gt; {
+this.sayHi(); // this 指向 vue 实例
+})
+},
+sayHi () {
+setTimeout(() =&amp;gt; {
+// this 指向 vue 实例
+}, 1000);
+}
+}
+}
+&lt;/code>&lt;/pre>
+&lt;p>使用箭头函数之后，再也无需缓存 vue 实例，像是 &lt;code>var vm = this;&lt;/code> 这种代码统统可以消灭掉，嗯，清爽！&lt;/p>
+&lt;h2 id="相关链接">相关链接&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>
+&lt;a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Strict_mode" target="_blank" rel="noopener">严格模式 - MDN&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>
+&lt;a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/arrow_functions" target="_blank" rel="noopener">箭头函数 - MDN&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>
+&lt;a href="http://es6.ruanyifeng.com/#docs/function#%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0" target="_blank" rel="noopener">箭头函数 - ES6 入门&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="总结">总结&lt;/h2>
+&lt;p>在箭头函数出现之前，每一个新函数根据&lt;strong>它是被如何调用的&lt;/strong>来定义这个函数的 &lt;code>this&lt;/code> 值：&lt;/p>
+&lt;ul>
+&lt;li>如果是该函数是一个普通函数或者匿名函数
+&lt;ul>
+&lt;li>在严格模式下的函数调用下，&lt;code>this&lt;/code> 指向 &lt;code>undefined&lt;/code>，&lt;/li>
+&lt;li>在非严格模式的函数调用中，&lt;code>this&lt;/code> 指向全局对象，浏览器中全局对象是 &lt;code>window&lt;/code> ，在 nodejs 中全局对象是 &lt;code>global&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>如果是该函数是一个构造函数，&lt;code>this&lt;/code> 指针指向一个新的对象（实例）&lt;/li>
+&lt;li>如果是该函数是一个对象的方法，则它的&lt;code>this&lt;/code> 指针指向这个对象&lt;/li>
+&lt;li>或者使用 &lt;code>call&lt;/code> &lt;code>apply&lt;/code> 等方法显式指定 &lt;code>this&lt;/code> 的指向&lt;/li>
+&lt;/ul>
+&lt;p>在箭头函数中，则是根据箭头函数上下文决定其 this 指向，且无法修改 &lt;code>this&lt;/code> 指向。&lt;/p>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Slides</title><link>/slides/example/</link><pubDate>Tue, 05 Feb 2019 00:00:00 +0000</pubDate><guid>/slides/example/</guid><description>&lt;h1 id="create-slides-in-markdown-with-academic">Create slides in Markdown with Academic&lt;/h1>
+&lt;p>
+&lt;a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic&lt;/a> |
+&lt;a href="https://sourcethemes.com/academic/docs/managing-content/#create-slides" target="_blank" rel="noopener">Documentation&lt;/a>&lt;/p>
+&lt;hr>
+&lt;h2 id="features">Features&lt;/h2>
+&lt;ul>
+&lt;li>Efficiently write slides in Markdown&lt;/li>
+&lt;li>3-in-1: Create, Present, and Publish your slides&lt;/li>
+&lt;li>Supports speaker notes&lt;/li>
+&lt;li>Mobile friendly slides&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="controls">Controls&lt;/h2>
+&lt;ul>
+&lt;li>Next: &lt;code>Right Arrow&lt;/code> or &lt;code>Space&lt;/code>&lt;/li>
+&lt;li>Previous: &lt;code>Left Arrow&lt;/code>&lt;/li>
+&lt;li>Start: &lt;code>Home&lt;/code>&lt;/li>
+&lt;li>Finish: &lt;code>End&lt;/code>&lt;/li>
+&lt;li>Overview: &lt;code>Esc&lt;/code>&lt;/li>
+&lt;li>Speaker notes: &lt;code>S&lt;/code>&lt;/li>
+&lt;li>Fullscreen: &lt;code>F&lt;/code>&lt;/li>
+&lt;li>Zoom: &lt;code>Alt + Click&lt;/code>&lt;/li>
+&lt;li>
+&lt;a href="https://github.com/hakimel/reveal.js#pdf-export" target="_blank" rel="noopener">PDF Export&lt;/a>: &lt;code>E&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="code-highlighting">Code Highlighting&lt;/h2>
+&lt;p>Inline code: &lt;code>variable&lt;/code>&lt;/p>
+&lt;p>Code block:&lt;/p>
+&lt;pre>&lt;code class="language-python">porridge = &amp;quot;blueberry&amp;quot;
+if porridge == &amp;quot;blueberry&amp;quot;:
+print(&amp;quot;Eating...&amp;quot;)
+&lt;/code>&lt;/pre>
+&lt;hr>
+&lt;h2 id="math">Math&lt;/h2>
+&lt;p>In-line math: $x + y = z$&lt;/p>
+&lt;p>Block math:&lt;/p>
+&lt;p>$$
+f\left( x \right) = ;\frac{{2\left( {x + 4} \right)\left( {x - 4} \right)}}{{\left( {x + 4} \right)\left( {x + 1} \right)}}
+$$&lt;/p>
+&lt;hr>
+&lt;h2 id="fragments">Fragments&lt;/h2>
+&lt;p>Make content appear incrementally&lt;/p>
+&lt;pre>&lt;code>{{% fragment %}} One {{% /fragment %}}
+{{% fragment %}} **Two** {{% /fragment %}}
+{{% fragment %}} Three {{% /fragment %}}
+&lt;/code>&lt;/pre>
+&lt;p>Press &lt;code>Space&lt;/code> to play!&lt;/p>
+&lt;p>&lt;span class="fragment " >
+One
+&lt;/span>
+&lt;span class="fragment " >
+&lt;strong>Two&lt;/strong>
+&lt;/span>
+&lt;span class="fragment " >
+Three
+&lt;/span>&lt;/p>
+&lt;hr>
+&lt;p>A fragment can accept two optional parameters:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>class&lt;/code>: use a custom style (requires definition in custom CSS)&lt;/li>
+&lt;li>&lt;code>weight&lt;/code>: sets the order in which a fragment appears&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="speaker-notes">Speaker Notes&lt;/h2>
+&lt;p>Add speaker notes to your presentation&lt;/p>
+&lt;pre>&lt;code class="language-markdown">{{% speaker_note %}}
+- Only the speaker can read these notes
+- Press `S` key to view
+{{% /speaker_note %}}
+&lt;/code>&lt;/pre>
+&lt;p>Press the &lt;code>S&lt;/code> key to view the speaker notes!&lt;/p>
+&lt;aside class="notes">
+&lt;ul>
+&lt;li>Only the speaker can read these notes&lt;/li>
+&lt;li>Press &lt;code>S&lt;/code> key to view&lt;/li>
+&lt;/ul>
+&lt;/aside>
+&lt;hr>
+&lt;h2 id="themes">Themes&lt;/h2>
+&lt;ul>
+&lt;li>black: Black background, white text, blue links (default)&lt;/li>
+&lt;li>white: White background, black text, blue links&lt;/li>
+&lt;li>league: Gray background, white text, blue links&lt;/li>
+&lt;li>beige: Beige background, dark text, brown links&lt;/li>
+&lt;li>sky: Blue background, thin dark text, blue links&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;ul>
+&lt;li>night: Black background, thick white text, orange links&lt;/li>
+&lt;li>serif: Cappuccino background, gray text, brown links&lt;/li>
+&lt;li>simple: White background, black text, blue links&lt;/li>
+&lt;li>solarized: Cream-colored background, dark green text, blue links&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;section data-noprocess data-shortcode-slide
+data-background-image="/img/boards.jpg"
+>
+&lt;h2 id="custom-slide">Custom Slide&lt;/h2>
+&lt;p>Customize the slide style and background&lt;/p>
+&lt;pre>&lt;code class="language-markdown">{{&amp;lt; slide background-image=&amp;quot;/img/boards.jpg&amp;quot; &amp;gt;}}
+{{&amp;lt; slide background-color=&amp;quot;#0000FF&amp;quot; &amp;gt;}}
+{{&amp;lt; slide class=&amp;quot;my-style&amp;quot; &amp;gt;}}
+&lt;/code>&lt;/pre>
+&lt;hr>
+&lt;h2 id="custom-css-example">Custom CSS Example&lt;/h2>
+&lt;p>Let&amp;rsquo;s make headers navy colored.&lt;/p>
+&lt;p>Create &lt;code>assets/css/reveal_custom.css&lt;/code> with:&lt;/p>
+&lt;pre>&lt;code class="language-css">.reveal section h1,
+.reveal section h2,
+.reveal section h3 {
+color: navy;
+}
+&lt;/code>&lt;/pre>
+&lt;hr>
+&lt;h1 id="questions">Questions?&lt;/h1>
+&lt;p>
+&lt;a href="https://spectrum.chat/academic" target="_blank" rel="noopener">Ask&lt;/a>&lt;/p>
+&lt;p>
+&lt;a href="https://sourcethemes.com/academic/docs/managing-content/#create-slides" target="_blank" rel="noopener">Documentation&lt;/a>&lt;/p></description></item><item><title>IbbPress</title><link>/project/ibbpress/</link><pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate><guid>/project/ibbpress/</guid><description>&lt;p>&lt;span style="text-shadow: none;">&lt;a class="github-button" href="https://github.com/IbbPress/nestjs-blog-server" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star this on GitHub">Star&lt;/a>&lt;script async defer src="https://buttons.github.io/buttons.js">&lt;/script>&lt;/span>&lt;/p></description></item><item><title/><link>/doc/oh-my-js/readme/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/doc/oh-my-js/readme/</guid><description>&lt;h1 id="说明">说明&lt;/h1>
+&lt;h2 id="写给自己看的-javascript-参考手册">写给自己看的 JavaScript 参考手册&lt;/h2>
+&lt;h3 id="what-is-this">What is this&lt;/h3>
+&lt;p>此文档为本人复习 JavaScript 基础知识时所整理，文档内容来自以下网站以及个人的理解：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript" target="_blank" rel="noopener">JavaScript · MDN&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="http://es6.ruanyifeng.com/" target="_blank" rel="noopener">ECMAScript 6 入门&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://book.douban.com/subject/10546125/" target="_blank" rel="noopener">JavaScript 高级程序设计&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>除去学习每个 API 的使用之外，还尽量考虑「不用eval的前提下用JS实现一次JS」。&lt;/p>
+&lt;h3 id="contributing">Contributing&lt;/h3>
+&lt;p>所有内容均为手打，且为个人见解，难免存在各种各样的问题。&lt;/p>
+&lt;p>如果您对本站点有一些疑惑，或发现了一些问题，或有什么建议，欢迎在
+&lt;a href="https://github.com/wencaizhang/oh-my-js/issues" target="_blank" rel="noopener">issue board&lt;/a> 中讨论。如果发现有重大问题可发 Email 至 &lt;a href="mailto:1052642137@qq.com">&lt;a href="mailto:1052642137@qq.com">1052642137@qq.com&lt;/a>&lt;/a>&lt;/p>
+&lt;h3 id="地址">地址&lt;/h3>
+&lt;p>文档地址：
+&lt;a href="http://coolfe.fun/oh-my-js/" target="_blank" rel="noopener">http://coolfe.fun/oh-my-js/&lt;/a>&lt;/p>
+&lt;p>备用地址：
+&lt;a href="https://wencaizhang.github.io/oh-my-js/" target="_blank" rel="noopener">https://wencaizhang.github.io/oh-my-js/&lt;/a>&lt;/p>
+&lt;h3 id="end">End&lt;/h3>
+&lt;p>Just for fun! 😝&lt;/p></description></item></channel></rss>

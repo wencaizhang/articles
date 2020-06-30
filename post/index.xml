@@ -1,0 +1,1066 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts | 阿文的网络空间</title><link>/post/</link><atom:link href="/post/index.xml" rel="self" type="application/rss+xml"/><description>Posts</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Thu, 28 Nov 2019 15:39:43 +0800</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>Posts</title><link>/post/</link></image><item><title>如何创建一个 Vue.js 插件</title><link>/post/2019/2019-11-28-how-to-create-a-plugin-of-vue.js/</link><pubDate>Thu, 28 Nov 2019 15:39:43 +0800</pubDate><guid>/post/2019/2019-11-28-how-to-create-a-plugin-of-vue.js/</guid><description>&lt;h2 id="vuejs-插件介绍">Vue.js 插件介绍&lt;/h2>
+&lt;p>Vue.js 插件以一种更优雅的方式来为 Vue 添加全局功能。&lt;/p>
+&lt;p>插件的使用方法很简单，只需要在 &lt;code>new Vue()&lt;/code> 之前通过 Vue.js 提供的 &lt;code>use&lt;/code> 方法来注册（启用）插件即可：&lt;/p>
+&lt;pre>&lt;code class="language-js">import MyPlugin from &amp;quot;MyPlugin&amp;quot;;
+// 要在 new Vue() 之前调用 use 方法
+Vue.use(MyPlugin)
+// 也可以传入一个可选的选项对象
+Vue.use(MyPlugin, { someOption: true })
+&lt;/code>&lt;/pre>
+&lt;h2 id="如何自己开发一个插件">如何自己开发一个插件&lt;/h2>
+&lt;p>上面讲到，通过 &lt;code>Vue.use&lt;/code> 方法来注册插件， &lt;code>Vue.use&lt;/code> 方法接收两个参数，第一个是插件，第二个是一个可选的选项对象&lt;/p>
+&lt;pre>&lt;code class="language-js">Vue.use(MyPlugin, { someOption: true })
+&lt;/code>&lt;/pre>
+&lt;p>而 &lt;code>Vue.use&lt;/code> 方法执行时是调用由 &lt;code>MyPlugin&lt;/code> 提供的 &lt;code>install&lt;/code> 方法，因此上面代码相当于：&lt;/p>
+&lt;pre>&lt;code class="language-js">MyPlugin.install(Vue, { someOption: true })
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>install&lt;/code> 方法接收两个参数，&lt;code>Vue&lt;/code> 构造函数和调用插件时传入的可选的选项对象。&lt;/p>
+&lt;p>因此，只要是一个向外暴露 &lt;code>install&lt;/code> 方法的模块，就可以作为 Vue 的插件，例如：&lt;/p>
+&lt;pre>&lt;code class="language-js">// MyPlugin.js
+MyPlugin.install = function (Vue, options) {
+console.log('hello, MyPlugin');
+}
+export default MyPlugin;
+&lt;/code>&lt;/pre>
+&lt;p>这便是一个最简单的 Vue.js 插件了。&lt;/p>
+&lt;p>当然，我们开发插件不可能只是为了打印一句话，而是有更重要的使命等待我们去完成，因为 &lt;code>install&lt;/code> 方法第一个参数是 &lt;code>Vue&lt;/code> 构造函数，所以你可以围绕着 &lt;code>Vue&lt;/code> 来扩展更多更强大的功能，另外 &lt;code>install&lt;/code> 第二个参数可以接收一个配置选项对象，这样可以使你提供的功能更加灵活更具有可配置性。&lt;/p>
+&lt;pre>&lt;code class="language-js">MyPlugin.install = function (Vue, options) {
+// 1. 添加全局方法或属性
+Vue.myGlobalMethod = function () {
+// 逻辑...
+}
+// 2. 添加全局资源
+Vue.directive('my-directive', {
+bind (el, binding, vnode, oldVnode) {
+// 逻辑...
+}
+})
+// 3. 注入组件选项
+Vue.mixin({
+created: function () {
+// 逻辑...
+}
+})
+// 4. 添加实例方法
+Vue.prototype.$myMethod = function (methodOptions) {
+// 逻辑...
+}
+}
+&lt;/code>&lt;/pre>
+&lt;p>ps: 有的同学担心插件会被多次注册，其实 &lt;code>Vue.use&lt;/code> 会自动阻止多次注册相同插件，届时即使多次调用也只会注册一次该插件。&lt;/p>
+&lt;h2 id="live-demos">live demos&lt;/h2>
+&lt;p>我们常见的库
+&lt;a href="https://element.eleme.cn/#/zh-CN/component/quickstart#wan-zheng-yin-ru" target="_blank" rel="noopener">Element UI&lt;/a> 也是以插件形式引入，而且组件库内部的单个组件也都是插件形式存在，如
+&lt;a href="https://github.com/ElemeFE/element/blob/dev/packages/button/index.js" target="_blank" rel="noopener">ElButton&lt;/a>&lt;/p>
+&lt;p>另外，
+&lt;a href="https://github.com/vuejs/awesome-vue#components--libraries" target="_blank" rel="noopener">awesome-vue&lt;/a> 集合了大量由社区贡献的插件和库，有兴趣的同学可以自行研究学习。&lt;/p>
+&lt;h2 id="相关链接">相关链接：&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;a href="https://element.eleme.cn/#/zh-CN/component/quickstart#wan-zheng-yin-ru" target="_blank" rel="noopener">Element UI 文档&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://github.com/ElemeFE/element" target="_blank" rel="noopener">Element UI 源码&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://cn.vuejs.org/v2/guide/plugins.html" target="_blank" rel="noopener">插件 - Vue.js 文档&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Request Methods With Axios</title><link>/post/2019/2019-11-22-request-methods-with-axios/</link><pubDate>Fri, 22 Nov 2019 15:46:45 +0800</pubDate><guid>/post/2019/2019-11-22-request-methods-with-axios/</guid><description>&lt;p>Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中&lt;/p>
+&lt;p>Axios 有以下特点：&lt;/p>
+&lt;ul>
+&lt;li>支持浏览器和node.js&lt;/li>
+&lt;li>支持promise&lt;/li>
+&lt;li>能拦截请求和响应&lt;/li>
+&lt;li>能转换请求和响应数据&lt;/li>
+&lt;li>能取消请求&lt;/li>
+&lt;li>自动转换JSON数据&lt;/li>
+&lt;li>浏览器端支持防止CSRF(跨站请求伪造)&lt;/li>
+&lt;/ul>
+&lt;p>axios 的详细使用都可以在
+&lt;a href="https://github.com/axios/axios" target="_blank" rel="noopener">https://github.com/axios/axios&lt;/a> 中看到，本文主要将在项目实践中如何进一步封装 axios ，使得 axios 更符合实际需求。&lt;/p>
+&lt;h2 id="封装步骤">封装步骤&lt;/h2>
+&lt;h3 id="全局配置">全局配置&lt;/h3>
+&lt;p>全局配置是指配置 &lt;code>baseURL&lt;/code> &lt;code>timeout&lt;/code> 等选项。&lt;/p>
+&lt;p>全局配置会影响到每个请求，可以直接对 axios 配置，也可以创建 axios 的实例，对实例进行配置。&lt;/p>
+&lt;p>axios 和 axios 实例的区别就在于，axios 可以创建多个实例，不同实例之间的配置可以不同，并且不会影响到 axios 这个源头。&lt;/p>
+&lt;p>直接配置 axios：&lt;/p>
+&lt;pre>&lt;code class="language-js">axios.defaults.baseURL = 'https://api.example.com';
+axios.defaults.timeout = 2000;
+&lt;/code>&lt;/pre>
+&lt;p>或者配置 axios 实例：&lt;/p>
+&lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
+// 创建 axios 实例
+const request = axios.create({
+baseURL: &amp;quot;https://api.example.com&amp;quot;,
+timeout: 2000, // 请求超时时间
+});
+&lt;/code>&lt;/pre>
+&lt;h3 id="拦截器">拦截器&lt;/h3>
+&lt;p>axios 拦截器分为「请求拦截器」和「响应拦截器」，它们相当于是项目 http 请求的大门。&lt;/p>
+&lt;p>每次发送请求时要经过「请求拦截器」这道门，每次请求得到响应时也要经过「响应拦截器」这道门。&lt;/p>
+&lt;p>有了拦截器，方便我们对每个请求进行一些处理，比如：&lt;/p>
+&lt;ol>
+&lt;li>发送请求时，判断用户的登录状态或者用户权限，不满足条件的或者跳转登录页面或者弹窗提示&lt;/li>
+&lt;li>发送请求时，添加特定的 headers&lt;/li>
+&lt;li>请求得到响应时，根据响应状态码做不同处理：
+&lt;ul>
+&lt;li>200: 响应成功&lt;/li>
+&lt;li>404: 未找到资源&lt;/li>
+&lt;li>409: 用户没有相应权限&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
+// 创建 axios 实例
+const request = axios.create({
+baseURL: &amp;quot;[/cmp/v1](https://api.example.com)&amp;quot;,
+timeout: 2000 // 请求超时时间
+});
+// request 拦截器
+request.interceptors.request.use(
+confit =&amp;gt; {
+// 设置 token，或者其他设置
+config.headers[&amp;quot;token&amp;quot;] = 'token_123';
+return config;
+},
+err =&amp;gt; {
+return Promise.reject(err)
+},
+);
+// response 拦截器
+request.interceptors.response.use(
+resp =&amp;gt; resp.data,
+error =&amp;gt; {
+if (error.response) {
+const data = error.response.data;
+let msg = data.desc || data.exception || '';
+switch (error.response.status) {
+case 401:
+// 提示：登录过期，跳转登录页面重新登录
+break;
+case 403:
+// 提示：权限不足
+break;
+case 404:
+// 提示：资源不存在
+break;
+default:
+// 提示：请求失败
+break;
+}
+}
+return Promise.reject(error);
+}
+);
+&lt;/code>&lt;/pre>
+&lt;h3 id="封装各类型请求">封装各类型请求&lt;/h3>
+&lt;p>这一步封装主要是为了统一 axios 中不同请求类型的参数要求。&lt;/p>
+&lt;p>以 POST 和 GET 为例，封装之前&lt;/p>
+&lt;pre>&lt;code class="language-js">const payload = { ID: 12345 }
+// get 请求，params 属性值是携带的参数
+axios.get('/user', {
+params: payload
+})
+// post 请求
+axios.post('/user', payload)
+&lt;/code>&lt;/pre>
+&lt;p>封装之后：&lt;/p>
+&lt;pre>&lt;code class="language-js">const payload = { ID: 12345 }
+GET('/user', payload)
+POST('/user', payload)
+&lt;/code>&lt;/pre>
+&lt;p>封装之后，每种类型的请求方法都接受两个参数：url 和需要传递到服务端的数据 payload。&lt;/p>
+&lt;p>这里我封装了 &lt;code>GET&lt;/code> &lt;code>POST&lt;/code> &lt;code>PUT&lt;/code> &lt;code>DELETE&lt;/code> 四种方法，分别对应 &lt;code>get&lt;/code> &lt;code>post&lt;/code> &lt;code>put&lt;/code> &lt;code>delete&lt;/code> 类型的请求：&lt;/p>
+&lt;pre>&lt;code class="language-js">export function GET (url, payload) {
+return request.get(url, {
+params: payload
+});
+}
+export function POST (url, payload) {
+return request.post(url, payload);
+}
+export function PUT (url, payload) {
+return request.put(url, payload);
+}
+export function DELETE (url, payload) {
+return request.delete(url, {
+data: payload
+});
+}
+&lt;/code>&lt;/pre>
+&lt;p>使用方法：&lt;/p>
+&lt;pre>&lt;code class="language-js">// 示例：
+import { GET, POST, PUT, DELETE } from '@/utils/request.js'
+const payload = { username: 'admin', password: '123456' }
+POST('/login', payload)
+.then(resp =&amp;gt; {
+// 请求成功
+})
+.catch(err =&amp;gt; {
+// 请求失败
+})
+.finally {
+// 成功/失败都会执行这里代码
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="其他">其他&lt;/h2>
+&lt;h3 id="post-请求数据格式">post 请求数据格式&lt;/h3>
+&lt;p>默认情况下，axios 中 post 请求的 &lt;code>Content-Type&lt;/code> 字段对应的值是 &lt;code>application/json&lt;/code> ，此时是以 json 格式向服务端发送数据。&lt;/p>
+&lt;p>如果想要以 &lt;code>FormData&lt;/code> 形式发送数据，你可以这样解决&lt;/p>
+&lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
+import qs from 'qs';
+const data = { 'bar': 123 };
+const options = {
+url,
+method: 'POST',
+data: qs.stringify(data),
+headers: { 'content-type': 'application/x-www-form-urlencoded' },
+};
+axios(options);
+&lt;/code>&lt;/pre>
+&lt;p>那么前面对 POST 方法的封装也要进行修改：&lt;/p>
+&lt;pre>&lt;code class="language-js">import qs from 'qs';
+export function POST (url, payload) {
+const options = {
+url,
+method: 'POST',
+data: qs.stringify(data),
+headers: { 'content-type': 'application/x-www-form-urlencoded' },
+};
+return request(options);
+}
+&lt;/code>&lt;/pre>
+&lt;!--
+疑问：
+全局设置是否有效
+// 设置 post 请求的 Content-Type
+request.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+-->
+&lt;h3 id="挂载到-vue-原型上">挂载到 vue 原型上&lt;/h3>
+&lt;pre>&lt;code class="language-js">import { GET, POST, PUT, DELETE } from '@/utils/request.js'
+Vue.prototype.$http = {
+get: GET,
+post: POST,
+put: PUT,
+delete: DELETE
+}
+&lt;/code>&lt;/pre>
+&lt;p>挂载到原型上之后，就可以在任意的 vue 组件内通过 vue 实例调用请求：&lt;/p>
+&lt;pre>&lt;code class="language-js">this.$http.get('/user', { id: 123 })
+&lt;/code>&lt;/pre>
+&lt;h2 id="完整代码">完整代码&lt;/h2>
+&lt;details>
+&lt;summary>
+完整的 request.js 代码在此，请点击展开完整代码
+&lt;/summary>
+&lt;pre>&lt;code class="language-js">// request.js
+import axios from &amp;quot;axios&amp;quot;;
+// 创建 axios 实例
+const request = axios.create({
+baseURL: &amp;quot;https://api.example.com&amp;quot;,
+timeout: 2000, // 请求超时时间
+});
+// request 拦截器
+request.interceptors.request.use(
+confit =&amp;gt; {
+// 设置 token，或者其他设置
+config.headers[&amp;quot;token&amp;quot;] = 'token_123';
+return config;
+},
+err =&amp;gt; {
+return Promise.reject(err)
+},
+);
+// response 拦截器
+request.interceptors.response.use(
+resp =&amp;gt; resp.data,
+error =&amp;gt; {
+if (error.response) {
+const data = error.response.data;
+let msg = data.desc || data.exception || '';
+switch (error.response.status) {
+case 401:
+// 提示：登录过期，跳转登录页面重新登录
+break;
+case 403:
+// 提示：权限不足
+break;
+case 404:
+// 提示：资源不存在
+break;
+default:
+// 提示：请求失败
+break;
+}
+}
+return Promise.reject(error);
+}
+);
+export function GET (url, payload) {
+return request.get(url, {
+params: payload
+});
+}
+export function POST (url, payload) {
+return request.post(url, payload);
+}
+export function PUT (url, payload) {
+return request.put(url, payload);
+}
+export function PATCH (url, payload) {
+return request.patch(url, payload);
+}
+export function DELETE (url, payload) {
+return request.delete(url, {
+params: payload
+});
+}
+&lt;/code>&lt;/pre>
+&lt;/details>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Get the Beginning and Ending in a Unit of Time via Momentjs</title><link>/post/2019/2019-11-19-get-the-beginning-and-ending-in-a-unit-of-time-via-momentjs/</link><pubDate>Tue, 19 Nov 2019 17:04:31 +0800</pubDate><guid>/post/2019/2019-11-19-get-the-beginning-and-ending-in-a-unit-of-time-via-momentjs/</guid><description>&lt;blockquote>
+&lt;p>根据 &lt;code>moment.js&lt;/code> 得到一个单位时间或者时间段（如本周，上周，本月，上月，当前季度，上个季度）的开始结束时间&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;a href="https://momentjs.com/" target="_blank" rel="noopener">momentjs 文档&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>主要利用以下几项 API：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>format()&lt;/code>: 得到格式化的时间&lt;/li>
+&lt;li>&lt;code>startOf()&lt;/code>: 得到一个单位时间的开始时间点，
+&lt;a href="https://momentjs.com/docs/#/manipulating/start-of/" target="_blank" rel="noopener">文档&lt;/a>&lt;/li>
+&lt;li>&lt;code>endOf()&lt;/code>: 得到一个单位时间的结束时间点&lt;/li>
+&lt;li>&lt;code>add()&lt;/code>: 在指定时间点的基础上，加上一个时间段&lt;/li>
+&lt;li>&lt;code>subtract()&lt;/code>: 在指定时间点的基础上，减去一个时间段&lt;/li>
+&lt;li>&lt;code>week()&lt;/code>: 获取或设置一个时间对象的周数（第几周）&lt;/li>
+&lt;li>&lt;code>month()&lt;/code>: 获取或设置一个时间对象的月份&lt;/li>
+&lt;li>&lt;code>quarter()&lt;/code>: 获取或设置一个时间对象的季度&lt;/li>
+&lt;/ul>
+&lt;h2 id="天">天&lt;/h2>
+&lt;pre>&lt;code class="language-js">// 获取当天开始结束时间
+function getCurrDays () {
+let date = moment()
+let start = date.startOf('days').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('days').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 获取昨天的开始结束时间
+function getYesterday () {
+let date = moment().subtract('days',1);
+let start = date.startOf('days').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('days').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 获取明天的开始结束时间
+function getTomorrow () {
+let date = moment().add('days',1);
+let start = date.startOf('days').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('days').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="周">周&lt;/h2>
+&lt;p>获取某一周（本周，上周，下周）的开始结束时间，一周从周日开始到周六结束。&lt;/p>
+&lt;pre>&lt;code class="language-js">// 本周
+function getCurrWeekDays () {
+let date = moment()
+let start = date.startOf('week').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('week').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 上一周
+function getLastWeekDays () {
+let date = moment().week(moment().week() - 1)
+let start = date.startOf('week').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('week').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+// 下一周
+function getNextWeekDays () {
+let date = moment().week(moment().week() + 1)
+let start = date.startOf('week').format('YYYY-MM-DD HH:mm:ss')
+let end = date.endOf('week').format('YYYY-MM-DD HH:mm:ss')
+return [ start, end ]
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="月">月&lt;/h2>
+&lt;pre>&lt;code class="language-js">// 本月
+function getCurrMonthDays () {
+let date = moment()
+let start = date.startOf('month').format('YYYY-MM-DD')
+let end = date.endOf('month').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 上个月
+function getLastMonthDays () {
+let date = moment().month(moment().month() - 1)
+let start = date.startOf('month').format('YYYY-MM-DD')
+let end = date.endOf('month').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 下个月
+function getNextMonthDays () {
+let date = moment().month(moment().month() + 1)
+let start = date.startOf('month').format('YYYY-MM-DD')
+let end = date.endOf('month').format('YYYY-MM-DD')
+return [ start, end ];
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="季度">季度&lt;/h2>
+&lt;pre>&lt;code class="language-js">// 当前季度
+function getCurrQuarter () {
+let date = moment()
+let start = date.startOf('quarter').format('YYYY-MM-DD')
+let end = date.endOf('quarter').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 上个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() - 1)
+let start = date.startOf('quarter').format('YYYY-MM-DD')
+let end = date.endOf('quarter').format('YYYY-MM-DD')
+return [ start, end ];
+}
+// 下个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() + 1)
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="dry--">DRY -&lt;/h2>
+&lt;blockquote>
+&lt;p>Don&amp;rsquo;t repeat yourself.&lt;/p>
+&lt;/blockquote>
+&lt;p>上面代码中可以看到有一个固定结构重复了好多次：&lt;/p>
+&lt;pre>&lt;code class="language-js">function getX () {
+let date = x
+let start = date.startOf('时间单位类型').format('格式化')
+let end = date.endOf('时间单位类型').format('格式化')
+return [ start, end ];
+}
+&lt;/code>&lt;/pre>
+&lt;p>所以我们可以专门封装一个函数，接收三个参数（时间，时间单位，格式化），返回开始和结束时间。&lt;/p>
+&lt;pre>&lt;code class="language-js">function getDuringTime (date, type, format) {
+let start = date.startOf(type).format(format)
+let end = date.endOf(type).format(format)
+return [ start, end ];
+}
+&lt;/code>&lt;/pre>
+&lt;p>有了此工具函数，将上面代码汇总如下：&lt;/p>
+&lt;pre>&lt;code class="language-js">/**
+* @param {date} date [momentjs 时间对象]
+* @param {String} type [单位时间类型]
+* @param {String} format [时间格式]
+* type 可以接收的值： year, month, quarter, week, isoWeek, day, date, hour, minute, second
+*/
+function getDuringTime (date=moment(), type='days', format='YYYY-MM-DD HH:mm:ss') {
+let start = date.startOf(type).format(format)
+let end = date.endOf(type).format(format)
+return [ start, end ];
+}
+// 获取当天开始结束时间
+function getCurrDays () {
+let date = moment()
+return getDuringTime(date, 'days', 'YYYY-MM-DD')
+}
+// 获取昨天的开始结束时间
+function getYesterday () {
+let date = moment().subtract('days',1)
+return getDuringTime(date, 'days', 'YYYY-MM-DD')
+}
+// 获取明天的开始结束时间
+function getTomorrow () {
+let date = moment().add('days',1)
+return getDuringTime(date, 'days', 'YYYY-MM-DD')
+}
+// 获取某一周（本周，上周，下周）的开始结束时间，一周从周日开始到周六结束。
+// 本周
+function getCurrWeekDays () {
+let date = moment()
+return getDuringTime(date, 'week', 'YYYY-MM-DD')
+}
+// 上一周
+function getLastWeekDays () {
+let date = moment().week(moment().week() - 1)
+return getDuringTime(date, 'week', 'YYYY-MM-DD')
+}
+// 下一周
+function getNextWeekDays () {
+let date = moment().week(moment().week() + 1)
+return getDuringTime(date, 'week', 'YYYY-MM-DD')
+}
+// 本月
+function getCurrMonthDays () {
+let date = moment()
+return getDuringTime(date, 'month', 'YYYY-MM-DD')
+}
+// 上个月
+function getLastMonthDays () {
+let date = moment().month(moment().month() - 1)
+return getDuringTime(date, 'month', 'YYYY-MM-DD')
+}
+// 下个月
+function getNextMonthDays () {
+let date = moment().month(moment().month() + 1)
+return getDuringTime(date, 'month', 'YYYY-MM-DD')
+}
+// 当前季度
+function getCurrQuarter () {
+let date = moment()
+return getDuringTime(date, 'quarter', 'YYYY-MM-DD')
+}
+// 上个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() - 1)
+return getDuringTime(date, 'quarter', 'YYYY-MM-DD')
+}
+// 下个季度
+function getLastQuarter () {
+let date = moment().quarter(moment().quarter() + 1)
+return getDuringTime(date, 'quarter', 'YYYY-MM-DD')
+}
+&lt;/code>&lt;/pre>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Basic Setup for Ubuntu</title><link>/post/2019/2019-11-17-basic-setup-for-ubuntu/</link><pubDate>Sun, 17 Nov 2019 09:49:31 +0800</pubDate><guid>/post/2019/2019-11-17-basic-setup-for-ubuntu/</guid><description>&lt;blockquote>
+&lt;p>Ubuntu 基础设置，包含一些常用软件安装，配置文件修改等等。&lt;/p>
+&lt;/blockquote>
+&lt;p>这篇文章的意义在于，当你拿到一个新的 Ubuntu 系统之后，直接按照本文的步骤进行设置，就可以得到一个顺手的开发/部署环境。不再需要逐项搜索每个软件的安装步骤了。&lt;/p>
+&lt;ul>
+&lt;li>设置国内软件镜像源&lt;/li>
+&lt;li>node&lt;/li>
+&lt;li>git&lt;/li>
+&lt;li>docker&lt;/li>
+&lt;li>nginx&lt;/li>
+&lt;li>oh-my-zsh&lt;/li>
+&lt;li>alias&lt;/li>
+&lt;li>vim&lt;/li>
+&lt;/ul>
+&lt;h2 id="设置系统软件镜像源">设置系统软件镜像源&lt;/h2>
+&lt;p>配置系统源第一件事是修改镜像源，这样方便后续其他软件的安装。在国内可以选择阿里云的源。&lt;/p>
+&lt;pre>&lt;code class="language-bash"># 编辑源文件
+sudo vim /etc/apt/sources.list
+# 在VIM编辑器内替换默认源为阿里云
+:0,$ s/archive.ubuntu.com/mirrors.aliyun.com/
+# 保存源文件并退出
+:wq
+&lt;/code>&lt;/pre>
+&lt;h2 id="包管理工具安装">包管理工具安装&lt;/h2>
+&lt;p>&lt;strong>先更新&lt;/strong>&lt;/p>
+&lt;pre>&lt;code class="language-bash">sudo apt update &amp;amp;&amp;amp; apt upgrade -y
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>
+&lt;a href="https://www.sysgeek.cn/apt-vs-apt-get/" target="_blank" rel="noopener">Linux中apt与apt-get命令的区别与解释&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://www.cnblogs.com/fenglongyu/p/8654991.html" target="_blank" rel="noopener">linux命令系列 sudo apt-get update和upgrade的区别&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>安装常用软件&lt;/strong>&lt;/p>
+&lt;p>通常会有一些是默认安装的，比如 git vim wget curl vim，如果没有，用下面方式安装即可。&lt;/p>
+&lt;pre>&lt;code class="language-bash">sudo apt install zsh nginx tree -y
+&lt;/code>&lt;/pre>
+&lt;h2 id="oh-my-zsh">oh-my-zsh&lt;/h2>
+&lt;p>关于 zsh 和 oh-my-zsh 可以参考：
+&lt;a href="https://zhuanlan.zhihu.com/p/19556676" target="_blank" rel="noopener">终极 Shell——ZSH&lt;/a>&lt;/p>
+&lt;h3 id="安装">安装&lt;/h3>
+&lt;p>脚本安装：&lt;/p>
+&lt;pre>&lt;code class="language-bash">wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
+&lt;/code>&lt;/pre>
+&lt;p>或者手动安装:&lt;/p>
+&lt;pre>&lt;code class="language-bash">git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
+&lt;/code>&lt;/pre>
+&lt;p>安装完成之后退出当前会话重新打开一个终端窗口即可。&lt;/p>
+&lt;h3 id="插件">插件&lt;/h3>
+&lt;p>&lt;strong>(1) autojump&lt;/strong>
+github 地址
+&lt;a href="https://github.com/wting/autojump" target="_blank" rel="noopener">autojump&lt;/a>&lt;/p>
+&lt;p>下载并执行&lt;/p>
+&lt;pre>&lt;code class="language-bash">wget https://github.com/downloads/joelthelion/autojump/autojump_v21.1.2.tar.gz
+./install.sh
+&lt;/code>&lt;/pre>
+&lt;p>最后把以下代码加入.zshrc:&lt;/p>
+&lt;pre>&lt;code class="language-bash">[[ -s ~/.autojump/etc/profile.d/autojump.sh ]] &amp;amp;&amp;amp; . ~/.autojump/etc/profile.d/autojump.sh
+&lt;/code>&lt;/pre>
+&lt;h2 id="nodenvm">node(nvm)&lt;/h2>
+&lt;p>nvm github 地址：
+&lt;a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">nvm-sh/nvm&lt;/a>&lt;/p>
+&lt;h3 id="方法一脚本安装">方法一：脚本安装&lt;/h3>
+&lt;p>执行脚本&lt;/p>
+&lt;pre>&lt;code class="language-bash">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash
+# 或者
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | bash
+&lt;/code>&lt;/pre>
+&lt;p>最后，将下面内容分别添加到 &lt;code>~/.bashrc&lt;/code>, &lt;code>~/.profile&lt;/code>, 和 &lt;code>~/.zshrc&lt;/code> 文件中。&lt;/p>
+&lt;pre>&lt;code>export NVM_DIR=&amp;quot;$([ -z &amp;quot;${XDG_CONFIG_HOME-}&amp;quot; ] &amp;amp;&amp;amp; printf %s &amp;quot;${HOME}/.nvm&amp;quot; || printf %s &amp;quot;${XDG_CONFIG_HOME}/nvm&amp;quot;)&amp;quot;
+[ -s &amp;quot;$NVM_DIR/nvm.sh&amp;quot; ] &amp;amp;&amp;amp; \. &amp;quot;$NVM_DIR/nvm.sh&amp;quot; # This loads nvm
+&lt;/code>&lt;/pre>
+&lt;p>加载配置文件：&lt;/p>
+&lt;pre>&lt;code class="language-bash">source ~/.bashrc
+&lt;/code>&lt;/pre>
+&lt;h3 id="方法二git-安装">方法二：git 安装&lt;/h3>
+&lt;p>将代码克隆到用户目录下：&lt;/p>
+&lt;pre>&lt;code class="language-bash">cd ~/
+git clone https://github.com/nvm-sh/nvm.git .nvm
+&lt;/code>&lt;/pre>
+&lt;p>切换到最新版本&lt;/p>
+&lt;pre>&lt;code class="language-bash">cd ~/.nvm
+git checkout v0.35.1
+&lt;/code>&lt;/pre>
+&lt;p>激活 nvm，在命令行执行：&lt;/p>
+&lt;pre>&lt;code class="language-bash">. nvm.sh
+&lt;/code>&lt;/pre>
+&lt;p>最后，将下面内容分别添加到 &lt;code>~/.bashrc&lt;/code>, &lt;code>~/.profile&lt;/code>, 和 &lt;code>~/.zshrc&lt;/code> 文件中。&lt;/p>
+&lt;pre>&lt;code>export NVM_DIR=&amp;quot;$HOME/.nvm&amp;quot;
+[ -s &amp;quot;$NVM_DIR/nvm.sh&amp;quot; ] &amp;amp;&amp;amp; \. &amp;quot;$NVM_DIR/nvm.sh&amp;quot; # This loads nvm
+[ -s &amp;quot;$NVM_DIR/bash_completion&amp;quot; ] &amp;amp;&amp;amp; \. &amp;quot;$NVM_DIR/bash_completion&amp;quot; # This loads nvm bash_completion
+&lt;/code>&lt;/pre>
+&lt;p>完成之后，通过 &lt;code>nvm -v&lt;/code> 查看版本来验证是否安装成功。&lt;/p>
+&lt;h2 id="docker">docker&lt;/h2>
+&lt;h3 id="安装-docker">安装 Docker&lt;/h3>
+&lt;pre>&lt;code class="language-bash">curl -fsSL https://get.docker.com -o get-docker.sh &amp;amp;&amp;amp; sudo sh get-docker.sh
+&lt;/code>&lt;/pre>
+&lt;h3 id="安装-compose">安装 Compose&lt;/h3>
+&lt;pre>&lt;code class="language-bash">sudo curl -L &amp;quot;https://github.com/docker/compose/releases/download/1.22.0/docke-compose-$(uname -s)-$(uname -m)&amp;quot; -o /usr/local/bin/docker-compose
+# 给Docker Compose 执行权限
+sudo chmod +x /usr/local/bin/docker-compose
+#查看Docker和Docker Compose的版本
+sudo docker version
+sudo docker-compose version
+&lt;/code>&lt;/pre>
+&lt;h3 id="设置镜像源">设置镜像源&lt;/h3>
+&lt;p>执行下面命令进行设置&lt;/p>
+&lt;p>&lt;em>ps: 阿里云镜像源是个人注册阿里云账号之后分配的个人专属镜像源。&lt;/em>&lt;/p>
+&lt;pre>&lt;code class="language-bash">sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json &amp;lt;&amp;lt;-'EOF'
+{
+&amp;quot;registry-mirrors&amp;quot;: [&amp;quot;https://oojjt1xs.mirror.aliyuncs.com&amp;quot;]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+&lt;/code>&lt;/pre>
+&lt;h2 id="vim-配置">vim 配置&lt;/h2>
+&lt;p>有些系统默认没有安装&lt;/p>
+&lt;p>配置文件路径：&lt;/p>
+&lt;ul>
+&lt;li>全局配置文件：&lt;code>/etc/vim/vimrc&lt;/code>&lt;/li>
+&lt;li>当前用户配置文件：&lt;code>~/.vimrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>将下面内容粘贴到配置文件中：&lt;/p>
+&lt;pre>&lt;code>&amp;quot; 左单引号表示单行注释
+&amp;quot; 编码指定 UTF-8
+set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936
+set termencoding=utf-8
+set encoding=utf-8
+set number &amp;quot; 显示行号
+set cursorline &amp;quot; 突出显示当前行
+set ruler &amp;quot; 打开状态栏标尺
+&lt;/code>&lt;/pre>
+&lt;h2 id="设置别名alias">设置别名(alias)&lt;/h2>
+&lt;p>将所有的别名放在单独一个文件 &lt;code>.bash_aliases&lt;/code> 中，这样更加方便管理，ubuntu 也推荐这种做法。&lt;/p>
+&lt;pre>&lt;code class="language-bash">if [ -f ~/.bash_aliases ]; then
+. ~/.bash_aliases
+fi
+&lt;/code>&lt;/pre>
+&lt;p>&lt;strong>注意：等号两侧不能有空格!&lt;/strong>&lt;/p>
+&lt;pre>&lt;code class="language-bash"># 代替键盘上难以触及的 ~ 键
+alias home=&amp;quot;cd ~&amp;quot;
+# 同样也可以为一些深层却很常用的目录设置别名
+# 如：宝塔面包的 nginx 配置目录
+alias ng=&amp;quot;cd /www/server/panel/vhost/nginx&amp;quot;
+# 回退多级目录
+alias bk1=&amp;quot;cd ..&amp;quot;
+alias bk2=&amp;quot;cd ../..&amp;quot;
+alias bk3=&amp;quot;cd ../../..&amp;quot;
+alias bk4=&amp;quot;cd ../../../..&amp;quot;
+alias bk5=&amp;quot;cd ../../../../..&amp;quot;
+# ls 相关
+alias cls='clear'
+alias ll='ls -l'
+alias la='ls -a'
+# git 相关
+alias gs='git status'
+alias glog=&amp;quot;git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Cr eset %s %Cgreen(%cr) %C(bold blue)&amp;lt;%an&amp;gt;%Creset' --abbrev-commit&amp;quot;
+# 解压
+alias -s gz='tar -xzvf'
+alias -s tgz='tar -xzvf'
+alias -s zip='unzip'
+alias -s bz2='tar -xjvf'
+# other
+alias vi='vim'
+alias grep=&amp;quot;grep --color=auto&amp;quot;
+alias tree=&amp;quot;tree -I '*svn|*node_module*'&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Basic Usage of Nginx</title><link>/post/2019/2019-11-16-basic-usage-of-nginx/</link><pubDate>Sat, 16 Nov 2019 11:16:00 +0800</pubDate><guid>/post/2019/2019-11-16-basic-usage-of-nginx/</guid><description>&lt;h2 id="安装">安装&lt;/h2>
+&lt;pre>&lt;code class="language-bash"># ubuntu
+sudo apt install nginx -y
+&lt;/code>&lt;/pre>
+&lt;h2 id="命令">命令&lt;/h2>
+&lt;h3 id="nginx命令">nginx 命令&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th align="left">描述&lt;/th>
+&lt;th align="left">命令&lt;/th>
+&lt;th align="left">命令二&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td align="left">启动&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">停止&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx -s stop&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -s stop&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">重启&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx -s restart&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -s restart&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">重载配置文件&lt;/td>
+&lt;td align="left">&lt;code>sudo nginx -s reload&lt;/code>&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -s reload&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="nginx目录">nginx 目录&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th align="left">描述&lt;/th>
+&lt;th align="left">命令&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td align="left">nginx 安装目录&lt;/td>
+&lt;td align="left">&lt;code>/usr/sbin/nginx&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">默认网站根目录&lt;/td>
+&lt;td align="left">&lt;code>/usr/share/nginx/html&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">配置文件&lt;/td>
+&lt;td align="left">&lt;code>/etc/nginx/nginx.conf &lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="查找nginx安装目录的命令">查找 nginx 安装目录的命令&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th align="left">描述&lt;/th>
+&lt;th align="left">命令&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td align="left">查找 nginx 安装目录&lt;/td>
+&lt;td align="left">&lt;code>which nginx&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">查找 nginx 配置文件&lt;/td>
+&lt;td align="left">&lt;code>sudo find / -name nginx.conf&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td align="left">检测配置文件语法是否正确：&lt;/td>
+&lt;td align="left">&lt;code>sudo /usr/sbin/nginx -t&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="常见使用场景">常见使用场景&lt;/h2>
+&lt;h3 id="一-静态网站">(一) 静态网站&lt;/h3>
+&lt;p>指定域名和对应的网站根目录位置，&lt;code>server_name&lt;/code> 可以是域名、二级域名，也可以是 ip 地址。&lt;/p>
+&lt;pre>&lt;code>server {
+listen 80;
+server_name demo.example.com;
+location / {
+root /www/demo/;
+index index.html index.htm;
+}
+}
+&lt;/code>&lt;/pre>
+&lt;h3 id="二-反向代理">(二) 反向代理&lt;/h3>
+&lt;p>场景：&lt;/p>
+&lt;ul>
+&lt;li>解决跨域问题，利用 nginx 来访问其他域名下的接口&lt;/li>
+&lt;li>当 docker 服务的端口映射到宿主机上某个端口（如 8080）时，可以设置二级域名代理 8080 端口。&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code>server {
+server_name docker.example.com;
+listen 80;
+location / {
+proxy_pass http://localhost:8000;
+proxy_set_header Host $host;
+proxy_set_header X-Forward-For $remote_addr;
+}
+}
+&lt;/code>&lt;/pre>
+&lt;h3 id="三-负载均衡">(三) 负载均衡&lt;/h3>
+&lt;pre>&lt;code>upstream backend {
+server backend1.example.com weight=5;
+server backend2.example.com:8080;
+server unix:/tmp/backend3;
+}
+server {
+location / {
+proxy_pass http://backend;
+}
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="一些学习资源">一些学习资源&lt;/h2>
+&lt;p>
+&lt;a href="http://www.nginx.cn/doc/" target="_blank" rel="noopener">Nginx中文文档&lt;/a>&lt;/p></description></item><item><title>JavaScript 中 this 总结</title><link>/post/2019/2019-09-29-this-in-javascript/</link><pubDate>Sun, 29 Sep 2019 14:49:00 +0000</pubDate><guid>/post/2019/2019-09-29-this-in-javascript/</guid><description>&lt;p>JavaScript 中的 &lt;code>this&lt;/code> 总是指向一个对象，而具体指向哪个对象是在函数运行时的环境动态绑定的，而非函数被声明时的环境。&lt;/p>
+&lt;p>但是 ES6 标准新增的箭头函数中的 &lt;code>this&lt;/code> 却是由被声明的环境即上下文来确定的。&lt;/p>
+&lt;p>&lt;code>this&lt;/code> 的指向大致分为下面 5 种：&lt;/p>
+&lt;ul>
+&lt;li>作为对象的方法调用&lt;/li>
+&lt;li>作为普通函数调用&lt;/li>
+&lt;li>作为构造器调用&lt;/li>
+&lt;li>通过 &lt;code>call&lt;/code> 和 &lt;code>apply&lt;/code> 调用&lt;/li>
+&lt;li>箭头函数&lt;/li>
+&lt;/ul>
+&lt;h2 id="情况一作为普通函数调用">情况一：作为普通函数调用&lt;/h2>
+&lt;p>当函数作为普通函数或者匿名函数调用时，&lt;code>this&lt;/code> 总是指向全局对象，在浏览器中这个全局对象是 &lt;code>window&lt;/code>，在 nodejs 中全局对象是 &lt;code>global&lt;/code>，这里讨论的是浏览器端，所有代码都可以在 chrome 开发者工具的 console 面板中执行。&lt;/p>
+&lt;p>ES5 规范提出了「严格模式」，在整个脚本文件第一行或者函数内第一行添加一条语句 &lt;code>'use strict';&lt;/code> 即可开启严格模式。&lt;/p>
+&lt;p>如果启用「严格模式」，那么 &lt;code>this&lt;/code> 就不再是指向全局对象，而是 &lt;code>undefined&lt;/code> 。&lt;/p>
+&lt;p>&lt;strong>1) 普通函数：&lt;/strong>&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name';
+function printName1 () {
+console.log(this === window); // true
+console.log(this.name); // &amp;quot;global object&amp;quot;
+}
+function printName2 () {
+&amp;quot;use strict&amp;quot;; // 启用严格模式
+console.log(this); // undefined
+}
+printName1();
+printName2();
+&lt;/code>&lt;/pre>
+&lt;p>&lt;strong>2) 匿名函数：&lt;/strong>&lt;/p>
+&lt;p>匿名函数自执行，这种形式封装公用库的时候最常见：&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name';
+(function () {
+console.log(this === window); // true
+console.log(this.name); // &amp;quot;global object&amp;quot;
+})()
+&lt;/code>&lt;/pre>
+&lt;p>作为参数的匿名函数：&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name';
+setTimeout(function () {
+console.log(this === window); // true
+console.log(this.name); // &amp;quot;global object&amp;quot;
+}, 100);
+[1, 2, 3].forEach(function (item) {
+console.log(item, this.name)
+// 1 &amp;quot;global name&amp;quot;
+// 2 &amp;quot;global name&amp;quot;
+// 3 &amp;quot;global name&amp;quot;
+});
+&lt;/code>&lt;/pre>
+&lt;h2 id="情况二作为对象的方法调用">情况二：作为对象的方法调用&lt;/h2>
+&lt;p>当函数作为对象当属性方法调用时，&lt;code>this&lt;/code> 总指向这个对象。&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = {
+name: 'obj',
+printName: function () {
+console.log(this === obj); // true
+console.log(this.name); // &amp;quot;obj&amp;quot;
+}
+}
+obj.printName();
+&lt;/code>&lt;/pre>
+&lt;p>但是如果一个对象的属性方法又赋值给了其他变量，那么 &lt;code>this&lt;/code> 将发生变化，其指向只有在函数执行那一刻才能确定。例如：&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = {
+name: 'obj',
+printName: function () {
+console.log(this === obj); // true
+console.log(this.name); // &amp;quot;obj&amp;quot;
+}
+}
+var myPrintName = obj.printName;
+window.name = 'global name';
+myPrintName();
+// false
+// &amp;quot;global name&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>当 &lt;code>myPrintName&lt;/code> 执行时，就要按照普通函数来判断 &lt;code>this&lt;/code> 指向了。&lt;/p>
+&lt;p>再来一个例子：&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = {
+name: 'obj',
+printName: function () {
+console.log(this === obj); // true
+console.log(this.name); // &amp;quot;obj&amp;quot;
+}
+}
+var obj2 = {
+name: 'obj2',
+}
+obj2.printName = obj.printName;
+obj2.printName();
+// false
+// &amp;quot;obj2&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>当 &lt;code>obj2.printName&lt;/code> 执行时，&lt;code>printName&lt;/code> 是作为 &lt;code>obj2&lt;/code> 的属性方法来调用的，因此 &lt;code>this&lt;/code> 指向 &lt;code>obj2&lt;/code> 这个对象。&lt;/p>
+&lt;p>所以说，JavaScript 中的 this 指向无法在定义时判断，只有在其执行时才能判断。&lt;/p>
+&lt;h2 id="情况三作为构造器调用">情况三：作为构造器调用&lt;/h2>
+&lt;p>在 JavaScript 中没有「类」的概念（直到 ES6 才有类的出现），而是把函数作为构造器，通过 new 操作符来生成实例。&lt;/p>
+&lt;p>那么在构造函数中 &lt;code>this&lt;/code> 就指向新生成的实例。&lt;/p>
+&lt;pre>&lt;code class="language-js">var MyClass = function () {
+// 给实例添加 name 属性
+this.name = 'myclass'
+this.printName = function () {
+return this.name
+}
+}
+var obj = new MyClass()
+obj.printName() // &amp;quot;myclass&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h2 id="情况四显式指定-this">情况四：显式指定 &lt;code>this&lt;/code>&lt;/h2>
+&lt;p>前面的几种方法都是被动地根据代码执行时的环境来判断 &lt;code>this&lt;/code> 具体指向哪里，那么有没有办法主动指定 &lt;code>this&lt;/code> 指向呢。&lt;/p>
+&lt;p>答案当然是有的，甚至它们的出场率还相当高。&lt;/p>
+&lt;p>常见的显式指定 &lt;code>this&lt;/code> 的方法主要是 &lt;code>call&lt;/code>，&lt;code>apply&lt;/code> 和 &lt;code>bind&lt;/code> 来，在函数式编程中几乎离不开这三个方法。&lt;/p>
+&lt;p>先定义如下变量：&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name'
+function printName () {
+console.log(this.name)
+}
+var obj1 = { name: 'obj1' }
+var obj2 = { name: 'obj2' }
+var obj3 = { name: 'obj3' }
+&lt;/code>&lt;/pre>
+&lt;p>默认情况 this 指向全局对象 window&lt;/p>
+&lt;pre>&lt;code class="language-js">printName() // &amp;quot;global name&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>使用 &lt;code>call&lt;/code> 来改变 &lt;code>this&lt;/code> 指向：&lt;/p>
+&lt;pre>&lt;code class="language-js">printName.call(obj1) // &amp;quot;obj1&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>使用 &lt;code>apply&lt;/code> 来改变 &lt;code>this&lt;/code> 指向：&lt;/p>
+&lt;pre>&lt;code class="language-js">printName.apply(obj2) // &amp;quot;obj2&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>使用 &lt;code>bind&lt;/code> 来改变 &lt;code>this&lt;/code> 指向：&lt;/p>
+&lt;pre>&lt;code class="language-js">var printName2 = printName.bind(obj3)
+printName2() // &amp;quot;obj3&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>除此之外，还有一些函数也可以修改 this 指向，例如：forEach, map, filter, some, every 等。以 &lt;code>forEach&lt;/code> 为例：&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = { name: 'zwc' }
+var arr = [ 1, 2 ]
+arr.forEach(function (item, index) {
+console.log(item, this)
+})
+// 1 Window
+// 2 Window
+arr.forEach(function (item, index) {
+console.log(item, this)
+}, obj)
+// 1 {name: &amp;quot;zwc&amp;quot;}
+// 2 {name: &amp;quot;zwc&amp;quot;}
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>forEach&lt;/code> 第一个参数接收一个函数作为迭代器，用来处理数组中每一项元素，这个函数通常是一个匿名函数，函数内部的 &lt;code>this&lt;/code> 指向全局对象。&lt;/p>
+&lt;p>&lt;code>forEach&lt;/code> 第二个参数可以接收一个对象，这个对象就是参数函数中的 &lt;code>this&lt;/code> 指向。&lt;/p>
+&lt;p>根据打印结果可以看到，在 &lt;code>forEach&lt;/code> 的迭代器函数中的 &lt;code>this&lt;/code> 已经指向了 &lt;code>obj&lt;/code> 。&lt;/p>
+&lt;h2 id="情况五es6箭头函数">情况五：ES6箭头函数&lt;/h2>
+&lt;h3 id="箭头函数简介">箭头函数简介&lt;/h3>
+&lt;p>ES6 允许使用「箭头」（=&amp;gt;）定义函数。&lt;/p>
+&lt;pre>&lt;code class="language-js">var f = v =&amp;gt; v;
+// 等同于
+var f = function (v) {
+return v;
+};
+&lt;/code>&lt;/pre>
+&lt;p>除了形式更简洁之外，箭头函数没有自己的 &lt;code>this&lt;/code>，而是&lt;strong>从自己作用域链的上一层继承 &lt;code>this&lt;/code>&lt;/strong>。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>箭头函数总是从自己作用域链的上一层继承 &lt;code>this&lt;/code>。&lt;/strong>&lt;/p>
+&lt;p>神马意思呢？我的理解就是箭头函数内部的 &lt;code>this&lt;/code> 指向永远是箭头函数被定义时所在的作用域的 &lt;code>this&lt;/code>，并且无法修改。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="无法绑定-this">无法绑定 this&lt;/h3>
+&lt;p>使用 call 来调用箭头函数时，第一个参数会被忽略，也就是说无法修改 this 指向。apply 和 bind 也是同样现象。&lt;/p>
+&lt;pre>&lt;code class="language-js">var printName = () =&amp;gt; {
+console.log(this === window); // true
+}
+var obj = { name: 'obj' }
+printName.call(obj);
+&lt;/code>&lt;/pre>
+&lt;h3 id="例子一">例子一&lt;/h3>
+&lt;p>来看一个例子，在不使用箭头函数的情况下，我们知道构造器函数内部 this 指向对象实例，而匿名函数的 this 是指向全局对象的，因此想要通过定时器打印对象实例的 &lt;code>age&lt;/code> 属性，只能用一个变量 &lt;code>self&lt;/code> 保存 &lt;code>this&lt;/code> 的引用（即闭包）&lt;/p>
+&lt;pre>&lt;code class="language-js">function Person(){
+// 构造器函数内部 this 指向对象实例
+this.age = 0;
+var self = this;
+setInterval(function () {
+// 匿名函数中 this 指向全局对象
+console.log(self.age++)
+}, 1000);
+}
+var p = new Person();
+&lt;/code>&lt;/pre>
+&lt;p>使用箭头函数之后，因为箭头函数的 &lt;code>this&lt;/code> 继承自其被定义时所在环境的 &lt;code>this&lt;/code>，在本例中这个 this 就是实例对象：&lt;/p>
+&lt;pre>&lt;code class="language-js">function Person(){
+// 构造器函数内部 this 指向对象实例
+this.age = 0;
+setInterval(() =&amp;gt; {
+// 这里的 this 也指向构造函数的 this
+console.log(this.age++)
+}, 1000);
+}
+var p = new Person();
+&lt;/code>&lt;/pre>
+&lt;h3 id="例子二">例子二&lt;/h3>
+&lt;p>再说一个更实用的例子：在 Vue.js 中使用箭头函数&lt;/p>
+&lt;pre>&lt;code class="language-js">import axios from 'axios';
+export default {
+methods: {
+fetch () {
+axios.get('/userinfo')
+.then(resp =&amp;gt; {
+this.sayHi(); // this 指向 vue 实例
+})
+.catch(err =&amp;gt; {
+this.sayHi(); // this 指向 vue 实例
+})
+},
+sayHi () {
+setTimeout(() =&amp;gt; {
+// this 指向 vue 实例
+}, 1000);
+}
+}
+}
+&lt;/code>&lt;/pre>
+&lt;p>使用箭头函数之后，再也无需缓存 vue 实例，像是 &lt;code>var vm = this;&lt;/code> 这种代码统统可以消灭掉，嗯，清爽！&lt;/p>
+&lt;h2 id="相关链接">相关链接&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>
+&lt;a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Strict_mode" target="_blank" rel="noopener">严格模式 - MDN&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>
+&lt;a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/arrow_functions" target="_blank" rel="noopener">箭头函数 - MDN&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>
+&lt;a href="http://es6.ruanyifeng.com/#docs/function#%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0" target="_blank" rel="noopener">箭头函数 - ES6 入门&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="总结">总结&lt;/h2>
+&lt;p>在箭头函数出现之前，每一个新函数根据&lt;strong>它是被如何调用的&lt;/strong>来定义这个函数的 &lt;code>this&lt;/code> 值：&lt;/p>
+&lt;ul>
+&lt;li>如果是该函数是一个普通函数或者匿名函数
+&lt;ul>
+&lt;li>在严格模式下的函数调用下，&lt;code>this&lt;/code> 指向 &lt;code>undefined&lt;/code>，&lt;/li>
+&lt;li>在非严格模式的函数调用中，&lt;code>this&lt;/code> 指向全局对象，浏览器中全局对象是 &lt;code>window&lt;/code> ，在 nodejs 中全局对象是 &lt;code>global&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>如果是该函数是一个构造函数，&lt;code>this&lt;/code> 指针指向一个新的对象（实例）&lt;/li>
+&lt;li>如果是该函数是一个对象的方法，则它的&lt;code>this&lt;/code> 指针指向这个对象&lt;/li>
+&lt;li>或者使用 &lt;code>call&lt;/code> &lt;code>apply&lt;/code> 等方法显式指定 &lt;code>this&lt;/code> 的指向&lt;/li>
+&lt;/ul>
+&lt;p>在箭头函数中，则是根据箭头函数上下文决定其 this 指向，且无法修改 &lt;code>this&lt;/code> 指向。&lt;/p>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item></channel></rss>

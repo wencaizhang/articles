@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>js | 阿文的网络空间</title><link>/tag/js/</link><atom:link href="/tag/js/index.xml" rel="self" type="application/rss+xml"/><description>js</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Sun, 29 Sep 2019 14:49:00 +0000</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>js</title><link>/tag/js/</link></image><item><title>JavaScript 中 this 总结</title><link>/post/2019/2019-09-29-this-in-javascript/</link><pubDate>Sun, 29 Sep 2019 14:49:00 +0000</pubDate><guid>/post/2019/2019-09-29-this-in-javascript/</guid><description>&lt;p>JavaScript 中的 &lt;code>this&lt;/code> 总是指向一个对象，而具体指向哪个对象是在函数运行时的环境动态绑定的，而非函数被声明时的环境。&lt;/p>
+&lt;p>但是 ES6 标准新增的箭头函数中的 &lt;code>this&lt;/code> 却是由被声明的环境即上下文来确定的。&lt;/p>
+&lt;p>&lt;code>this&lt;/code> 的指向大致分为下面 5 种：&lt;/p>
+&lt;ul>
+&lt;li>作为对象的方法调用&lt;/li>
+&lt;li>作为普通函数调用&lt;/li>
+&lt;li>作为构造器调用&lt;/li>
+&lt;li>通过 &lt;code>call&lt;/code> 和 &lt;code>apply&lt;/code> 调用&lt;/li>
+&lt;li>箭头函数&lt;/li>
+&lt;/ul>
+&lt;h2 id="情况一作为普通函数调用">情况一：作为普通函数调用&lt;/h2>
+&lt;p>当函数作为普通函数或者匿名函数调用时，&lt;code>this&lt;/code> 总是指向全局对象，在浏览器中这个全局对象是 &lt;code>window&lt;/code>，在 nodejs 中全局对象是 &lt;code>global&lt;/code>，这里讨论的是浏览器端，所有代码都可以在 chrome 开发者工具的 console 面板中执行。&lt;/p>
+&lt;p>ES5 规范提出了「严格模式」，在整个脚本文件第一行或者函数内第一行添加一条语句 &lt;code>'use strict';&lt;/code> 即可开启严格模式。&lt;/p>
+&lt;p>如果启用「严格模式」，那么 &lt;code>this&lt;/code> 就不再是指向全局对象，而是 &lt;code>undefined&lt;/code> 。&lt;/p>
+&lt;p>&lt;strong>1) 普通函数：&lt;/strong>&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name';
+function printName1 () {
+console.log(this === window); // true
+console.log(this.name); // &amp;quot;global object&amp;quot;
+}
+function printName2 () {
+&amp;quot;use strict&amp;quot;; // 启用严格模式
+console.log(this); // undefined
+}
+printName1();
+printName2();
+&lt;/code>&lt;/pre>
+&lt;p>&lt;strong>2) 匿名函数：&lt;/strong>&lt;/p>
+&lt;p>匿名函数自执行，这种形式封装公用库的时候最常见：&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name';
+(function () {
+console.log(this === window); // true
+console.log(this.name); // &amp;quot;global object&amp;quot;
+})()
+&lt;/code>&lt;/pre>
+&lt;p>作为参数的匿名函数：&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name';
+setTimeout(function () {
+console.log(this === window); // true
+console.log(this.name); // &amp;quot;global object&amp;quot;
+}, 100);
+[1, 2, 3].forEach(function (item) {
+console.log(item, this.name)
+// 1 &amp;quot;global name&amp;quot;
+// 2 &amp;quot;global name&amp;quot;
+// 3 &amp;quot;global name&amp;quot;
+});
+&lt;/code>&lt;/pre>
+&lt;h2 id="情况二作为对象的方法调用">情况二：作为对象的方法调用&lt;/h2>
+&lt;p>当函数作为对象当属性方法调用时，&lt;code>this&lt;/code> 总指向这个对象。&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = {
+name: 'obj',
+printName: function () {
+console.log(this === obj); // true
+console.log(this.name); // &amp;quot;obj&amp;quot;
+}
+}
+obj.printName();
+&lt;/code>&lt;/pre>
+&lt;p>但是如果一个对象的属性方法又赋值给了其他变量，那么 &lt;code>this&lt;/code> 将发生变化，其指向只有在函数执行那一刻才能确定。例如：&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = {
+name: 'obj',
+printName: function () {
+console.log(this === obj); // true
+console.log(this.name); // &amp;quot;obj&amp;quot;
+}
+}
+var myPrintName = obj.printName;
+window.name = 'global name';
+myPrintName();
+// false
+// &amp;quot;global name&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>当 &lt;code>myPrintName&lt;/code> 执行时，就要按照普通函数来判断 &lt;code>this&lt;/code> 指向了。&lt;/p>
+&lt;p>再来一个例子：&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = {
+name: 'obj',
+printName: function () {
+console.log(this === obj); // true
+console.log(this.name); // &amp;quot;obj&amp;quot;
+}
+}
+var obj2 = {
+name: 'obj2',
+}
+obj2.printName = obj.printName;
+obj2.printName();
+// false
+// &amp;quot;obj2&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>当 &lt;code>obj2.printName&lt;/code> 执行时，&lt;code>printName&lt;/code> 是作为 &lt;code>obj2&lt;/code> 的属性方法来调用的，因此 &lt;code>this&lt;/code> 指向 &lt;code>obj2&lt;/code> 这个对象。&lt;/p>
+&lt;p>所以说，JavaScript 中的 this 指向无法在定义时判断，只有在其执行时才能判断。&lt;/p>
+&lt;h2 id="情况三作为构造器调用">情况三：作为构造器调用&lt;/h2>
+&lt;p>在 JavaScript 中没有「类」的概念（直到 ES6 才有类的出现），而是把函数作为构造器，通过 new 操作符来生成实例。&lt;/p>
+&lt;p>那么在构造函数中 &lt;code>this&lt;/code> 就指向新生成的实例。&lt;/p>
+&lt;pre>&lt;code class="language-js">var MyClass = function () {
+// 给实例添加 name 属性
+this.name = 'myclass'
+this.printName = function () {
+return this.name
+}
+}
+var obj = new MyClass()
+obj.printName() // &amp;quot;myclass&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;h2 id="情况四显式指定-this">情况四：显式指定 &lt;code>this&lt;/code>&lt;/h2>
+&lt;p>前面的几种方法都是被动地根据代码执行时的环境来判断 &lt;code>this&lt;/code> 具体指向哪里，那么有没有办法主动指定 &lt;code>this&lt;/code> 指向呢。&lt;/p>
+&lt;p>答案当然是有的，甚至它们的出场率还相当高。&lt;/p>
+&lt;p>常见的显式指定 &lt;code>this&lt;/code> 的方法主要是 &lt;code>call&lt;/code>，&lt;code>apply&lt;/code> 和 &lt;code>bind&lt;/code> 来，在函数式编程中几乎离不开这三个方法。&lt;/p>
+&lt;p>先定义如下变量：&lt;/p>
+&lt;pre>&lt;code class="language-js">window.name = 'global name'
+function printName () {
+console.log(this.name)
+}
+var obj1 = { name: 'obj1' }
+var obj2 = { name: 'obj2' }
+var obj3 = { name: 'obj3' }
+&lt;/code>&lt;/pre>
+&lt;p>默认情况 this 指向全局对象 window&lt;/p>
+&lt;pre>&lt;code class="language-js">printName() // &amp;quot;global name&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>使用 &lt;code>call&lt;/code> 来改变 &lt;code>this&lt;/code> 指向：&lt;/p>
+&lt;pre>&lt;code class="language-js">printName.call(obj1) // &amp;quot;obj1&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>使用 &lt;code>apply&lt;/code> 来改变 &lt;code>this&lt;/code> 指向：&lt;/p>
+&lt;pre>&lt;code class="language-js">printName.apply(obj2) // &amp;quot;obj2&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>使用 &lt;code>bind&lt;/code> 来改变 &lt;code>this&lt;/code> 指向：&lt;/p>
+&lt;pre>&lt;code class="language-js">var printName2 = printName.bind(obj3)
+printName2() // &amp;quot;obj3&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;p>除此之外，还有一些函数也可以修改 this 指向，例如：forEach, map, filter, some, every 等。以 &lt;code>forEach&lt;/code> 为例：&lt;/p>
+&lt;pre>&lt;code class="language-js">var obj = { name: 'zwc' }
+var arr = [ 1, 2 ]
+arr.forEach(function (item, index) {
+console.log(item, this)
+})
+// 1 Window
+// 2 Window
+arr.forEach(function (item, index) {
+console.log(item, this)
+}, obj)
+// 1 {name: &amp;quot;zwc&amp;quot;}
+// 2 {name: &amp;quot;zwc&amp;quot;}
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>forEach&lt;/code> 第一个参数接收一个函数作为迭代器，用来处理数组中每一项元素，这个函数通常是一个匿名函数，函数内部的 &lt;code>this&lt;/code> 指向全局对象。&lt;/p>
+&lt;p>&lt;code>forEach&lt;/code> 第二个参数可以接收一个对象，这个对象就是参数函数中的 &lt;code>this&lt;/code> 指向。&lt;/p>
+&lt;p>根据打印结果可以看到，在 &lt;code>forEach&lt;/code> 的迭代器函数中的 &lt;code>this&lt;/code> 已经指向了 &lt;code>obj&lt;/code> 。&lt;/p>
+&lt;h2 id="情况五es6箭头函数">情况五：ES6箭头函数&lt;/h2>
+&lt;h3 id="箭头函数简介">箭头函数简介&lt;/h3>
+&lt;p>ES6 允许使用「箭头」（=&amp;gt;）定义函数。&lt;/p>
+&lt;pre>&lt;code class="language-js">var f = v =&amp;gt; v;
+// 等同于
+var f = function (v) {
+return v;
+};
+&lt;/code>&lt;/pre>
+&lt;p>除了形式更简洁之外，箭头函数没有自己的 &lt;code>this&lt;/code>，而是&lt;strong>从自己作用域链的上一层继承 &lt;code>this&lt;/code>&lt;/strong>。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>箭头函数总是从自己作用域链的上一层继承 &lt;code>this&lt;/code>。&lt;/strong>&lt;/p>
+&lt;p>神马意思呢？我的理解就是箭头函数内部的 &lt;code>this&lt;/code> 指向永远是箭头函数被定义时所在的作用域的 &lt;code>this&lt;/code>，并且无法修改。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="无法绑定-this">无法绑定 this&lt;/h3>
+&lt;p>使用 call 来调用箭头函数时，第一个参数会被忽略，也就是说无法修改 this 指向。apply 和 bind 也是同样现象。&lt;/p>
+&lt;pre>&lt;code class="language-js">var printName = () =&amp;gt; {
+console.log(this === window); // true
+}
+var obj = { name: 'obj' }
+printName.call(obj);
+&lt;/code>&lt;/pre>
+&lt;h3 id="例子一">例子一&lt;/h3>
+&lt;p>来看一个例子，在不使用箭头函数的情况下，我们知道构造器函数内部 this 指向对象实例，而匿名函数的 this 是指向全局对象的，因此想要通过定时器打印对象实例的 &lt;code>age&lt;/code> 属性，只能用一个变量 &lt;code>self&lt;/code> 保存 &lt;code>this&lt;/code> 的引用（即闭包）&lt;/p>
+&lt;pre>&lt;code class="language-js">function Person(){
+// 构造器函数内部 this 指向对象实例
+this.age = 0;
+var self = this;
+setInterval(function () {
+// 匿名函数中 this 指向全局对象
+console.log(self.age++)
+}, 1000);
+}
+var p = new Person();
+&lt;/code>&lt;/pre>
+&lt;p>使用箭头函数之后，因为箭头函数的 &lt;code>this&lt;/code> 继承自其被定义时所在环境的 &lt;code>this&lt;/code>，在本例中这个 this 就是实例对象：&lt;/p>
+&lt;pre>&lt;code class="language-js">function Person(){
+// 构造器函数内部 this 指向对象实例
+this.age = 0;
+setInterval(() =&amp;gt; {
+// 这里的 this 也指向构造函数的 this
+console.log(this.age++)
+}, 1000);
+}
+var p = new Person();
+&lt;/code>&lt;/pre>
+&lt;h3 id="例子二">例子二&lt;/h3>
+&lt;p>再说一个更实用的例子：在 Vue.js 中使用箭头函数&lt;/p>
+&lt;pre>&lt;code class="language-js">import axios from 'axios';
+export default {
+methods: {
+fetch () {
+axios.get('/userinfo')
+.then(resp =&amp;gt; {
+this.sayHi(); // this 指向 vue 实例
+})
+.catch(err =&amp;gt; {
+this.sayHi(); // this 指向 vue 实例
+})
+},
+sayHi () {
+setTimeout(() =&amp;gt; {
+// this 指向 vue 实例
+}, 1000);
+}
+}
+}
+&lt;/code>&lt;/pre>
+&lt;p>使用箭头函数之后，再也无需缓存 vue 实例，像是 &lt;code>var vm = this;&lt;/code> 这种代码统统可以消灭掉，嗯，清爽！&lt;/p>
+&lt;h2 id="相关链接">相关链接&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>
+&lt;a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Strict_mode" target="_blank" rel="noopener">严格模式 - MDN&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>
+&lt;a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/arrow_functions" target="_blank" rel="noopener">箭头函数 - MDN&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>
+&lt;a href="http://es6.ruanyifeng.com/#docs/function#%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0" target="_blank" rel="noopener">箭头函数 - ES6 入门&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="总结">总结&lt;/h2>
+&lt;p>在箭头函数出现之前，每一个新函数根据&lt;strong>它是被如何调用的&lt;/strong>来定义这个函数的 &lt;code>this&lt;/code> 值：&lt;/p>
+&lt;ul>
+&lt;li>如果是该函数是一个普通函数或者匿名函数
+&lt;ul>
+&lt;li>在严格模式下的函数调用下，&lt;code>this&lt;/code> 指向 &lt;code>undefined&lt;/code>，&lt;/li>
+&lt;li>在非严格模式的函数调用中，&lt;code>this&lt;/code> 指向全局对象，浏览器中全局对象是 &lt;code>window&lt;/code> ，在 nodejs 中全局对象是 &lt;code>global&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>如果是该函数是一个构造函数，&lt;code>this&lt;/code> 指针指向一个新的对象（实例）&lt;/li>
+&lt;li>如果是该函数是一个对象的方法，则它的&lt;code>this&lt;/code> 指针指向这个对象&lt;/li>
+&lt;li>或者使用 &lt;code>call&lt;/code> &lt;code>apply&lt;/code> 等方法显式指定 &lt;code>this&lt;/code> 的指向&lt;/li>
+&lt;/ul>
+&lt;p>在箭头函数中，则是根据箭头函数上下文决定其 this 指向，且无法修改 &lt;code>this&lt;/code> 指向。&lt;/p>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item></channel></rss>

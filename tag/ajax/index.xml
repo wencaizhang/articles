@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ajax | 阿文的网络空间</title><link>/tag/ajax/</link><atom:link href="/tag/ajax/index.xml" rel="self" type="application/rss+xml"/><description>ajax</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Fri, 22 Nov 2019 15:46:45 +0800</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>ajax</title><link>/tag/ajax/</link></image><item><title>Request Methods With Axios</title><link>/post/2019/2019-11-22-request-methods-with-axios/</link><pubDate>Fri, 22 Nov 2019 15:46:45 +0800</pubDate><guid>/post/2019/2019-11-22-request-methods-with-axios/</guid><description>&lt;p>Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中&lt;/p>
+&lt;p>Axios 有以下特点：&lt;/p>
+&lt;ul>
+&lt;li>支持浏览器和node.js&lt;/li>
+&lt;li>支持promise&lt;/li>
+&lt;li>能拦截请求和响应&lt;/li>
+&lt;li>能转换请求和响应数据&lt;/li>
+&lt;li>能取消请求&lt;/li>
+&lt;li>自动转换JSON数据&lt;/li>
+&lt;li>浏览器端支持防止CSRF(跨站请求伪造)&lt;/li>
+&lt;/ul>
+&lt;p>axios 的详细使用都可以在
+&lt;a href="https://github.com/axios/axios" target="_blank" rel="noopener">https://github.com/axios/axios&lt;/a> 中看到，本文主要将在项目实践中如何进一步封装 axios ，使得 axios 更符合实际需求。&lt;/p>
+&lt;h2 id="封装步骤">封装步骤&lt;/h2>
+&lt;h3 id="全局配置">全局配置&lt;/h3>
+&lt;p>全局配置是指配置 &lt;code>baseURL&lt;/code> &lt;code>timeout&lt;/code> 等选项。&lt;/p>
+&lt;p>全局配置会影响到每个请求，可以直接对 axios 配置，也可以创建 axios 的实例，对实例进行配置。&lt;/p>
+&lt;p>axios 和 axios 实例的区别就在于，axios 可以创建多个实例，不同实例之间的配置可以不同，并且不会影响到 axios 这个源头。&lt;/p>
+&lt;p>直接配置 axios：&lt;/p>
+&lt;pre>&lt;code class="language-js">axios.defaults.baseURL = 'https://api.example.com';
+axios.defaults.timeout = 2000;
+&lt;/code>&lt;/pre>
+&lt;p>或者配置 axios 实例：&lt;/p>
+&lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
+// 创建 axios 实例
+const request = axios.create({
+baseURL: &amp;quot;https://api.example.com&amp;quot;,
+timeout: 2000, // 请求超时时间
+});
+&lt;/code>&lt;/pre>
+&lt;h3 id="拦截器">拦截器&lt;/h3>
+&lt;p>axios 拦截器分为「请求拦截器」和「响应拦截器」，它们相当于是项目 http 请求的大门。&lt;/p>
+&lt;p>每次发送请求时要经过「请求拦截器」这道门，每次请求得到响应时也要经过「响应拦截器」这道门。&lt;/p>
+&lt;p>有了拦截器，方便我们对每个请求进行一些处理，比如：&lt;/p>
+&lt;ol>
+&lt;li>发送请求时，判断用户的登录状态或者用户权限，不满足条件的或者跳转登录页面或者弹窗提示&lt;/li>
+&lt;li>发送请求时，添加特定的 headers&lt;/li>
+&lt;li>请求得到响应时，根据响应状态码做不同处理：
+&lt;ul>
+&lt;li>200: 响应成功&lt;/li>
+&lt;li>404: 未找到资源&lt;/li>
+&lt;li>409: 用户没有相应权限&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
+// 创建 axios 实例
+const request = axios.create({
+baseURL: &amp;quot;[/cmp/v1](https://api.example.com)&amp;quot;,
+timeout: 2000 // 请求超时时间
+});
+// request 拦截器
+request.interceptors.request.use(
+confit =&amp;gt; {
+// 设置 token，或者其他设置
+config.headers[&amp;quot;token&amp;quot;] = 'token_123';
+return config;
+},
+err =&amp;gt; {
+return Promise.reject(err)
+},
+);
+// response 拦截器
+request.interceptors.response.use(
+resp =&amp;gt; resp.data,
+error =&amp;gt; {
+if (error.response) {
+const data = error.response.data;
+let msg = data.desc || data.exception || '';
+switch (error.response.status) {
+case 401:
+// 提示：登录过期，跳转登录页面重新登录
+break;
+case 403:
+// 提示：权限不足
+break;
+case 404:
+// 提示：资源不存在
+break;
+default:
+// 提示：请求失败
+break;
+}
+}
+return Promise.reject(error);
+}
+);
+&lt;/code>&lt;/pre>
+&lt;h3 id="封装各类型请求">封装各类型请求&lt;/h3>
+&lt;p>这一步封装主要是为了统一 axios 中不同请求类型的参数要求。&lt;/p>
+&lt;p>以 POST 和 GET 为例，封装之前&lt;/p>
+&lt;pre>&lt;code class="language-js">const payload = { ID: 12345 }
+// get 请求，params 属性值是携带的参数
+axios.get('/user', {
+params: payload
+})
+// post 请求
+axios.post('/user', payload)
+&lt;/code>&lt;/pre>
+&lt;p>封装之后：&lt;/p>
+&lt;pre>&lt;code class="language-js">const payload = { ID: 12345 }
+GET('/user', payload)
+POST('/user', payload)
+&lt;/code>&lt;/pre>
+&lt;p>封装之后，每种类型的请求方法都接受两个参数：url 和需要传递到服务端的数据 payload。&lt;/p>
+&lt;p>这里我封装了 &lt;code>GET&lt;/code> &lt;code>POST&lt;/code> &lt;code>PUT&lt;/code> &lt;code>DELETE&lt;/code> 四种方法，分别对应 &lt;code>get&lt;/code> &lt;code>post&lt;/code> &lt;code>put&lt;/code> &lt;code>delete&lt;/code> 类型的请求：&lt;/p>
+&lt;pre>&lt;code class="language-js">export function GET (url, payload) {
+return request.get(url, {
+params: payload
+});
+}
+export function POST (url, payload) {
+return request.post(url, payload);
+}
+export function PUT (url, payload) {
+return request.put(url, payload);
+}
+export function DELETE (url, payload) {
+return request.delete(url, {
+data: payload
+});
+}
+&lt;/code>&lt;/pre>
+&lt;p>使用方法：&lt;/p>
+&lt;pre>&lt;code class="language-js">// 示例：
+import { GET, POST, PUT, DELETE } from '@/utils/request.js'
+const payload = { username: 'admin', password: '123456' }
+POST('/login', payload)
+.then(resp =&amp;gt; {
+// 请求成功
+})
+.catch(err =&amp;gt; {
+// 请求失败
+})
+.finally {
+// 成功/失败都会执行这里代码
+}
+&lt;/code>&lt;/pre>
+&lt;h2 id="其他">其他&lt;/h2>
+&lt;h3 id="post-请求数据格式">post 请求数据格式&lt;/h3>
+&lt;p>默认情况下，axios 中 post 请求的 &lt;code>Content-Type&lt;/code> 字段对应的值是 &lt;code>application/json&lt;/code> ，此时是以 json 格式向服务端发送数据。&lt;/p>
+&lt;p>如果想要以 &lt;code>FormData&lt;/code> 形式发送数据，你可以这样解决&lt;/p>
+&lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
+import qs from 'qs';
+const data = { 'bar': 123 };
+const options = {
+url,
+method: 'POST',
+data: qs.stringify(data),
+headers: { 'content-type': 'application/x-www-form-urlencoded' },
+};
+axios(options);
+&lt;/code>&lt;/pre>
+&lt;p>那么前面对 POST 方法的封装也要进行修改：&lt;/p>
+&lt;pre>&lt;code class="language-js">import qs from 'qs';
+export function POST (url, payload) {
+const options = {
+url,
+method: 'POST',
+data: qs.stringify(data),
+headers: { 'content-type': 'application/x-www-form-urlencoded' },
+};
+return request(options);
+}
+&lt;/code>&lt;/pre>
+&lt;!--
+疑问：
+全局设置是否有效
+// 设置 post 请求的 Content-Type
+request.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+-->
+&lt;h3 id="挂载到-vue-原型上">挂载到 vue 原型上&lt;/h3>
+&lt;pre>&lt;code class="language-js">import { GET, POST, PUT, DELETE } from '@/utils/request.js'
+Vue.prototype.$http = {
+get: GET,
+post: POST,
+put: PUT,
+delete: DELETE
+}
+&lt;/code>&lt;/pre>
+&lt;p>挂载到原型上之后，就可以在任意的 vue 组件内通过 vue 实例调用请求：&lt;/p>
+&lt;pre>&lt;code class="language-js">this.$http.get('/user', { id: 123 })
+&lt;/code>&lt;/pre>
+&lt;h2 id="完整代码">完整代码&lt;/h2>
+&lt;details>
+&lt;summary>
+完整的 request.js 代码在此，请点击展开完整代码
+&lt;/summary>
+&lt;pre>&lt;code class="language-js">// request.js
+import axios from &amp;quot;axios&amp;quot;;
+// 创建 axios 实例
+const request = axios.create({
+baseURL: &amp;quot;https://api.example.com&amp;quot;,
+timeout: 2000, // 请求超时时间
+});
+// request 拦截器
+request.interceptors.request.use(
+confit =&amp;gt; {
+// 设置 token，或者其他设置
+config.headers[&amp;quot;token&amp;quot;] = 'token_123';
+return config;
+},
+err =&amp;gt; {
+return Promise.reject(err)
+},
+);
+// response 拦截器
+request.interceptors.response.use(
+resp =&amp;gt; resp.data,
+error =&amp;gt; {
+if (error.response) {
+const data = error.response.data;
+let msg = data.desc || data.exception || '';
+switch (error.response.status) {
+case 401:
+// 提示：登录过期，跳转登录页面重新登录
+break;
+case 403:
+// 提示：权限不足
+break;
+case 404:
+// 提示：资源不存在
+break;
+default:
+// 提示：请求失败
+break;
+}
+}
+return Promise.reject(error);
+}
+);
+export function GET (url, payload) {
+return request.get(url, {
+params: payload
+});
+}
+export function POST (url, payload) {
+return request.post(url, payload);
+}
+export function PUT (url, payload) {
+return request.put(url, payload);
+}
+export function PATCH (url, payload) {
+return request.patch(url, payload);
+}
+export function DELETE (url, payload) {
+return request.delete(url, {
+params: payload
+});
+}
+&lt;/code>&lt;/pre>
+&lt;/details>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item></channel></rss>

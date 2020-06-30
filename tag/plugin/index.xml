@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>plugin | 阿文的网络空间</title><link>/tag/plugin/</link><atom:link href="/tag/plugin/index.xml" rel="self" type="application/rss+xml"/><description>plugin</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Thu, 28 Nov 2019 15:39:43 +0800</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>plugin</title><link>/tag/plugin/</link></image><item><title>如何创建一个 Vue.js 插件</title><link>/post/2019/2019-11-28-how-to-create-a-plugin-of-vue.js/</link><pubDate>Thu, 28 Nov 2019 15:39:43 +0800</pubDate><guid>/post/2019/2019-11-28-how-to-create-a-plugin-of-vue.js/</guid><description>&lt;h2 id="vuejs-插件介绍">Vue.js 插件介绍&lt;/h2>
+&lt;p>Vue.js 插件以一种更优雅的方式来为 Vue 添加全局功能。&lt;/p>
+&lt;p>插件的使用方法很简单，只需要在 &lt;code>new Vue()&lt;/code> 之前通过 Vue.js 提供的 &lt;code>use&lt;/code> 方法来注册（启用）插件即可：&lt;/p>
+&lt;pre>&lt;code class="language-js">import MyPlugin from &amp;quot;MyPlugin&amp;quot;;
+// 要在 new Vue() 之前调用 use 方法
+Vue.use(MyPlugin)
+// 也可以传入一个可选的选项对象
+Vue.use(MyPlugin, { someOption: true })
+&lt;/code>&lt;/pre>
+&lt;h2 id="如何自己开发一个插件">如何自己开发一个插件&lt;/h2>
+&lt;p>上面讲到，通过 &lt;code>Vue.use&lt;/code> 方法来注册插件， &lt;code>Vue.use&lt;/code> 方法接收两个参数，第一个是插件，第二个是一个可选的选项对象&lt;/p>
+&lt;pre>&lt;code class="language-js">Vue.use(MyPlugin, { someOption: true })
+&lt;/code>&lt;/pre>
+&lt;p>而 &lt;code>Vue.use&lt;/code> 方法执行时是调用由 &lt;code>MyPlugin&lt;/code> 提供的 &lt;code>install&lt;/code> 方法，因此上面代码相当于：&lt;/p>
+&lt;pre>&lt;code class="language-js">MyPlugin.install(Vue, { someOption: true })
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>install&lt;/code> 方法接收两个参数，&lt;code>Vue&lt;/code> 构造函数和调用插件时传入的可选的选项对象。&lt;/p>
+&lt;p>因此，只要是一个向外暴露 &lt;code>install&lt;/code> 方法的模块，就可以作为 Vue 的插件，例如：&lt;/p>
+&lt;pre>&lt;code class="language-js">// MyPlugin.js
+MyPlugin.install = function (Vue, options) {
+console.log('hello, MyPlugin');
+}
+export default MyPlugin;
+&lt;/code>&lt;/pre>
+&lt;p>这便是一个最简单的 Vue.js 插件了。&lt;/p>
+&lt;p>当然，我们开发插件不可能只是为了打印一句话，而是有更重要的使命等待我们去完成，因为 &lt;code>install&lt;/code> 方法第一个参数是 &lt;code>Vue&lt;/code> 构造函数，所以你可以围绕着 &lt;code>Vue&lt;/code> 来扩展更多更强大的功能，另外 &lt;code>install&lt;/code> 第二个参数可以接收一个配置选项对象，这样可以使你提供的功能更加灵活更具有可配置性。&lt;/p>
+&lt;pre>&lt;code class="language-js">MyPlugin.install = function (Vue, options) {
+// 1. 添加全局方法或属性
+Vue.myGlobalMethod = function () {
+// 逻辑...
+}
+// 2. 添加全局资源
+Vue.directive('my-directive', {
+bind (el, binding, vnode, oldVnode) {
+// 逻辑...
+}
+})
+// 3. 注入组件选项
+Vue.mixin({
+created: function () {
+// 逻辑...
+}
+})
+// 4. 添加实例方法
+Vue.prototype.$myMethod = function (methodOptions) {
+// 逻辑...
+}
+}
+&lt;/code>&lt;/pre>
+&lt;p>ps: 有的同学担心插件会被多次注册，其实 &lt;code>Vue.use&lt;/code> 会自动阻止多次注册相同插件，届时即使多次调用也只会注册一次该插件。&lt;/p>
+&lt;h2 id="live-demos">live demos&lt;/h2>
+&lt;p>我们常见的库
+&lt;a href="https://element.eleme.cn/#/zh-CN/component/quickstart#wan-zheng-yin-ru" target="_blank" rel="noopener">Element UI&lt;/a> 也是以插件形式引入，而且组件库内部的单个组件也都是插件形式存在，如
+&lt;a href="https://github.com/ElemeFE/element/blob/dev/packages/button/index.js" target="_blank" rel="noopener">ElButton&lt;/a>&lt;/p>
+&lt;p>另外，
+&lt;a href="https://github.com/vuejs/awesome-vue#components--libraries" target="_blank" rel="noopener">awesome-vue&lt;/a> 集合了大量由社区贡献的插件和库，有兴趣的同学可以自行研究学习。&lt;/p>
+&lt;h2 id="相关链接">相关链接：&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;a href="https://element.eleme.cn/#/zh-CN/component/quickstart#wan-zheng-yin-ru" target="_blank" rel="noopener">Element UI 文档&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://github.com/ElemeFE/element" target="_blank" rel="noopener">Element UI 源码&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="https://cn.vuejs.org/v2/guide/plugins.html" target="_blank" rel="noopener">插件 - Vue.js 文档&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item></channel></rss>
