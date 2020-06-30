@@ -35,6 +35,6 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.ALIYUN }}
           ARGS: "-rltgoDzvO --delete"
           SOURCE: "public/"
-          REMOTE_HOST: "39.106.12.170"
+          REMOTE_HOST: "101.201.57.17"
           REMOTE_USER: "root"
-          TARGET: "/www/wwwroot/autodeploy/"
+          TARGET: "/www/wwwroot/blog.webjam.cn/"
