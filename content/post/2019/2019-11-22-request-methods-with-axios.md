@@ -9,7 +9,7 @@ tags:
   - axios
 ---
 
-Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中
+Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中。
 
 Axios 有以下特点：
 
@@ -59,7 +59,7 @@ const request = axios.create({
 
 axios 拦截器分为「请求拦截器」和「响应拦截器」，它们相当于是项目 http 请求的大门。
 
-每次发送请求时要经过「请求拦截器」这道门，每次请求得到响应时也要经过「响应拦截器」这道门。
+每次发送请求时要经过「请求拦截器」这道门，请求得到响应时也要经过「响应拦截器」这道门。
 
 有了拦截器，方便我们对每个请求进行一些处理，比如：
 
@@ -75,14 +75,14 @@ import axios from "axios";
 
 // 创建 axios 实例
 const request = axios.create({
-  baseURL: "[/cmp/v1](https://api.example.com)",
+  baseURL: "https://api.example.com",
   timeout: 2000 // 请求超时时间
 });
 
 
 // request 拦截器
 request.interceptors.request.use(
-  confit => {
+  config => {
     // 设置 token，或者其他设置
     config.headers["token"] = 'token_123';
     return config;
@@ -278,7 +278,7 @@ const request = axios.create({
 
 // request 拦截器
 request.interceptors.request.use(
-  confit => {
+  config => {
     // 设置 token，或者其他设置
     config.headers["token"] = 'token_123';
     return config;
