@@ -1,34 +1,62 @@
-/* 滚动条整体样式 */
-::-webkit-scrollbar {
-  width: 1rem;
-  height: 1rem;
-  background:hsla(0,0%,100%,.4);
-}
-/* 滚动条轨道 */
-::-webkit-scrollbar-track {
-  border-radius: 0;
-}
 
-/* 滑块部分 */
-::-webkit-scrollbar-thumb {
-  border-radius: 0;
-  background-color: rgba(81,132,246, .3);
-  // background: linear-gradient(180deg, #6e2ee5, #5184f6);
-  -webkit-transition:background-color .1s;
-  transition:background-color .1s;
-  border-radius: 30px;
-  // box-shadow: inset 2px 2px 2px hsla(0, 0%, 100%, .25), inset -2px -2px 2px rgba(0, 0, 0, .25);
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(81,132,246, .5);
-}
-/* 滚动条里面轨道 */
-::-webkit-scrollbar-track {
-  width: 4px;
-  // background: linear-gradient(90deg, #f2f2f2, #f2f2f2 1px, #f2f2f2 0, #f2f2f2);
-}
 
 // 文档内容部分居中
 .docs-article-container {
   margin: 0 auto;
 }
+
+
+// 模糊渐变顶部导航栏
+// 参考 https://io-oi.me/tech/natural-native-gradient-rainbow-header
+#navbar-main {
+  -webkit-backdrop-filter: saturate(180%) blur(1em);
+  backdrop-filter: saturate(180%) blur(1em);
+  background: linear-gradient(90deg, rgba(247, 149, 51, 0.1) 0, rgba(243, 112, 85, 0.1) 15%, rgba(239, 78, 123, 0.1) 30%, rgba(161, 102, 171, 0.1) 44%, rgba(80, 115, 184, 0.1) 58%, rgba(16, 152, 173, 0.1) 72%, rgba(7, 179, 155, 0.1) 86%, rgba(109, 186, 130, 0.1) 100%);
+}
+@supports not (backdrop-filter: none) {
+  #navbar-main {
+      background-color: var(--color-bg);
+  }
+}
+
+
+// 文档右侧 TOC 样式
+#TableOfContents li a {
+  position: relative;
+  left: -1px;
+}
+#TableOfContents li a.active::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 100%;
+  background-color: $primary;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#TableOfContents li ul a.active::before {
+  left: -0.8rem;
+}
+
+
+
+
+
+.body-footer {
+  margin: 0 auto;
+  max-width: 760px;
+}
+
+.docs-article-container .post-nav {
+  display: flex;
+  justify-content: space-between;
+  .post-nav-item {
+    width: auto;
+  }
+}
+
+
+@import "base.scss";
+@import "code.scss";
+@import "scrollbar.scss";
