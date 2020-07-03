@@ -11,7 +11,7 @@ destDir="./public"
 currTime1=`date +%Y-%m-%d`
 currTime2=`date +%H:%M:%S`
 commit=":rocket: deploy @${currTime1} ${currTime2}"
-repo="https://github.com/wencaizhang/blog.git"
+repo="https://github.com/wencaizhang/articles.git"
 remoteBranch="gh-pages"
 # domain="coolfe.fun"
 

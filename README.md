@@ -9,7 +9,7 @@
 1. 克隆代码：
 
 ```bash
-git clone https://github.com/wencaizhang/blog.git My_Website
+git clone https://github.com/wencaizhang/articles.git My_Website
 ```
 
 2. 拉取主题代码
