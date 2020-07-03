@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>axios | 阿文的网络空间</title><link>/tag/axios/</link><atom:link href="/tag/axios/index.xml" rel="self" type="application/rss+xml"/><description>axios</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Fri, 22 Nov 2019 15:46:45 +0800</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>axios</title><link>/tag/axios/</link></image><item><title>Request Methods With Axios</title><link>/post/2019/2019-11-22-request-methods-with-axios/</link><pubDate>Fri, 22 Nov 2019 15:46:45 +0800</pubDate><guid>/post/2019/2019-11-22-request-methods-with-axios/</guid><description>&lt;p>Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>axios | 阿文的网络空间</title><link>/tag/axios/</link><atom:link href="/tag/axios/index.xml" rel="self" type="application/rss+xml"/><description>axios</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Fri, 22 Nov 2019 15:46:45 +0800</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>axios</title><link>/tag/axios/</link></image><item><title>Request Methods With Axios</title><link>/post/2019/2019-11-22-request-methods-with-axios/</link><pubDate>Fri, 22 Nov 2019 15:46:45 +0800</pubDate><guid>/post/2019/2019-11-22-request-methods-with-axios/</guid><description>&lt;p>Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中。&lt;/p>
 &lt;p>Axios 有以下特点：&lt;/p>
 &lt;ul>
 &lt;li>支持浏览器和node.js&lt;/li>
@@ -30,7 +30,7 @@ timeout: 2000, // 请求超时时间
 &lt;/code>&lt;/pre>
 &lt;h3 id="拦截器">拦截器&lt;/h3>
 &lt;p>axios 拦截器分为「请求拦截器」和「响应拦截器」，它们相当于是项目 http 请求的大门。&lt;/p>
-&lt;p>每次发送请求时要经过「请求拦截器」这道门，每次请求得到响应时也要经过「响应拦截器」这道门。&lt;/p>
+&lt;p>每次发送请求时要经过「请求拦截器」这道门，请求得到响应时也要经过「响应拦截器」这道门。&lt;/p>
 &lt;p>有了拦截器，方便我们对每个请求进行一些处理，比如：&lt;/p>
 &lt;ol>
 &lt;li>发送请求时，判断用户的登录状态或者用户权限，不满足条件的或者跳转登录页面或者弹窗提示&lt;/li>
@@ -46,12 +46,12 @@ timeout: 2000, // 请求超时时间
 &lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
 // 创建 axios 实例
 const request = axios.create({
-baseURL: &amp;quot;[/cmp/v1](https://api.example.com)&amp;quot;,
+baseURL: &amp;quot;https://api.example.com&amp;quot;,
 timeout: 2000 // 请求超时时间
 });
 // request 拦截器
 request.interceptors.request.use(
-confit =&amp;gt; {
+config =&amp;gt; {
 // 设置 token，或者其他设置
 config.headers[&amp;quot;token&amp;quot;] = 'token_123';
 return config;
@@ -195,7 +195,7 @@ timeout: 2000, // 请求超时时间
 });
 // request 拦截器
 request.interceptors.request.use(
-confit =&amp;gt; {
+config =&amp;gt; {
 // 设置 token，或者其他设置
 config.headers[&amp;quot;token&amp;quot;] = 'token_123';
 return config;

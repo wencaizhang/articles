@@ -1,4 +1,66 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts | 阿文的网络空间</title><link>/post/</link><atom:link href="/post/index.xml" rel="self" type="application/rss+xml"/><description>Posts</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Thu, 28 Nov 2019 15:39:43 +0800</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>Posts</title><link>/post/</link></image><item><title>如何创建一个 Vue.js 插件</title><link>/post/2019/2019-11-28-how-to-create-a-plugin-of-vue.js/</link><pubDate>Thu, 28 Nov 2019 15:39:43 +0800</pubDate><guid>/post/2019/2019-11-28-how-to-create-a-plugin-of-vue.js/</guid><description>&lt;h2 id="vuejs-插件介绍">Vue.js 插件介绍&lt;/h2>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts | 阿文的网络空间</title><link>/post/</link><atom:link href="/post/index.xml" rel="self" type="application/rss+xml"/><description>Posts</description><generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>zh-Hans</language><lastBuildDate>Thu, 02 Jul 2020 19:58:34 +0800</lastBuildDate><image><url>/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url><title>Posts</title><link>/post/</link></image><item><title>说一下我常用的前端 CDN 加速服务</title><link>/post/cdn-hosts-for-front-end-projects/</link><pubDate>Thu, 02 Jul 2020 19:58:34 +0800</pubDate><guid>/post/cdn-hosts-for-front-end-projects/</guid><description>&lt;p>搭建（开发）过网站的同学应该都知道，一个网站往往要依赖一些第三方库，例如 jQuery、BootStrap、Vue.js 等等，但是依赖的第三方库数量多了之后，难免会拖慢网站的打开速度，这时候适当的引入 CDN 服务是一个很好的策略。&lt;/p>
+&lt;blockquote>
+&lt;p>CDN 的全称是 &lt;strong>C&lt;/strong>ontent &lt;strong>D&lt;/strong>elivery &lt;strong>N&lt;/strong>etwork，即内容分发网络。&lt;/p>
+&lt;p>
+&lt;a href="https://www.zhihu.com/question/36514327" target="_blank" rel="noopener">CDN是什么？使用CDN有什么优势 - 知乎&lt;/a>&lt;/p>
+&lt;p>
+&lt;a href="https://www.zhihu.com/question/37353035" target="_blank" rel="noopener">什么是CDN？- 知乎&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>使用 CDN 有这些好处：&lt;/p>
+&lt;ol>
+&lt;li>降低主站的压力：带宽压力和服务器请求压力&lt;/li>
+&lt;li>增加并发请求数量：浏览器对同一个域名并发请求数量有限制，使用 CDN 会将请求分散到多个域名下，这样同一时间就可以发出更多的请求&lt;/li>
+&lt;li>更快速的资源响应速度：请求 CDN 资源得到响应的速度，一般是比自己的服务器要快的。&lt;/li>
+&lt;/ol>
+&lt;h3 id="bootcdn">BootCDN&lt;/h3>
+&lt;p>网址：
+&lt;a href="https://www.bootcdn.cn/" target="_blank" rel="noopener">BootCDN&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>Bootstrap 中文网开源项目免费 CDN 加速服务 - 我们致力于为 Bootstrap、jQuery、Angular、Vue.js 一样优秀的开源项目提供稳定、快速、免费的 CDN 加速服务。BootCDN 是运营时间最长、用户量最大、最早同时支持 HTTPS（SSL）和 HTTP/2.0 协议的中立免费 CDN 。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="jsdelivr">jsDelivr&lt;/h3>
+&lt;p>网址：
+&lt;a href="https://cdn.jsdelivr.net/" target="_blank" rel="noopener">jsDelivr&lt;/a>&lt;/p>
+&lt;p>jsDelivr 提供 npm，GitHub，WordPress 等项目的镜像。也就是说开发者托管在 GitHub 的代码、发布到 npm 的项目、发布到 WordPress.org 的项目（插件或主题）等文件，都可以使用 jsDelivr 的 cdn 加速功能。&lt;/p>
+&lt;p>其他的 cdn 托管的大都是知名开源前端库，而个人开发者想要让自己的文件也享受 cdn 服务，除了使用专业的 cdn 服务（如七牛云、又拍云）之外，还有一个很好的选项就是把文件托管到 GitHub，使用 jsDelivr 的加速服务。&lt;/p>
+&lt;p>jsDelivr 具体的使用规则略微复杂，可以参考：
+&lt;a href="https://blog.csdn.net/larpland/article/details/101349605" target="_blank" rel="noopener">jsDelivr 为开发者提供免费公共 CDN 加速服务&lt;/a>&lt;/p>
+&lt;h3 id="cdnjs-by-cloudflare">CDNJS (by CloudFlare)&lt;/h3>
+&lt;p>Everyone loves the Google CDN right? Even Microsoft runs their own CDN.
+The problem is, they only host the most popular libraries.
+We host it all - JavaScript, CSS, SWF, images, etc!&lt;/p>
+&lt;p>此仓库通过GitHub接受Fork和PR。地址：https://github.com/cdnjs/cdnjs&lt;/p>
+&lt;h3 id="360-前端静态资源库">360 前端静态资源库&lt;/h3>
+&lt;p>网址：
+&lt;a href="https://cdn.baomitu.com/" target="_blank" rel="noopener">360 前端静态资源库&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>360 前端静态资源库是由奇舞团支持并维护的开源项目免费 CDN 服务，支持 HTTPS 和 HTTP/2，囊括上千个前端资源库和 Google 字体库。&lt;/p>
+&lt;p>本站静态资源库数据均同步于 cdnjs，如发现版本更新不及时或未收录，欢迎向 cdnjs 提交 PR。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="其他">其他&lt;/h3>
+&lt;p>国内还有一些机构提供了前端静态资源的 CDN 服务，但是因为资源数量比较少，就不是特别常用了。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;a href="http://lib.sinaapp.com/" target="_blank" rel="noopener">新浪云计算CDN公共库&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="http://jscdn.upai.com/" target="_blank" rel="noopener">又拍云JS库CDN服务&lt;/a>&lt;/li>
+&lt;li>
+&lt;a href="http://www.staticfile.org/" target="_blank" rel="noopener">七牛云存储 开放静态文件CDN&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="加一道保险">加一道保险&lt;/h2>
+&lt;p>当然，单纯依赖于第三方的 CDN 都是不保险的，所以你可以给自己的网站添加一层保险：在 CDN 读取失败的时候从自己服务器获取对应的文件。&lt;/p>
+&lt;p>一般来说，JS 库都会向外暴露一个全局变量，根据是否存在这个全局变量从而判断出 cdn 资源是否加载成功。如果加载失败，就创建 &lt;code>script&lt;/code> 标签从自己的服务器加载资源。示例代码如下：&lt;/p>
+&lt;pre>&lt;code class="language-html">&amp;lt;script src=&amp;quot;//cdn.staticfile.org/jquery/1.8.3/jquery.min.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script&amp;gt;
+if (!window.jQuery) {
+var script = document.createElement('script');
+script.src = &amp;quot;/js/jquery.min.js&amp;quot;;
+document.body.appendChild(script);
+}
+&amp;lt;/script&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;h2 id="结语">结语&lt;/h2>
+&lt;p>祝小伙伴用上 CDN 之后，网站打开速度飞起！&lt;/p></description></item><item><title>如何创建一个 Vue.js 插件</title><link>/post/2019/2019-11-28-how-to-create-a-plugin-of-vue.js/</link><pubDate>Thu, 28 Nov 2019 15:39:43 +0800</pubDate><guid>/post/2019/2019-11-28-how-to-create-a-plugin-of-vue.js/</guid><description>&lt;h2 id="vuejs-插件介绍">Vue.js 插件介绍&lt;/h2>
 &lt;p>Vue.js 插件以一种更优雅的方式来为 Vue 添加全局功能。&lt;/p>
 &lt;p>插件的使用方法很简单，只需要在 &lt;code>new Vue()&lt;/code> 之前通过 Vue.js 提供的 &lt;code>use&lt;/code> 方法来注册（启用）插件即可：&lt;/p>
 &lt;pre>&lt;code class="language-js">import MyPlugin from &amp;quot;MyPlugin&amp;quot;;
@@ -64,7 +126,7 @@ Vue.prototype.$myMethod = function (methodOptions) {
 &lt;a href="https://cn.vuejs.org/v2/guide/plugins.html" target="_blank" rel="noopener">插件 - Vue.js 文档&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;hr>
-&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Request Methods With Axios</title><link>/post/2019/2019-11-22-request-methods-with-axios/</link><pubDate>Fri, 22 Nov 2019 15:46:45 +0800</pubDate><guid>/post/2019/2019-11-22-request-methods-with-axios/</guid><description>&lt;p>Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中&lt;/p>
+&lt;p>本文完，感谢阅读。😜&lt;/p></description></item><item><title>Request Methods With Axios</title><link>/post/2019/2019-11-22-request-methods-with-axios/</link><pubDate>Fri, 22 Nov 2019 15:46:45 +0800</pubDate><guid>/post/2019/2019-11-22-request-methods-with-axios/</guid><description>&lt;p>Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中。&lt;/p>
 &lt;p>Axios 有以下特点：&lt;/p>
 &lt;ul>
 &lt;li>支持浏览器和node.js&lt;/li>
@@ -96,7 +158,7 @@ timeout: 2000, // 请求超时时间
 &lt;/code>&lt;/pre>
 &lt;h3 id="拦截器">拦截器&lt;/h3>
 &lt;p>axios 拦截器分为「请求拦截器」和「响应拦截器」，它们相当于是项目 http 请求的大门。&lt;/p>
-&lt;p>每次发送请求时要经过「请求拦截器」这道门，每次请求得到响应时也要经过「响应拦截器」这道门。&lt;/p>
+&lt;p>每次发送请求时要经过「请求拦截器」这道门，请求得到响应时也要经过「响应拦截器」这道门。&lt;/p>
 &lt;p>有了拦截器，方便我们对每个请求进行一些处理，比如：&lt;/p>
 &lt;ol>
 &lt;li>发送请求时，判断用户的登录状态或者用户权限，不满足条件的或者跳转登录页面或者弹窗提示&lt;/li>
@@ -112,12 +174,12 @@ timeout: 2000, // 请求超时时间
 &lt;pre>&lt;code class="language-js">import axios from &amp;quot;axios&amp;quot;;
 // 创建 axios 实例
 const request = axios.create({
-baseURL: &amp;quot;[/cmp/v1](https://api.example.com)&amp;quot;,
+baseURL: &amp;quot;https://api.example.com&amp;quot;,
 timeout: 2000 // 请求超时时间
 });
 // request 拦截器
 request.interceptors.request.use(
-confit =&amp;gt; {
+config =&amp;gt; {
 // 设置 token，或者其他设置
 config.headers[&amp;quot;token&amp;quot;] = 'token_123';
 return config;
@@ -261,7 +323,7 @@ timeout: 2000, // 请求超时时间
 });
 // request 拦截器
 request.interceptors.request.use(
-confit =&amp;gt; {
+config =&amp;gt; {
 // 设置 token，或者其他设置
 config.headers[&amp;quot;token&amp;quot;] = 'token_123';
 return config;
